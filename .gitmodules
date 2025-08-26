@@ -10,3 +10,6 @@
 [submodule "libs/ark-dev-sdk"]
 	path = libs/ark-dev-sdk
 	url = https://github.com/PSP-Arkfive/ark-dev-sdk.git
+[submodule "core/Inferno"]
+	path = core/Inferno
+	url = https://github.com/PSP-Arkfive/Inferno2.git
