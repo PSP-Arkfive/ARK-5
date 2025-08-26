@@ -1,15 +1,20 @@
-.PHONY : libraries \
+PY = $(shell which python3)
+
+.PHONY : mkdist libraries \
 	SystemControl \
+	VSHControl \
 	Inferno \
 	PopCorn \
 	Stargate
 
-all: libraries \
-	SystemControl \
-	Inferno \
-	PopCorn \
-	Stargate
 
+all: mkdist libraries \
+	FakeSignFlashModules
+	$(Q)echo "Build Done"
+
+mkdist:
+	$(Q)mkdir -p dist
+	$(Q)mkdir -p dist/flash0
 
 libraries:
 	$(MAKE) -C libs/ark-dev-sdk/
@@ -19,6 +24,11 @@ SystemControl: libraries
 	$(Q)cp libs/ark-dev-sdk/libs/*.a core/SystemControl/external/libs/
 	$(Q)cp libs/ark-dev-sdk/src/ansi-c/*.c core/SystemControl/external/src/
 	$(MAKE) -C core/SystemControl
+
+VSHControl: libraries
+	$(Q)cp libs/ark-dev-sdk/include/*.h core/VSHControl/external/include/
+	$(Q)cp libs/ark-dev-sdk/libs/*.a core/VSHControl/external/libs/
+	$(MAKE) -C core/VSHControl
 
 Inferno: libraries
 	$(Q)cp libs/ark-dev-sdk/include/*.h core/Inferno/external/include/
@@ -35,6 +45,18 @@ Stargate: libraries
 	$(Q)cp libs/ark-dev-sdk/libs/*.a core/Stargate/external/libs/
 	$(MAKE) -C core/Stargate
 
+FakeSignFlashModules: mkdist \
+	SystemControl \
+	VSHControl \
+	Inferno \
+	PopCorn \
+	Stargate
+	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_systemctrl.prx build-tools/pspgz/SystemControl.hdr core/SystemControl/systemctrl.prx SystemControl 0x3007
+	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vshctrl.prx build-tools/pspgz/SystemControl.hdr core/VSHControl/vshctrl.prx VshControl 0x3007
+	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_inferno.prx build-tools/pspgz/SystemControl.hdr core/Inferno/inferno.prx PRO_Inferno_Driver 0x3007
+	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_popcorn.prx build-tools/pspgz/SystemControl.hdr core/PopCorn/popcorn.prx PROPopcornManager 0x3007
+	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_stargate.prx build-tools/pspgz/SystemControl.hdr core/Stargate/stargate.prx Stargate 0x3007
+
 
 clean:
 	# SystemControl
@@ -42,6 +64,10 @@ clean:
 	$(Q)rm -f core/SystemControl/external/libs/*.a
 	$(Q)rm -f core/SystemControl/external/src/*.c
 	$(MAKE) -C core/SystemControl clean
+	# VSHControl
+	$(Q)rm -f core/VSHControl/external/include/*.h
+	$(Q)rm -f core/VSHControl/external/libs/*.a
+	$(MAKE) -C core/VSHControl clean
 	# Inferno
 	$(Q)rm -f core/Inferno/external/include/*.h
 	$(Q)rm -f core/Inferno/external/libs/*.a
@@ -56,3 +82,5 @@ clean:
 	$(MAKE) -C core/Stargate clean
 	# Libs
 	$(MAKE) -C libs/ark-dev-sdk clean
+	# Rest
+	$(Q)rm -rf dist

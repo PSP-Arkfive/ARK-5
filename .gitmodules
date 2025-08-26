@@ -19,3 +19,6 @@
 [submodule "core/Stargate"]
 	path = core/Stargate
 	url = https://github.com/PSP-Arkfive/Stargate.git
+[submodule "core/VSHControl"]
+	path = core/VSHControl
+	url = https://github.com/PSP-Arkfive/VSHControl.git
