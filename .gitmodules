@@ -16,3 +16,6 @@
 [submodule "core/PopCorn"]
 	path = core/PopCorn
 	url = https://github.com/PSP-Arkfive/PopCorn.git
+[submodule "core/Stargate"]
+	path = core/Stargate
+	url = https://github.com/PSP-Arkfive/Stargate.git
