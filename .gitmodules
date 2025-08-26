@@ -13,3 +13,6 @@
 [submodule "core/Inferno"]
 	path = core/Inferno
 	url = https://github.com/PSP-Arkfive/Inferno2.git
+[submodule "core/PopCorn"]
+	path = core/PopCorn
+	url = https://github.com/PSP-Arkfive/PopCorn.git
