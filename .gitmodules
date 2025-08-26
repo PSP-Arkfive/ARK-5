@@ -7,6 +7,3 @@
 [submodule "core/SystemControl"]
 	path = core/SystemControl
 	url = https://github.com/PSP-Arkfive/SystemControl.git
-[submodule "libs/ark-dev-sdk"]
-	path = libs/ark-dev-sdk
-	url = https://github.com/PSP-Arkfive/ark-dev-sdk.git
