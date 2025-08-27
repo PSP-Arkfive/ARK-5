@@ -6,7 +6,8 @@ PY = $(shell which python3)
 	Inferno \
 	PopCorn \
 	Stargate \
-	PSPCompat
+	PSPCompat \
+	VitaCompat
 
 
 all: mkdist libraries \
@@ -52,19 +53,27 @@ PSPCompat: libraries
 	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/PSP/rebootex
 	$(MAKE) -C core/Compat/PSP/
 
+VitaCompat: libraries
+	$(Q)cp libs/ark-dev-sdk/include/*.h core/Compat/ePSP/external/include/
+	$(Q)cp libs/ark-dev-sdk/libs/*.a core/Compat/ePSP/external/libs/
+	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/ePSP/rebootex
+	$(MAKE) -C core/Compat/ePSP/
+
 FakeSignFlashModules: mkdist \
 	SystemControl \
 	VSHControl \
 	Inferno \
 	PopCorn \
 	Stargate \
-	PSPCompat
+	PSPCompat \
+	VitaCompat
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_systemctrl.prx build-tools/pspgz/SystemControl.hdr core/SystemControl/systemctrl.prx SystemControl 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vshctrl.prx build-tools/pspgz/SystemControl.hdr core/VSHControl/vshctrl.prx VshControl 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_inferno.prx build-tools/pspgz/SystemControl.hdr core/Inferno/inferno.prx PRO_Inferno_Driver 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_popcorn.prx build-tools/pspgz/SystemControl.hdr core/PopCorn/popcorn.prx PROPopcornManager 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_stargate.prx build-tools/pspgz/SystemControl.hdr core/Stargate/stargate.prx Stargate 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_pspcompat.prx build-tools/pspgz/SystemControl.hdr core/Compat/PSP/pspcompat.prx PSPCompat 0x3007
+	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vitacompat.prx build-tools/pspgz/SystemControl.hdr core/Compat/ePSP/vitacompat.prx VitaCompat 0x3007
 
 
 clean:
@@ -94,7 +103,13 @@ clean:
 	$(Q)rm -f core/Compat/PSP/external/libs/*.a
 	$(MAKE) -C core/Compat/PSP clean
 	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/PSP/rebootex clean
+	# VitaCompat
+	$(Q)rm -f core/Compat/ePSP/external/include/*.h
+	$(Q)rm -f core/Compat/ePSP/external/libs/*.a
+	$(MAKE) -C core/Compat/ePSP clean
+	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/ePSP/rebootex clean
 	# Libs
 	$(MAKE) -C libs/ark-dev-sdk clean
+	$(MAKE) -C libs/BootLoadEx clean
 	# Rest
 	$(Q)rm -rf dist

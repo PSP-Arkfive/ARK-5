@@ -28,3 +28,6 @@
 [submodule "libs/BootLoadEx"]
 	path = libs/BootLoadEx
 	url = https://github.com/PSP-Arkfive/BootLoadEx.git
+[submodule "core/Compat/ePSP"]
+	path = core/Compat/ePSP
+	url = https://github.com/PSP-Arkfive/VitaCompat.git
