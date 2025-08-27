@@ -31,3 +31,6 @@
 [submodule "core/Compat/ePSP"]
 	path = core/Compat/ePSP
 	url = https://github.com/PSP-Arkfive/VitaCompat.git
+[submodule "core/Compat/ePSX"]
+	path = core/Compat/ePSX
+	url = https://github.com/PSP-Arkfive/VitaPopsCompat.git

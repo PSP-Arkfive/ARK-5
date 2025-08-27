@@ -1,13 +1,8 @@
 PY = $(shell which python3)
 
 .PHONY : mkdist libraries \
-	SystemControl \
-	VSHControl \
-	Inferno \
-	PopCorn \
-	Stargate \
-	PSPCompat \
-	VitaCompat
+	SystemControl VSHControl Inferno PopCorn Stargate \
+	PSPCompat VitaCompat VitaPopsCompat
 
 
 all: mkdist libraries \
@@ -59,14 +54,15 @@ VitaCompat: libraries
 	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/ePSP/rebootex
 	$(MAKE) -C core/Compat/ePSP/
 
+VitaPopsCompat: libraries
+	$(Q)cp libs/ark-dev-sdk/include/*.h core/Compat/ePSX/external/include/
+	$(Q)cp libs/ark-dev-sdk/libs/*.a core/Compat/ePSX/external/libs/
+	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/ePSX/rebootex
+	$(MAKE) -C core/Compat/ePSX/
+
 FakeSignFlashModules: mkdist \
-	SystemControl \
-	VSHControl \
-	Inferno \
-	PopCorn \
-	Stargate \
-	PSPCompat \
-	VitaCompat
+	SystemControl VSHControl Inferno PopCorn Stargate \
+	PSPCompat VitaCompat VitaPopsCompat
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_systemctrl.prx build-tools/pspgz/SystemControl.hdr core/SystemControl/systemctrl.prx SystemControl 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vshctrl.prx build-tools/pspgz/SystemControl.hdr core/VSHControl/vshctrl.prx VshControl 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_inferno.prx build-tools/pspgz/SystemControl.hdr core/Inferno/inferno.prx PRO_Inferno_Driver 0x3007
@@ -74,6 +70,7 @@ FakeSignFlashModules: mkdist \
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_stargate.prx build-tools/pspgz/SystemControl.hdr core/Stargate/stargate.prx Stargate 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_pspcompat.prx build-tools/pspgz/SystemControl.hdr core/Compat/PSP/pspcompat.prx PSPCompat 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vitacompat.prx build-tools/pspgz/SystemControl.hdr core/Compat/ePSP/vitacompat.prx VitaCompat 0x3007
+	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vitapops.prx build-tools/pspgz/SystemControl.hdr core/Compat/ePSX/vitapops.prx VitaPopsCompat 0x3007
 
 
 clean:
@@ -108,6 +105,11 @@ clean:
 	$(Q)rm -f core/Compat/ePSP/external/libs/*.a
 	$(MAKE) -C core/Compat/ePSP clean
 	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/ePSP/rebootex clean
+	# VitaPopsCompat
+	$(Q)rm -f core/Compat/ePSX/external/include/*.h
+	$(Q)rm -f core/Compat/ePSX/external/libs/*.a
+	$(MAKE) -C core/Compat/ePSX clean
+	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/ePSX/rebootex clean
 	# Libs
 	$(MAKE) -C libs/ark-dev-sdk clean
 	$(MAKE) -C libs/BootLoadEx clean
