@@ -5,7 +5,8 @@ PY = $(shell which python3)
 	VSHControl \
 	Inferno \
 	PopCorn \
-	Stargate
+	Stargate \
+	PSPCompat
 
 
 all: mkdist libraries \
@@ -45,17 +46,25 @@ Stargate: libraries
 	$(Q)cp libs/ark-dev-sdk/libs/*.a core/Stargate/external/libs/
 	$(MAKE) -C core/Stargate
 
+PSPCompat: libraries
+	$(Q)cp libs/ark-dev-sdk/include/*.h core/Compat/PSP/external/include/
+	$(Q)cp libs/ark-dev-sdk/libs/*.a core/Compat/PSP/external/libs/
+	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/PSP/rebootex
+	$(MAKE) -C core/Compat/PSP/
+
 FakeSignFlashModules: mkdist \
 	SystemControl \
 	VSHControl \
 	Inferno \
 	PopCorn \
-	Stargate
+	Stargate \
+	PSPCompat
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_systemctrl.prx build-tools/pspgz/SystemControl.hdr core/SystemControl/systemctrl.prx SystemControl 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vshctrl.prx build-tools/pspgz/SystemControl.hdr core/VSHControl/vshctrl.prx VshControl 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_inferno.prx build-tools/pspgz/SystemControl.hdr core/Inferno/inferno.prx PRO_Inferno_Driver 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_popcorn.prx build-tools/pspgz/SystemControl.hdr core/PopCorn/popcorn.prx PROPopcornManager 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_stargate.prx build-tools/pspgz/SystemControl.hdr core/Stargate/stargate.prx Stargate 0x3007
+	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_pspcompat.prx build-tools/pspgz/SystemControl.hdr core/Compat/PSP/pspcompat.prx PSPCompat 0x3007
 
 
 clean:
@@ -80,6 +89,11 @@ clean:
 	$(Q)rm -f core/Stargate/external/include/*.h
 	$(Q)rm -f core/Stargate/external/libs/*.a
 	$(MAKE) -C core/Stargate clean
+	# PSPCompat
+	$(Q)rm -f core/Compat/PSP/external/include/*.h
+	$(Q)rm -f core/Compat/PSP/external/libs/*.a
+	$(MAKE) -C core/Compat/PSP clean
+	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/PSP/rebootex clean
 	# Libs
 	$(MAKE) -C libs/ark-dev-sdk clean
 	# Rest

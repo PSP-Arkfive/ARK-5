@@ -22,3 +22,9 @@
 [submodule "core/VSHControl"]
 	path = core/VSHControl
 	url = https://github.com/PSP-Arkfive/VSHControl.git
+[submodule "core/Compat/PSP"]
+	path = core/Compat/PSP
+	url = https://github.com/PSP-Arkfive/PSPCompat.git
+[submodule "libs/BootLoadEx"]
+	path = libs/BootLoadEx
+	url = https://github.com/PSP-Arkfive/BootLoadEx.git
