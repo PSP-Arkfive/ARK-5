@@ -53,16 +53,30 @@ VitaCompat: libraries
 	$(Q)cp libs/ark-dev-sdk/libs/*.a core/Compat/ePSP/external/libs/
 	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/ePSP/rebootex
 	$(MAKE) -C core/Compat/ePSP/
+	$(PY) build-tools/btcnf.py build core/Compat/ePSP/btcnf/psvbtcnf.txt
+	$(PY) build-tools/btcnf.py build core/Compat/ePSP/btcnf/psvbtinf.txt
+	$(Q)mv core/Compat/ePSP/btcnf/*.bin dist/flash0/
 
 VitaPopsCompat: libraries
 	$(Q)cp libs/ark-dev-sdk/include/*.h core/Compat/ePSX/external/include/
 	$(Q)cp libs/ark-dev-sdk/libs/*.a core/Compat/ePSX/external/libs/
 	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/ePSX/rebootex
 	$(MAKE) -C core/Compat/ePSX/
+	$(PY) build-tools/btcnf.py build core/Compat/ePSX/btcnf/psxbtcnf.txt
+	$(Q)mv core/Compat/ePSX/btcnf/*.bin dist/flash0/
+
+Pentazemin: libraries
+	$(Q)cp libs/ark-dev-sdk/include/*.h core/Compat/vPSP/external/include/
+	$(Q)cp libs/ark-dev-sdk/libs/*.a core/Compat/vPSP/external/libs/
+	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/vPSP/rebootex
+	$(MAKE) -C core/Compat/vPSP/
+	$(PY) build-tools/btcnf.py build core/Compat/vPSP/btcnf/psvbtjnf.txt
+	$(PY) build-tools/btcnf.py build core/Compat/vPSP/btcnf/psvbtknf.txt
+	$(Q)mv core/Compat/vPSP/btcnf/*.bin dist/flash0/
 
 FakeSignFlashModules: mkdist \
 	SystemControl VSHControl Inferno PopCorn Stargate \
-	PSPCompat VitaCompat VitaPopsCompat
+	PSPCompat VitaCompat VitaPopsCompat Pentazemin
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_systemctrl.prx build-tools/pspgz/SystemControl.hdr core/SystemControl/systemctrl.prx SystemControl 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vshctrl.prx build-tools/pspgz/SystemControl.hdr core/VSHControl/vshctrl.prx VshControl 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_inferno.prx build-tools/pspgz/SystemControl.hdr core/Inferno/inferno.prx PRO_Inferno_Driver 0x3007
@@ -71,6 +85,7 @@ FakeSignFlashModules: mkdist \
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_pspcompat.prx build-tools/pspgz/SystemControl.hdr core/Compat/PSP/pspcompat.prx PSPCompat 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vitacompat.prx build-tools/pspgz/SystemControl.hdr core/Compat/ePSP/vitacompat.prx VitaCompat 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vitapops.prx build-tools/pspgz/SystemControl.hdr core/Compat/ePSX/vitapops.prx VitaPopsCompat 0x3007
+	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vitaplus.prx build-tools/pspgz/SystemControl.hdr core/Compat/vPSP/pentazemin.prx Pentazemin 0x3007
 
 
 clean:
@@ -110,6 +125,11 @@ clean:
 	$(Q)rm -f core/Compat/ePSX/external/libs/*.a
 	$(MAKE) -C core/Compat/ePSX clean
 	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/ePSX/rebootex clean
+	# Pentazemin
+	$(Q)rm -f core/Compat/vPSP/external/include/*.h
+	$(Q)rm -f core/Compat/vPSP/external/libs/*.a
+	$(MAKE) -C core/Compat/vPSP clean
+	$(MAKE) REBOOTEXDIR="$(CURDIR)/libs/BootLoadEx" -C core/Compat/vPSP/rebootex clean
 	# Libs
 	$(MAKE) -C libs/ark-dev-sdk clean
 	$(MAKE) -C libs/BootLoadEx clean
