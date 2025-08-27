@@ -1,12 +1,11 @@
 PY = $(shell which python3)
 
-.PHONY : mkdist libraries \
+.PHONY : mkdist libraries FlashPackage \
 	SystemControl VSHControl XMBControl Inferno PopCorn Stargate \
 	PSPCompat VitaCompat VitaPopsCompat Pentazemin
 
 
-all: mkdist libraries \
-	FakeSignFlashModules
+all: mkdist libraries FlashPackage
 	$(Q)echo "Build Done"
 
 mkdist:
@@ -79,7 +78,7 @@ Pentazemin: libraries
 	$(PY) build-tools/btcnf.py build Core/Compat/vPSP/btcnf/psvbtknf.txt
 	$(Q)mv Core/Compat/vPSP/btcnf/*.bin dist/flash0/
 
-FakeSignFlashModules: mkdist \
+FlashPackage: mkdist \
 	SystemControl VSHControl XMBControl Inferno PopCorn Stargate \
 	PSPCompat VitaCompat VitaPopsCompat Pentazemin
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_systemctrl.prx build-tools/pspgz/SystemControl.hdr Core/SystemControl/systemctrl.prx SystemControl 0x3007
@@ -92,6 +91,7 @@ FakeSignFlashModules: mkdist \
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vitacompat.prx build-tools/pspgz/SystemControl.hdr Core/Compat/ePSP/vitacompat.prx VitaCompat 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vitapops.prx build-tools/pspgz/SystemControl.hdr Core/Compat/ePSX/vitapops.prx VitaPopsCompat 0x3007
 	$(PY) build-tools/pspgz/pspgz.py dist/flash0/ark_vitaplus.prx build-tools/pspgz/SystemControl.hdr Core/Compat/vPSP/pentazemin.prx Pentazemin 0x3007
+	$(PY) build-tools/pack/pack.py -p dist/FLASH0.ARK build-tools/pack/flash0.txt -s
 
 
 clean:

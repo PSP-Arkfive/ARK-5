@@ -1,0 +1,14 @@
+psvbtcnf.bin,dist/flash0/psvbtcnf.bin
+psvbtinf.bin,dist/flash0/psvbtinf.bin
+psxbtcnf.bin,dist/flash0/psxbtcnf.bin
+psvbtjnf.bin,dist/flash0/psvbtjnf.bin
+psvbtknf.bin,dist/flash0/psvbtknf.bin
+/kd/ark_systemctrl.prx,dist/flash0/ark_systemctrl.prx
+/kd/ark_vshctrl.prx,dist/flash0/ark_vshctrl.prx
+/kd/ark_inferno.prx,dist/flash0/ark_inferno.prx
+/kd/ark_stargate.prx,dist/flash0/ark_stargate.prx
+/kd/ark_popcorn.prx,dist/flash0/ark_popcorn.prx
+/kd/ark_pspcompat.prx,dist/flash0/ark_pspcompat.prx
+/kd/ark_vitacompat.prx,dist/flash0/ark_vitacompat.prx
+/kd/ark_vitapops.prx,dist/flash0/ark_vitapops.prx
+/kd/ark_vitaplus.prx,dist/flash0/ark_vitaplus.prx
