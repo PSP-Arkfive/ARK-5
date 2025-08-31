@@ -1,12 +1,15 @@
 PY = $(shell which python3)
 
-.PHONY : mkdist libraries FlashPackage \
+.PHONY : full fullclean mkdist libraries FlashPackage \
 	SystemControl VSHControl XMBControl Inferno PopCorn Stargate \
 	PSPCompat VitaCompat VitaPopsCompat Pentazemin
 
 
-all: mkdist libraries FlashPackage
+all: mkdist FlashPackage
 	$(Q)echo "Build Done"
+
+full: libraries all
+
 
 mkdist:
 	$(Q)mkdir -p dist
@@ -96,52 +99,64 @@ FlashPackage: mkdist \
 
 clean:
 	# SystemControl
-	$(Q)rm -f Core/SystemControl/external/include/*.h
-	$(Q)rm -f Core/SystemControl/external/libs/*.a
-	$(Q)rm -f Core/SystemControl/external/src/*.c
 	$(MAKE) -C Core/SystemControl clean
 	# VSHControl
-	$(Q)rm -f Core/VSHControl/external/include/*.h
-	$(Q)rm -f Core/VSHControl/external/libs/*.a
 	$(MAKE) -C Core/VSHControl clean
 	# XMBControl
-	$(Q)rm -f Core/XMBControl/external/include/*.h
-	$(Q)rm -f Core/XMBControl/external/libs/*.a
 	$(MAKE) -C Core/XMBControl clean
 	# Inferno
-	$(Q)rm -f Core/Inferno/external/include/*.h
-	$(Q)rm -f Core/Inferno/external/libs/*.a
 	$(MAKE) -C Core/Inferno clean
 	# PopCorn
-	$(Q)rm -f Core/PopCorn/external/include/*.h
-	$(Q)rm -f Core/PopCorn/external/libs/*.a
 	$(MAKE) -C Core/PopCorn clean
 	# Stargate
-	$(Q)rm -f Core/Stargate/external/include/*.h
-	$(Q)rm -f Core/Stargate/external/libs/*.a
 	$(MAKE) -C Core/Stargate clean
 	# PSPCompat
-	$(Q)rm -f Core/Compat/PSP/external/include/*.h
-	$(Q)rm -f Core/Compat/PSP/external/libs/*.a
 	$(MAKE) -C Core/Compat/PSP clean
 	$(MAKE) REBOOTEXDIR="$(CURDIR)/Libs/BootLoadEx" -C Core/Compat/PSP/rebootex clean
 	# VitaCompat
-	$(Q)rm -f Core/Compat/ePSP/external/include/*.h
-	$(Q)rm -f Core/Compat/ePSP/external/libs/*.a
 	$(MAKE) -C Core/Compat/ePSP clean
 	$(MAKE) REBOOTEXDIR="$(CURDIR)/Libs/BootLoadEx" -C Core/Compat/ePSP/rebootex clean
 	# VitaPopsCompat
-	$(Q)rm -f Core/Compat/ePSX/external/include/*.h
-	$(Q)rm -f Core/Compat/ePSX/external/libs/*.a
 	$(MAKE) -C Core/Compat/ePSX clean
 	$(MAKE) REBOOTEXDIR="$(CURDIR)/Libs/BootLoadEx" -C Core/Compat/ePSX/rebootex clean
 	# Pentazemin
-	$(Q)rm -f Core/Compat/vPSP/external/include/*.h
-	$(Q)rm -f Core/Compat/vPSP/external/libs/*.a
 	$(MAKE) -C Core/Compat/vPSP clean
 	$(MAKE) REBOOTEXDIR="$(CURDIR)/Libs/BootLoadEx" -C Core/Compat/vPSP/rebootex clean
+	# Rest
+	$(Q)rm -rf dist
+
+fullclean: clean
+	# SystemControl
+	$(Q)rm -f Core/SystemControl/external/include/*.h
+	$(Q)rm -f Core/SystemControl/external/libs/*.a
+	$(Q)rm -f Core/SystemControl/external/src/*.c
+	# VSHControl
+	$(Q)rm -f Core/VSHControl/external/include/*.h
+	$(Q)rm -f Core/VSHControl/external/libs/*.a
+	# XMBControl
+	$(Q)rm -f Core/XMBControl/external/include/*.h
+	$(Q)rm -f Core/XMBControl/external/libs/*.a
+	# Inferno
+	$(Q)rm -f Core/Inferno/external/include/*.h
+	$(Q)rm -f Core/Inferno/external/libs/*.a
+	# PopCorn
+	$(Q)rm -f Core/PopCorn/external/include/*.h
+	$(Q)rm -f Core/PopCorn/external/libs/*.a
+	# Stargate
+	$(Q)rm -f Core/Stargate/external/include/*.h
+	$(Q)rm -f Core/Stargate/external/libs/*.a
+	# PSPCompat
+	$(Q)rm -f Core/Compat/PSP/external/include/*.h
+	$(Q)rm -f Core/Compat/PSP/external/libs/*.a
+	# VitaCompat
+	$(Q)rm -f Core/Compat/ePSP/external/include/*.h
+	$(Q)rm -f Core/Compat/ePSP/external/libs/*.a
+	# VitaPopsCompat
+	$(Q)rm -f Core/Compat/ePSX/external/include/*.h
+	$(Q)rm -f Core/Compat/ePSX/external/libs/*.a
+	# Pentazemin
+	$(Q)rm -f Core/Compat/vPSP/external/include/*.h
+	$(Q)rm -f Core/Compat/vPSP/external/libs/*.a
 	# Libs
 	$(MAKE) -C Libs/ark-dev-sdk clean
 	$(MAKE) -C Libs/BootLoadEx clean
-	# Rest
-	$(Q)rm -rf dist
