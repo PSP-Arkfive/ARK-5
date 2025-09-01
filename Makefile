@@ -122,6 +122,8 @@ clean:
 	# Pentazemin
 	$(MAKE) -C Core/Compat/vPSP clean
 	$(MAKE) REBOOTEXDIR="$(CURDIR)/Libs/BootLoadEx" -C Core/Compat/vPSP/rebootex clean
+	# BootLoadEx
+	$(MAKE) -C Libs/BootLoadEx clean
 	# Rest
 	$(Q)rm -rf dist
 
@@ -159,4 +161,3 @@ fullclean: clean
 	$(Q)rm -f Core/Compat/vPSP/external/libs/*.a
 	# Libs
 	$(MAKE) -C Libs/ark-dev-sdk clean
-	$(MAKE) -C Libs/BootLoadEx clean
