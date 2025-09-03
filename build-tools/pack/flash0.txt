@@ -5,6 +5,7 @@ psvbtjnf.bin,dist/flash0/psvbtjnf.bin
 psvbtknf.bin,dist/flash0/psvbtknf.bin
 /kd/ark_systemctrl.prx,dist/flash0/ark_systemctrl.prx
 /kd/ark_vshctrl.prx,dist/flash0/ark_vshctrl.prx
+/kd/ark_xmbctrl.prx,dist/flash0/ark_xmbctrl.prx
 /kd/ark_inferno.prx,dist/flash0/ark_inferno.prx
 /kd/ark_stargate.prx,dist/flash0/ark_stargate.prx
 /kd/ark_popcorn.prx,dist/flash0/ark_popcorn.prx
