@@ -19,64 +19,43 @@ libraries:
 	$(MAKE) -C Libs/ark-dev-sdk/
 
 SystemControl: libraries
-	$(Q)cp Libs/ark-dev-sdk/include/*.h Core/SystemControl/external/include/
-	$(Q)cp Libs/ark-dev-sdk/libs/*.a Core/SystemControl/external/libs/
-	$(Q)cp Libs/ark-dev-sdk/src/ansi-c/*.c Core/SystemControl/external/src/
-	$(MAKE) -C Core/SystemControl
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" -C Core/SystemControl
 
 VSHControl: libraries
-	$(Q)cp Libs/ark-dev-sdk/include/*.h Core/VSHControl/external/include/
-	$(Q)cp Libs/ark-dev-sdk/libs/*.a Core/VSHControl/external/libs/
-	$(MAKE) -C Core/VSHControl
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" -C Core/VSHControl
 
 XMBControl: libraries
-	$(Q)cp Libs/ark-dev-sdk/include/*.h Core/XMBControl/external/include/
-	$(Q)cp Libs/ark-dev-sdk/libs/*.a Core/XMBControl/external/libs/
-	$(MAKE) -C Core/XMBControl
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" -C Core/XMBControl
 
 Inferno: libraries
-	$(Q)cp Libs/ark-dev-sdk/include/*.h Core/Inferno/external/include/
-	$(Q)cp Libs/ark-dev-sdk/libs/*.a Core/Inferno/external/libs/
-	$(MAKE) -C Core/Inferno
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" -C Core/Inferno
 
 PopCorn: libraries
-	$(Q)cp Libs/ark-dev-sdk/include/*.h Core/PopCorn/external/include/
-	$(Q)cp Libs/ark-dev-sdk/libs/*.a Core/PopCorn/external/libs/
-	$(MAKE) -C Core/PopCorn
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" -C Core/PopCorn
 
 Stargate: libraries
-	$(Q)cp Libs/ark-dev-sdk/include/*.h Core/Stargate/external/include/
-	$(Q)cp Libs/ark-dev-sdk/libs/*.a Core/Stargate/external/libs/
-	$(MAKE) -C Core/Stargate
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" -C Core/Stargate
 
 PSPCompat: libraries
-	$(Q)cp Libs/ark-dev-sdk/include/*.h Core/Compat/PSP/external/include/
-	$(Q)cp Libs/ark-dev-sdk/libs/*.a Core/Compat/PSP/external/libs/
-	$(MAKE) REBOOTEXDIR="$(CURDIR)/Libs/BootLoadEx" -C Core/Compat/PSP/rebootex
-	$(MAKE) -C Core/Compat/PSP/
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" REBOOTEXDIR="$(CURDIR)/Libs/BootLoadEx" -C Core/Compat/PSP/rebootex
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" -C Core/Compat/PSP/
 
 VitaCompat: libraries
-	$(Q)cp Libs/ark-dev-sdk/include/*.h Core/Compat/ePSP/external/include/
-	$(Q)cp Libs/ark-dev-sdk/libs/*.a Core/Compat/ePSP/external/libs/
-	$(MAKE) REBOOTEXDIR="$(CURDIR)/Libs/BootLoadEx" -C Core/Compat/ePSP/rebootex
-	$(MAKE) -C Core/Compat/ePSP/
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" REBOOTEXDIR="$(CURDIR)/Libs/BootLoadEx" -C Core/Compat/ePSP/rebootex
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" -C Core/Compat/ePSP/
 	$(PY) build-tools/btcnf.py build Core/Compat/ePSP/btcnf/psvbtcnf.txt
 	$(PY) build-tools/btcnf.py build Core/Compat/ePSP/btcnf/psvbtinf.txt
 	$(Q)mv Core/Compat/ePSP/btcnf/*.bin dist/flash0/
 
 VitaPopsCompat: libraries
-	$(Q)cp Libs/ark-dev-sdk/include/*.h Core/Compat/ePSX/external/include/
-	$(Q)cp Libs/ark-dev-sdk/libs/*.a Core/Compat/ePSX/external/libs/
-	$(MAKE) REBOOTEXDIR="$(CURDIR)/Libs/BootLoadEx" -C Core/Compat/ePSX/rebootex
-	$(MAKE) -C Core/Compat/ePSX/
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" REBOOTEXDIR="$(CURDIR)/Libs/BootLoadEx" -C Core/Compat/ePSX/rebootex
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" -C Core/Compat/ePSX/
 	$(PY) build-tools/btcnf.py build Core/Compat/ePSX/btcnf/psxbtcnf.txt
 	$(Q)mv Core/Compat/ePSX/btcnf/*.bin dist/flash0/
 
 Pentazemin: libraries
-	$(Q)cp Libs/ark-dev-sdk/include/*.h Core/Compat/vPSP/external/include/
-	$(Q)cp Libs/ark-dev-sdk/libs/*.a Core/Compat/vPSP/external/libs/
-	$(MAKE) REBOOTEXDIR="$(CURDIR)/Libs/BootLoadEx" -C Core/Compat/vPSP/rebootex
-	$(MAKE) -C Core/Compat/vPSP/
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" REBOOTEXDIR="$(CURDIR)/Libs/BootLoadEx" -C Core/Compat/vPSP/rebootex
+	$(MAKE) ARKSDK="$(CURDIR)/Libs/ark-dev-sdk" -C Core/Compat/vPSP/
 	$(PY) build-tools/btcnf.py build Core/Compat/vPSP/btcnf/psvbtjnf.txt
 	$(PY) build-tools/btcnf.py build Core/Compat/vPSP/btcnf/psvbtknf.txt
 	$(Q)mv Core/Compat/vPSP/btcnf/*.bin dist/flash0/
