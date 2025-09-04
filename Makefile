@@ -107,36 +107,5 @@ clean:
 	$(Q)rm -rf dist
 
 fullclean: clean
-	# SystemControl
-	$(Q)rm -f Core/SystemControl/external/include/*.h
-	$(Q)rm -f Core/SystemControl/external/libs/*.a
-	$(Q)rm -f Core/SystemControl/external/src/*.c
-	# VSHControl
-	$(Q)rm -f Core/VSHControl/external/include/*.h
-	$(Q)rm -f Core/VSHControl/external/libs/*.a
-	# XMBControl
-	$(Q)rm -f Core/XMBControl/external/include/*.h
-	$(Q)rm -f Core/XMBControl/external/libs/*.a
-	# Inferno
-	$(Q)rm -f Core/Inferno/external/include/*.h
-	$(Q)rm -f Core/Inferno/external/libs/*.a
-	# PopCorn
-	$(Q)rm -f Core/PopCorn/external/include/*.h
-	$(Q)rm -f Core/PopCorn/external/libs/*.a
-	# Stargate
-	$(Q)rm -f Core/Stargate/external/include/*.h
-	$(Q)rm -f Core/Stargate/external/libs/*.a
-	# PSPCompat
-	$(Q)rm -f Core/Compat/PSP/external/include/*.h
-	$(Q)rm -f Core/Compat/PSP/external/libs/*.a
-	# VitaCompat
-	$(Q)rm -f Core/Compat/ePSP/external/include/*.h
-	$(Q)rm -f Core/Compat/ePSP/external/libs/*.a
-	# VitaPopsCompat
-	$(Q)rm -f Core/Compat/ePSX/external/include/*.h
-	$(Q)rm -f Core/Compat/ePSX/external/libs/*.a
-	# Pentazemin
-	$(Q)rm -f Core/Compat/vPSP/external/include/*.h
-	$(Q)rm -f Core/Compat/vPSP/external/libs/*.a
 	# Libs
 	$(MAKE) -C Libs/ark-dev-sdk clean
