@@ -1,5 +1,6 @@
 PY = $(shell which python3)
 ARKSDK = $(CURDIR)/Libs/ark-dev-sdk
+BUILDTOOLS = $(ARKSDK)/build-tools
 BOOTLOADEX = $(CURDIR)/Libs/BootLoadEx
 
 .PHONY : full fullclean mkdist libraries FlashPackage \
@@ -45,37 +46,37 @@ PSPCompat: libraries
 VitaCompat: libraries
 	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSP/rebootex
 	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/ePSP/
-	$(PY) $(ARKSDK)/build-tools/btcnf.py build Core/Compat/ePSP/btcnf/psvbtcnf.txt
-	$(PY) $(ARKSDK)/build-tools/btcnf.py build Core/Compat/ePSP/btcnf/psvbtinf.txt
+	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/ePSP/btcnf/psvbtcnf.txt
+	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/ePSP/btcnf/psvbtinf.txt
 	$(Q)mv Core/Compat/ePSP/btcnf/*.bin dist/flash0/
 
 VitaPopsCompat: libraries
 	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSX/rebootex
 	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/ePSX/
-	$(PY) $(ARKSDK)/build-tools/btcnf.py build Core/Compat/ePSX/btcnf/psxbtcnf.txt
+	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/ePSX/btcnf/psxbtcnf.txt
 	$(Q)mv Core/Compat/ePSX/btcnf/*.bin dist/flash0/
 
 Pentazemin: libraries
 	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/vPSP/rebootex
 	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/vPSP/
-	$(PY) $(ARKSDK)/build-tools/btcnf.py build Core/Compat/vPSP/btcnf/psvbtjnf.txt
-	$(PY) $(ARKSDK)/build-tools/btcnf.py build Core/Compat/vPSP/btcnf/psvbtknf.txt
+	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/vPSP/btcnf/psvbtjnf.txt
+	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/vPSP/btcnf/psvbtknf.txt
 	$(Q)mv Core/Compat/vPSP/btcnf/*.bin dist/flash0/
 
 FlashPackage: mkdist \
 	SystemControl VSHControl XMBControl Inferno PopCorn Stargate \
 	PSPCompat VitaCompat VitaPopsCompat Pentazemin
-	$(PY) $(ARKSDK)/build-tools/gz/pspgz.py dist/flash0/ark_systemctrl.prx $(ARKSDK)/build-tools/gz/SystemControl.hdr Core/SystemControl/systemctrl.prx SystemControl 0x3007
-	$(PY) $(ARKSDK)/build-tools/gz/pspgz.py dist/flash0/ark_vshctrl.prx $(ARKSDK)/build-tools/gz/SystemControl.hdr Core/VSHControl/vshctrl.prx VshControl 0x3007
-	$(PY) $(ARKSDK)/build-tools/gz/pspgz.py dist/flash0/ark_xmbctrl.prx $(ARKSDK)/build-tools/gz/UserModule.hdr Core/XMBControl/xmbctrl.prx XmbControl 0x0000
-	$(PY) $(ARKSDK)/build-tools/gz/pspgz.py dist/flash0/ark_inferno.prx $(ARKSDK)/build-tools/gz/SystemControl.hdr Core/Inferno/inferno.prx PRO_Inferno_Driver 0x3007
-	$(PY) $(ARKSDK)/build-tools/gz/pspgz.py dist/flash0/ark_popcorn.prx $(ARKSDK)/build-tools/gz/SystemControl.hdr Core/PopCorn/popcorn.prx PROPopcornManager 0x3007
-	$(PY) $(ARKSDK)/build-tools/gz/pspgz.py dist/flash0/ark_stargate.prx $(ARKSDK)/build-tools/gz/SystemControl.hdr Core/Stargate/stargate.prx Stargate 0x3007
-	$(PY) $(ARKSDK)/build-tools/gz/pspgz.py dist/flash0/ark_pspcompat.prx $(ARKSDK)/build-tools/gz/SystemControl.hdr Core/Compat/PSP/pspcompat.prx PSPCompat 0x3007
-	$(PY) $(ARKSDK)/build-tools/gz/pspgz.py dist/flash0/ark_vitacompat.prx $(ARKSDK)/build-tools/gz/SystemControl.hdr Core/Compat/ePSP/vitacompat.prx VitaCompat 0x3007
-	$(PY) $(ARKSDK)/build-tools/gz/pspgz.py dist/flash0/ark_vitapops.prx $(ARKSDK)/build-tools/gz/SystemControl.hdr Core/Compat/ePSX/vitapops.prx VitaPopsCompat 0x3007
-	$(PY) $(ARKSDK)/build-tools/gz/pspgz.py dist/flash0/ark_vitaplus.prx $(ARKSDK)/build-tools/gz/SystemControl.hdr Core/Compat/vPSP/pentazemin.prx Pentazemin 0x3007
-	$(PY) $(ARKSDK)/build-tools/pack/pack.py -p dist/FLASH0.ARK $(ARKSDK)/build-tools/pack/flash0.txt -s
+	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_systemctrl.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/SystemControl/systemctrl.prx SystemControl 0x3007
+	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vshctrl.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/VSHControl/vshctrl.prx VshControl 0x3007
+	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_xmbctrl.prx $(BUILDTOOLS)/gz/UserModule.hdr Core/XMBControl/xmbctrl.prx XmbControl 0x0000
+	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_inferno.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Inferno/inferno.prx PRO_Inferno_Driver 0x3007
+	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_popcorn.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/PopCorn/popcorn.prx PROPopcornManager 0x3007
+	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_stargate.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Stargate/stargate.prx Stargate 0x3007
+	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_pspcompat.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/PSP/pspcompat.prx PSPCompat 0x3007
+	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vitacompat.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/ePSP/vitacompat.prx VitaCompat 0x3007
+	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vitapops.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/ePSX/vitapops.prx VitaPopsCompat 0x3007
+	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vitaplus.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/vPSP/pentazemin.prx Pentazemin 0x3007
+	$(PY) $(BUILDTOOLS)/pack/pack.py -p dist/FLASH0.ARK $(BUILDTOOLS)/pack/flash0.txt -s
 
 
 clean:
