@@ -81,31 +81,31 @@ FlashPackage: mkdist \
 
 clean:
 	# SystemControl
-	$(MAKE) -C Core/SystemControl clean
+	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/SystemControl clean
 	# VSHControl
-	$(MAKE) -C Core/VSHControl clean
+	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/VSHControl clean
 	# XMBControl
-	$(MAKE) -C Core/XMBControl clean
+	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/XMBControl clean
 	# Inferno
-	$(MAKE) -C Core/Inferno clean
+	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Inferno clean
 	# PopCorn
-	$(MAKE) -C Core/PopCorn clean
+	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/PopCorn clean
 	# Stargate
-	$(MAKE) -C Core/Stargate clean
+	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Stargate clean
 	# PSPCompat
-	$(MAKE) -C Core/Compat/PSP clean
-	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/PSP/rebootex clean
+	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/PSP clean
+	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/PSP/rebootex clean
 	# VitaCompat
-	$(MAKE) -C Core/Compat/ePSP clean
-	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSP/rebootex clean
+	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/ePSP clean
+	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSP/rebootex clean
 	# VitaPopsCompat
-	$(MAKE) -C Core/Compat/ePSX clean
-	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSX/rebootex clean
+	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/ePSX clean
+	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSX/rebootex clean
 	# Pentazemin
-	$(MAKE) -C Core/Compat/vPSP clean
-	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/vPSP/rebootex clean
+	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/vPSP clean
+	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/vPSP/rebootex clean
 	# BootLoadEx
-	$(MAKE) -C Libs/BootLoadEx clean
+	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Libs/BootLoadEx clean
 	# Rest
 	$(Q)rm -rf dist
 
