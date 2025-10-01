@@ -23,17 +23,17 @@ set(ARK_REPOS
 
 include(FetchContent)
 foreach(ARK_REPO ${ARK_REPOS})
-   string(REPLACE "-" "" ARK_REPO_NAME "${ARK_REPO}")
    FetchContent_Declare(
-      ${ARK_REPO_NAME}
+      ${ARK_REPO}
       GIT_REPOSITORY https://github.com/PSP-Arkfive/${ARK_REPO}.git
       GIT_TAG main
       EXCLUDE_FROM_ALL
    )
-   FetchContent_MakeAvailable(${ARK_REPO_NAME})
 endforeach()
 
-set(ARKSDK ${arkdevsdk_SOURCE_DIR})
+FetchContent_MakeAvailable(${ARK_REPOS})
+
+set(ARKSDK ${ark-dev-sdk_SOURCE_DIR})
 set(BUILDTOOLS ${ARKSDK}/build-tools)
 
 add_custom_target(BuildARK5 ALL
