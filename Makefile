@@ -1,9 +1,9 @@
 PY = $(shell which python3)
-ARKSDK = $(CURDIR)/Libs/ark-dev-sdk
-BUILDTOOLS = $(ARKSDK)/build-tools
+PSPDEV = $(shell psp-config --pspdev-path)
+BUILDTOOLS = $(PSPDEV)/share/ark-dev-sdk/build-tools
 BOOTLOADEX = $(CURDIR)/Libs/BootLoadEx
 
-.PHONY : full fullclean mkdist libraries FlashPackage \
+.PHONY : mkdist FlashPackage \
 	SystemControl VSHControl XMBControl Inferno PopCorn Stargate \
 	PSPCompat VitaCompat VitaPopsCompat Pentazemin
 
@@ -11,54 +11,49 @@ BOOTLOADEX = $(CURDIR)/Libs/BootLoadEx
 all: mkdist FlashPackage
 	$(Q)echo "Build Done"
 
-full: libraries all
-
 
 mkdist:
 	$(Q)mkdir -p dist
 	$(Q)mkdir -p dist/flash0
 
-libraries:
-	$(MAKE) -C Libs/ark-dev-sdk/
+SystemControl: 
+	$(MAKE) -C Core/SystemControl
 
-SystemControl: libraries
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/SystemControl
+VSHControl: 
+	$(MAKE) -C Core/VSHControl
 
-VSHControl: libraries
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/VSHControl
+XMBControl: 
+	$(MAKE) -C Core/XMBControl
 
-XMBControl: libraries
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/XMBControl
+Inferno: 
+	$(MAKE) -C Core/Inferno
 
-Inferno: libraries
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Inferno
+PopCorn: 
+	$(MAKE) -C Core/PopCorn
 
-PopCorn: libraries
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/PopCorn
+Stargate: 
+	$(MAKE) -C Core/Stargate
 
-Stargate: libraries
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Stargate
+PSPCompat: 
+	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/PSP/rebootex
+	$(MAKE) -C Core/Compat/PSP/
 
-PSPCompat: libraries
-	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/PSP/rebootex
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/PSP/
-
-VitaCompat: libraries
-	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSP/rebootex
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/ePSP/
+VitaCompat: 
+	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSP/rebootex
+	$(MAKE) -C Core/Compat/ePSP/
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/ePSP/btcnf/psvbtcnf.txt
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/ePSP/btcnf/psvbtinf.txt
 	$(Q)mv Core/Compat/ePSP/btcnf/*.bin dist/flash0/
 
-VitaPopsCompat: libraries
-	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSX/rebootex
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/ePSX/
+VitaPopsCompat: 
+	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSX/rebootex
+	$(MAKE) -C Core/Compat/ePSX/
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/ePSX/btcnf/psxbtcnf.txt
 	$(Q)mv Core/Compat/ePSX/btcnf/*.bin dist/flash0/
 
-Pentazemin: libraries
-	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/vPSP/rebootex
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/vPSP/
+Pentazemin: 
+	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/vPSP/rebootex
+	$(MAKE) -C Core/Compat/vPSP/
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/vPSP/btcnf/psvbtjnf.txt
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/vPSP/btcnf/psvbtknf.txt
 	$(Q)mv Core/Compat/vPSP/btcnf/*.bin dist/flash0/
@@ -81,34 +76,30 @@ FlashPackage: mkdist \
 
 clean:
 	# SystemControl
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/SystemControl clean
+	$(MAKE) -C Core/SystemControl clean
 	# VSHControl
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/VSHControl clean
+	$(MAKE) -C Core/VSHControl clean
 	# XMBControl
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/XMBControl clean
+	$(MAKE) -C Core/XMBControl clean
 	# Inferno
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Inferno clean
+	$(MAKE) -C Core/Inferno clean
 	# PopCorn
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/PopCorn clean
+	$(MAKE) -C Core/PopCorn clean
 	# Stargate
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Stargate clean
+	$(MAKE) -C Core/Stargate clean
 	# PSPCompat
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/PSP clean
-	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/PSP/rebootex clean
+	$(MAKE) -C Core/Compat/PSP clean
+	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/PSP/rebootex clean
 	# VitaCompat
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/ePSP clean
-	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSP/rebootex clean
+	$(MAKE) -C Core/Compat/ePSP clean
+	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSP/rebootex clean
 	# VitaPopsCompat
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/ePSX clean
-	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSX/rebootex clean
+	$(MAKE) -C Core/Compat/ePSX clean
+	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSX/rebootex clean
 	# Pentazemin
-	$(MAKE) ARKSDK="$(ARKSDK)" -C Core/Compat/vPSP clean
-	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/vPSP/rebootex clean
+	$(MAKE) -C Core/Compat/vPSP clean
+	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/vPSP/rebootex clean
 	# BootLoadEx
-	$(MAKE) ARKSDK="$(ARKSDK)" BOOTLOADEX="$(BOOTLOADEX)" -C Libs/BootLoadEx clean
+	$(MAKE) -C Libs/BootLoadEx clean
 	# Rest
 	$(Q)rm -rf dist
-
-fullclean: clean
-	# Libs
-	$(MAKE) -C Libs/ark-dev-sdk clean
