@@ -1,5 +1,7 @@
 # ARK-5
-Next Generation Custom Firmware for PSP and Vita's ePSP
+Next Generation Custom Firmware for PSP and Vita's ePSP.
 
-### Compiled and tested with newest PSPSDK only.
-don't listen to this^ guy, he's bullshiting you, absolutely nobody has tested this
+Main differences with ARK-4:
+- Compiled with latest PSPSDK.
+- Modular project for easier development.
+- Code cleanup, refactor, restyling, fixes, improvements, etc.
