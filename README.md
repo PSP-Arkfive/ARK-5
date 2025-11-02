@@ -10,5 +10,5 @@ Main differences with ARK-4:
 - Code cleanup, refactor, restyling, fixes, improvements, etc.
 
 <br>
-<p>* VSH Menu can still be used via <L+R+Select> combo if it is still installed from previous ARK-4 installations.</p>
-<p>** Recovery Menu can still be used via <R trigger during bootup> combo if it is still installed from previous ARK-4 installations.</p>
+<p>* `VSH Menu` can still be used via `L+R+Select` combo if it is still installed from previous ARK-4 installations.</p>
+<p>** `Recovery Menu` can still be used via `R trigger during bootup` combo if it is still installed from previous ARK-4 installations.</p>
