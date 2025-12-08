@@ -1,0 +1,48 @@
+# Define the exports for the prx
+PSP_BEGIN_EXPORTS
+
+PSP_EXPORT_START(syslib, 0, 0x8000)
+PSP_EXPORT_FUNC_HASH(module_start)
+PSP_EXPORT_VAR_HASH(module_info)
+PSP_EXPORT_END
+
+PSP_EXPORT_START(xmbiso, 0, 0x4001)
+PSP_EXPORT_FUNC(gamedopen)
+PSP_EXPORT_FUNC(gamedread)
+PSP_EXPORT_FUNC(gamedclose)
+PSP_EXPORT_FUNC(gameopen)
+PSP_EXPORT_FUNC(gameread)
+PSP_EXPORT_FUNC(gameclose)
+PSP_EXPORT_FUNC(gamelseek)
+PSP_EXPORT_FUNC(gamegetstat)
+PSP_EXPORT_FUNC(gameremove)
+PSP_EXPORT_FUNC(gamermdir)
+PSP_EXPORT_FUNC(gamerename)
+PSP_EXPORT_FUNC(gamechstat)
+PSP_EXPORT_FUNC(myIoMkdir)
+PSP_EXPORT_FUNC(homebrewloadexec)
+PSP_EXPORT_FUNC(umdemuloadexec)
+PSP_EXPORT_FUNC(umdLoadExec)
+PSP_EXPORT_FUNC(umdLoadExecUpdater)
+PSP_EXPORT_END
+
+PSP_EXPORT_START(VshCtrlLib, 0, 0x4001)
+PSP_EXPORT_FUNC(vctrlVSHRegisterVshMenu)
+PSP_EXPORT_FUNC(vctrlVSHExitVSHMenu)
+PSP_EXPORT_FUNC(vctrlVSHUpdateConfig)
+PSP_EXPORT_FUNC(vshDetectDiscType)
+PSP_EXPORT_FUNC(fakeParamInexistance)
+PSP_EXPORT_FUNC(vshCtrlHibernationExists)
+PSP_EXPORT_FUNC(vshCtrlDeleteHibernation)
+PSP_EXPORT_FUNC(isoOpen)
+PSP_EXPORT_FUNC(isoRead)
+PSP_EXPORT_FUNC(isoClose)
+PSP_EXPORT_FUNC(isoGetFileInfo)
+PSP_EXPORT_FUNC(isoGetTotalSectorSize)
+PSP_EXPORT_FUNC(has_prometheus_module)
+PSP_EXPORT_FUNC(has_update_file)
+PSP_EXPORT_FUNC(vctrlGetRegistryValue)
+PSP_EXPORT_FUNC(vctrlSetRegistryValue)
+PSP_EXPORT_END
+
+PSP_END_EXPORTS
