@@ -2,42 +2,29 @@ PSPSDK = $(shell psp-config --pspsdk-path)
 PSPDEV = $(shell psp-config --pspdev-path)
 PYTHON = $(shell which python3)
 ARKSDK = $(PSPDEV)/share/ark-dev-sdk
-BOOTLOADEX ?= ../../BootLoadEx
 
 TARGET = reboot.bin.gz
 
 all: $(TARGET)
 
-INCDIR = $(PSPSDK)/include $(BOOTLOADEX) $(ARKSDK)/include
-
-CFLAGS = -std=c99 -Wall -Os -G0 -fno-pic $(addprefix -I, $(INCDIR)) -DREBOOTEX
+C_OBJS = main.o
 
 CC = psp-gcc
 LD = psp-ld
 STRIP = psp-strip
 OBJCOPY = psp-objcopy
-LINKFILE = $(BOOTLOADEX)/linkfile.l
+LINKFILE = $(ARKSDK)/build-tools/bootloadex.l
+INCDIR = $(PSPSDK)/include
+CFLAGS = -std=c99 -Wall -Os -G0 -fno-pic $(addprefix -I, $(INCDIR))
+LIBS = -L $(PSPSDK)/lib -lbootloadex -lansic
 
-REBOOT_OBJS = \
-	main.o \
-	pspbtcnf.o \
-	scanner.o \
-	patches_psp.o \
-
-LIBS = -L $(PSPSDK)/lib -lansic
 
 ifdef DEBUG
 CFLAGS += -DDEBUG=$(DEBUG)
 LIBS += -lcolordebugger
 endif
 
-crt0.o : $(BOOTLOADEX)/crt0.S
-	$(CC) -I$(PSPSDK)/include -c $< -o crt0.o
-
-$(REBOOT_OBJS) : %.o : $(BOOTLOADEX)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-main.elf: crt0.o $(C_OBJS) $(REBOOT_OBJS)
+main.elf: $(C_OBJS)
 
 $(TARGET): main.elf
 	$(Q)$(STRIP) -s $<
