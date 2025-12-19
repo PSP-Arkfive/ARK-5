@@ -1,7 +1,6 @@
 PY = $(shell which python3)
 PSPDEV = $(shell psp-config --pspdev-path)
 BUILDTOOLS = $(PSPDEV)/share/ark-dev-sdk/build-tools
-BOOTLOADEX = $(CURDIR)/Libs/BootLoadEx
 
 .PHONY : mkdist FlashPackage \
 	SystemControl VSHControl XMBControl Inferno PopCorn Stargate \
@@ -35,24 +34,24 @@ Stargate:
 	$(MAKE) -C Core/Stargate
 
 PSPCompat: 
-	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/PSP/rebootex
+	$(MAKE) -C Core/Compat/PSP/rebootex
 	$(MAKE) -C Core/Compat/PSP/
 
 VitaCompat: 
-	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSP/rebootex
+	$(MAKE) -C Core/Compat/ePSP/rebootex
 	$(MAKE) -C Core/Compat/ePSP/
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/ePSP/btcnf/psvbtcnf.txt
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/ePSP/btcnf/psvbtinf.txt
 	$(Q)mv Core/Compat/ePSP/btcnf/*.bin dist/flash0/
 
 VitaPopsCompat: 
-	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSX/rebootex
+	$(MAKE) -C Core/Compat/ePSX/rebootex
 	$(MAKE) -C Core/Compat/ePSX/
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/ePSX/btcnf/psxbtcnf.txt
 	$(Q)mv Core/Compat/ePSX/btcnf/*.bin dist/flash0/
 
 Pentazemin: 
-	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/vPSP/rebootex
+	$(MAKE) -C Core/Compat/vPSP/rebootex
 	$(MAKE) -C Core/Compat/vPSP/
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/vPSP/btcnf/psvbtjnf.txt
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/vPSP/btcnf/psvbtknf.txt
@@ -89,17 +88,15 @@ clean:
 	$(MAKE) -C Core/Stargate clean
 	# PSPCompat
 	$(MAKE) -C Core/Compat/PSP clean
-	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/PSP/rebootex clean
+	$(MAKE) -C Core/Compat/PSP/rebootex clean
 	# VitaCompat
 	$(MAKE) -C Core/Compat/ePSP clean
-	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSP/rebootex clean
+	$(MAKE) -C Core/Compat/ePSP/rebootex clean
 	# VitaPopsCompat
 	$(MAKE) -C Core/Compat/ePSX clean
-	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/ePSX/rebootex clean
+	$(MAKE) -C Core/Compat/ePSX/rebootex clean
 	# Pentazemin
 	$(MAKE) -C Core/Compat/vPSP clean
-	$(MAKE) BOOTLOADEX="$(BOOTLOADEX)" -C Core/Compat/vPSP/rebootex clean
-	# BootLoadEx
-	$(MAKE) -C Libs/BootLoadEx clean
+	$(MAKE) -C Core/Compat/vPSP/rebootex clean
 	# Rest
 	$(Q)rm -rf dist
