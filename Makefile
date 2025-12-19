@@ -71,7 +71,7 @@ FlashPackage: mkdist \
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vitacompat.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/ePSP/vitacompat.prx VitaCompat 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vitapops.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/ePSX/vitapops.prx VitaPopsCompat 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vitaplus.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/vPSP/pentazemin.prx Pentazemin 0x3007
-	$(PY) $(BUILDTOOLS)/pack/pack.py -p dist/FLASH0.ARK $(BUILDTOOLS)/pack/flash0.txt -s
+	$(PY) $(BUILDTOOLS)/pack/pack.py -p dist/FLASH0.ARK flash0.txt -s
 
 
 clean:
