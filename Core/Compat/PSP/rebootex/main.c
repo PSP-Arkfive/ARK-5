@@ -6,6 +6,11 @@
 #include <bootloadex.h>
 #include <colordebugger.h>
 
+BootLoadExConfig bleconf = {
+    .boot_type = TYPE_REBOOTEX,
+    .boot_storage = FLASH_BOOT,
+};
+
 // Entry Point
 int cfwBoot(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7)
 {
@@ -15,7 +20,7 @@ int cfwBoot(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7
     #endif
 
     // Configure
-    bootConfig(FLASH_BOOT, TYPE_REBOOTEX, NULL);
+    configureBoot(&bleconf);
 
     // scan functions
     findBootFunctions();
