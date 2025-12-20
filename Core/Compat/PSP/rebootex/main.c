@@ -9,9 +9,10 @@
 // Entry Point
 int cfwBoot(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7)
 {
-    //#ifdef DEBUG
+    #ifdef DEBUG
     _sw(0x44000000, 0xBC800100);
-    //#endif
+    colorDebug(0xFF00);
+    #endif
 
     // Configure
     bootConfig(FLASH_BOOT, TYPE_REBOOTEX, NULL);

@@ -16,7 +16,7 @@ OBJCOPY = psp-objcopy
 LINKFILE = $(ARKSDK)/build-tools/bootloadex.l
 INCDIR = $(PSPSDK)/include
 CFLAGS = -std=c99 -Wall -Os -G0 -fno-pic $(addprefix -I, $(INCDIR))
-LIBS = -L $(PSPSDK)/lib -lbootloadex -lansic -lcolordebugger
+LIBS = -L $(PSPSDK)/lib -lbootloadex -lansic
 
 
 ifdef DEBUG

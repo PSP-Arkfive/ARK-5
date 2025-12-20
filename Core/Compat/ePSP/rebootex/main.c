@@ -16,7 +16,8 @@ ExtraIoFuncs iofuncs = {
 int cfwBoot(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7)
 {
     #ifdef DEBUG
-    colorDebug(0xff00);
+    _sw(0x44000000, 0xBC800100);
+    colorDebug(0xFF00);
     #endif
 
     // Configure
