@@ -5,6 +5,13 @@
 #include <systemctrl_se.h>
 #include <bootloadex.h>
 
+ExtraIoFuncs iofuncs = {
+    .vita_io = {
+        .redirect_flash = 1,
+        .pspemuLfatOpenExtra = &pspemuLfatOpenExtraEPSP
+    }
+};
+
 // Entry Point
 int cfwBoot(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7)
 {
@@ -12,16 +19,14 @@ int cfwBoot(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7
     colorDebug(0xff00);
     #endif
 
-    // check config
-    checkRebootConfig();
+    // Configure
+    bootConfig(FLASH_BOOT, TYPE_REBOOTEX, &iofuncs);
 
     // scan for reboot functions
-    findRebootFunctions();
+    findBootFunctions();
     
     // patch reboot buffer
-    redirect_flash = 1;
-    pspemuLfatOpenExtra = &pspemuLfatOpenExtraEPSP;
-    patchRebootBufferVita();
+    patchBootVita();
     
     // Forward Call
     return sceReboot(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
