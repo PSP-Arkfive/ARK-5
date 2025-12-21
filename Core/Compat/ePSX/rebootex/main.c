@@ -11,7 +11,7 @@ BootLoadExConfig bleconf = {
     .extra_io = {
         .vita_io = {
             .redirect_flash = 1,
-            .pspemuLfatOpenExtra = &pspemuLfatOpenExtraEPSX
+            .pspemuLfatOpenExtra = &pspemuLfatOpenArkEPSX
         }
     }
 };

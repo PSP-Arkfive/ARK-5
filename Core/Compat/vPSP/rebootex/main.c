@@ -12,7 +12,7 @@ BootLoadExConfig bleconf = {
     .extra_io = {
         .vita_io = {
             .redirect_flash = 0,
-            .pspemuLfatOpenExtra = &pspemuLfatOpenExtraVPSP
+            .pspemuLfatOpenExtra = &pspemuLfatOpenArkVPSP
         }
     }
 };
@@ -25,6 +25,9 @@ int cfwBoot(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7
     _sw(0x44000000, 0xBC800100);
     colorDebug(0xFF00);
     #endif
+
+    // initialize ARK reboot config
+    checkArkRebootConfig();
 
     // Configure
     configureBoot(&bleconf);
