@@ -28,7 +28,7 @@ typedef struct {
 } SceLoadCoreBootModuleInfo;
 
 // Sony flash0 files
-BootFileList* boot_files = (BootFileList*)FILE_BOOT_LIST_ADDR;
+BootFileList* boot_files = (BootFileList*)BOOT_FILE_LIST_ADDR;
 
 static int cur_file = 14;
 
