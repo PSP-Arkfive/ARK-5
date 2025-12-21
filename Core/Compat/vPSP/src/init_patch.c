@@ -8,6 +8,7 @@
 #include <ark.h> 
 #include <cfwmacros.h>
 #include <rebootconfig.h>
+#include <bootloadex.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <systemctrl_private.h>
@@ -27,11 +28,7 @@ typedef struct {
 } SceLoadCoreBootModuleInfo;
 
 // Sony flash0 files
-typedef struct {
-    int nfiles;
-    char bootfile[100][64]; // list of boot files
-} FlashBackupList;
-FlashBackupList* flash_files = (FlashBackupList*)0x08800100;
+BootFileList* boot_files = (BootFileList*)FILE_BOOT_LIST_ADDR;
 
 static int cur_file = 14;
 
@@ -39,7 +36,7 @@ SceUID sceKernelLoadModuleBufferBootInitBtcnfPatched(SceLoadCoreBootModuleInfo *
 
     char path[64];
 
-    sprintf(path, "ms0:/__ADRENALINE__/flash0%s", (char*)&(flash_files->bootfile[cur_file])); //not use flash0 cause of cxmb
+    sprintf(path, "ms0:/__ADRENALINE__/flash0%s", (char*)&(boot_files->bootfile[cur_file])); //not use flash0 cause of cxmb
 
     cur_file++;
 
@@ -55,7 +52,7 @@ SceUID LoadModuleBufferAnchorInBtcnfPatched(void *buf, SceLoadCoreBootModuleInfo
 
     char path[64];
 
-    sprintf(path, "ms0:/__ADRENALINE__/flash0%s", (char*)&(flash_files->bootfile[cur_file]));
+    sprintf(path, "ms0:/__ADRENALINE__/flash0%s", (char*)&(boot_files->bootfile[cur_file]));
 
     cur_file++;
 
@@ -92,8 +89,8 @@ SceModule* patchLoaderCore(void)
     // Find Module
     SceModule* mod = (SceModule *)sceKernelFindModuleByName("sceLoaderCore");
 
-    for (int i=0; i<flash_files->nfiles; i++){
-        if (strcmp((char*)&(flash_files->bootfile[i]), "/kd/init.prx") == 0){
+    for (int i=0; i<boot_files->nfiles; i++){
+        if (strcmp((char*)&(boot_files->bootfile[i]), "/kd/init.prx") == 0){
         	cur_file = i+1;
         	break;
         }
