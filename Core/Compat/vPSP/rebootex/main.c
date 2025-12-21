@@ -5,12 +5,13 @@
 #include <systemctrl_se.h>
 #include <bootloadex.h>
 
+
 BootLoadExConfig bleconf = {
     .boot_type = TYPE_REBOOTEX,
     .boot_storage = FLASH_BOOT,
     .extra_io = {
         .vita_io = {
-            .redirect_flash = 1,
+            .redirect_flash = 0,
             .pspemuLfatOpenExtra = &pspemuLfatOpenExtraVPSP
         }
     }

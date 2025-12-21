@@ -30,8 +30,8 @@ typedef struct {
 typedef struct {
     int nfiles;
     char bootfile[100][64]; // list of boot files
-} SonyFlashFiles;
-SonyFlashFiles* flash_files = (SonyFlashFiles*)(ARK_FLASH-sizeof(SonyFlashFiles));
+} FlashBackupList;
+FlashBackupList* flash_files = (FlashBackupList*)0x08800100;
 
 static int cur_file = 14;
 
@@ -91,8 +91,6 @@ SceModule* patchLoaderCore(void)
 {
     // Find Module
     SceModule* mod = (SceModule *)sceKernelFindModuleByName("sceLoaderCore");
-
-    memcpy(flash_files, (void*)0x08800100, sizeof(SonyFlashFiles));
 
     for (int i=0; i<flash_files->nfiles; i++){
         if (strcmp((char*)&(flash_files->bootfile[i]), "/kd/init.prx") == 0){
