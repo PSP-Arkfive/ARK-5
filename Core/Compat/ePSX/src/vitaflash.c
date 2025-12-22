@@ -18,8 +18,8 @@ static int installFlash0Archive(char* path)
     int fd;
 
     // Base Address
-    uint32_t procfw = ARK_FLASH;
-    uint32_t sony = FLASH_SONY;
+    uint32_t procfw = VITA_FLASH_ARK;
+    uint32_t sony = VITA_FLASH_SONY;
 
     // Cast PROCFW flash0 Filesystem
     VitaFlashBufferFile * prof0 = (VitaFlashBufferFile *)procfw;

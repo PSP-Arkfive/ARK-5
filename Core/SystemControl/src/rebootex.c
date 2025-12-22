@@ -20,6 +20,7 @@
 #include <pspkernel.h>
 #include <psputilsforkernel.h>
 
+#include <bootloadex.h>
 #include <rebootconfig.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>

@@ -25,6 +25,7 @@
 #include <pspiofilemgr.h>
 
 #include <ark.h>
+#include <cfwmacros.h>
 #include <systemctrl.h>
 
 #include "high_mem.h"

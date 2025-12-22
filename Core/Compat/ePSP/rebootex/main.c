@@ -4,6 +4,7 @@
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <bootloadex.h>
+#include <bootloadex_ark.h>
 
 
 BootLoadExConfig bleconf = {

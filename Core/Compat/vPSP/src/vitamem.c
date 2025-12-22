@@ -1,12 +1,14 @@
+#include <stdio.h>
+#include <string.h>
 #include <pspsdk.h>
 #include <pspsysmem_kernel.h>
 #include <pspkernel.h>
 #include <psputilsforkernel.h>
 #include <pspsysevent.h>
 #include <pspiofilemgr.h>
-#include <stdio.h>
-#include <string.h>
+
 #include <ark.h>
+#include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 
@@ -48,9 +50,6 @@ int unlockVitaMemory(u32 user_size_mib){
             partition->data->size = (((partition->size >> 8) << 9) | 0xFC);
         }
     }
-
-    // prevent tampering with pspemu addresses, improves stability
-    sceKernelAllocPartitionMemory(2, "SCE_PSPEMU_FLASHFS", PSP_SMEM_Addr, 0x200000, (void*)0x0B000000);
 
     return 0;
 }
