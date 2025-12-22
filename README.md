@@ -1,6 +1,17 @@
 # ARK-5
 Next Generation Custom Firmware for PSP and Vita's ePSP.
 
+## Installation
+- Requires `ARK-4` to be previously installed.
+- Copy `FLASH0.ARK` to `ARK_01234` savedata.
+- If on PSP, run `ARK_Loader` to install the new flash0 files.
+
+## Building
+- Requires the very `latest pspsdk` develpoment build found here: https://github.com/pspdev/pspdev/releases/tag/latest
+- Requires the latest `ark-dev-sdk` package: `psp-pacman -Syu ark-dev-sdk`
+
+## Features
+
 Main differences with ARK-4:
 - Compiled with `latest PSPSDK`.
 - Modular project for easier development (`Divide et Impera`).
