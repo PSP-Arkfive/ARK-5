@@ -7,6 +7,7 @@
 #include <pspkernel.h>
 
 #include <ark.h>
+#include <cfwmacros.h>
 #include <vshctrl.h>
 #include <systemctrl_se.h>
 
