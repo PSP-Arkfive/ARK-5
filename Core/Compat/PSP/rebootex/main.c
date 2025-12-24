@@ -10,6 +10,10 @@
 BootLoadExConfig bleconf = {
     .boot_type = TYPE_REBOOTEX,
     .boot_storage = FLASH_BOOT,
+    .extra_io.psp_io = {
+        .use_fatms371 = 1,
+        .UnpackBootConfig = &UnpackBootConfigArkPSP,
+    }
 };
 
 // Entry Point
@@ -27,7 +31,7 @@ int cfwBoot(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7
     findBootFunctions();
     
     // patch sceboot
-    patchBootPSP(&UnpackBootConfigArkPSP);
+    patchBootPSP();
 
     // Forward Call
     return sceBoot(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
