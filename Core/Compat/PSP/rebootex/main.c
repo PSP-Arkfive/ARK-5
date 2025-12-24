@@ -12,8 +12,8 @@ BootLoadExConfig bleconf = {
     .boot_storage = FLASH_BOOT,
     .extra_io.psp_io = {
         .use_fatms371 = 1,
-        .UnpackBootConfig = &UnpackBootConfigArkPSP,
-    }
+    },
+    .UnpackBootConfig = &UnpackBootConfigArkPSP,
 };
 
 // Entry Point
