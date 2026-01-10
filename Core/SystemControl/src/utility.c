@@ -22,17 +22,19 @@ enum{ // internal id
 typedef struct {
     int modid;
     char* prxname;
+    char* libname;
 } CustomUtilityModule;
 
 extern ARKConfig* ark_config;
 
 static CustomUtilityModule custom_utility_modules[N_MODULES] = {
-    {-1, PSPFTP_PRX},
-    {-1, LIBPNG_PRX},
-    {-1, PSPAV_PRX},
-    {-1, VLF_PRX},
-    {-1, INTRAFONT_PRX},
-    {-1, UNARCHIVE_PRX},
+    {-1, PSPFTP_PRX, NULL},
+    {-1, LIBPNG_PRX, NULL},
+    {-1, PSPAV_PRX, NULL},
+    {-1, VLF_PRX, NULL},
+    {-1, "VLFFONT.PRX", "intraFont-vlf.prx"},
+    {-1, INTRAFONT_PRX, "intraFont-gu.prx"},
+    {-1, UNARCHIVE_PRX, "unarchiver.prx"},
 };
 
 static int (*origUtilityLoadModule)(int);
@@ -42,9 +44,16 @@ static int loadstartCustomUtilityModule(int internal_id){
     CustomUtilityModule* module = &custom_utility_modules[internal_id];
     if (module->modid >= 0) return 0x80111102; // SCE_UTILITY_MODULE_ERROR_ALREADY_LOADED
 
+    SceIoStat stat;
     char modpath[ARK_PATH_SIZE];
-    strcpy(modpath, ark_config->arkpath);
-    strcat(modpath, module->prxname);
+
+    strcpy(modpath, "ms0:/PSP/LIBS/");
+    strcat(modpath, module->libname? module->libname:module->prxname);
+    
+    if (sceIoGetstat(modpath, &stat) < 0){
+        strcpy(modpath, ark_config->arkpath);
+        strcat(modpath, module->prxname);
+    }
 
     module->modid = sceKernelLoadModule(modpath, 0, NULL);
     if (module->modid < 0) return module->modid;
