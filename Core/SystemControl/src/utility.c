@@ -12,28 +12,35 @@
 typedef struct {
     int id;
     int modid;
-    char* prxname;
-    char* libname;
-    char* f0path;
+    char* prxname; // prx name in ARK path
+    char* libname; // prx name in LIBS folder
 } CustomUtilityModule;
 
 extern ARKConfig* ark_config;
 
 static CustomUtilityModule custom_utility_modules[] = {
-    {PSP_MODULE_NET_FTP, -1, PSPFTP_PRX, NULL},
-    {PSP_MODULE_AV_PNG, -1, LIBPNG_PRX, NULL},
-    {PSP_MODULE_AV_PLAYER, -1, PSPAV_PRX, NULL},
-    {PSP_MODULE_VLF, -1, VLF_PRX, NULL},
-    {PSP_MODULE_INTRAFONT_VLF, -1, "VLFFONT.PRX", "intraFont-vlf.prx"},
-    {PSP_MODULE_INTRAFONT_GU, -1, INTRAFONT_PRX, "intraFont-gu.prx"},
-    {PSP_MODULE_UNARCHIVER, -1, UNARCHIVE_PRX, "unarchiver.prx"},
+    {PSP_MODULE_NET_FTP,           -1, PSPFTP_PRX},
+    {PSP_MODULE_AV_PNG,            -1, LIBPNG_PRX},
+    {PSP_MODULE_AV_HELPER,         -1, PSPAV_PRX},
+    {PSP_MODULE_VLF,               -1, VLF_PRX},
+    {PSP_MODULE_INTRAFONT_VLF,     -1, "VLFFONT.PRX", "intraFont-vlf.prx"},
+    {PSP_MODULE_INTRAFONT_GU,      -1, INTRAFONT_PRX, "intraFont-gu.prx"},
+    {PSP_MODULE_UNARCHIVER,        -1, UNARCHIVE_PRX, "unarchiver.prx"},
+    {PSP_MODULE_USB_DEV_DRV,       -1, USBDEV_PRX, "usbdevice.prx"},
+    {PSP_MODULE_IDS_REGEN,         -1, IDSREG_PRX, "idsregeneration.prx"},
+    {PSP_MODULE_IO_PRIVILEGED,     -1, "IOP.PRX"},
+    {PSP_MODULE_PSAR_DUMPER,       -1, "PSARDUMP.PRX", "libpsardumper.prx"},
+    {PSP_MODULE_PSPDECRYPT,        -1, "DECRYPT.PRX", "pspdecrypt.prx"},
+    {PSP_MODULE_KPSPIDENT,         -1, "KPSPID.PRX", "kpspident.prx"},
+    {PSP_MODULE_IPL_UPDATER,       -1, "IPL_UPDT.PRX", "ipl_update.prx"},
+    {PSP_MODULE_KBOOTI_UPDATER,    -1, "KBI_UPDT.PRX", "kbooti_update.prx"},
 };
 
 static int (*origUtilityLoadModule)(int);
 static int (*origUtilityUnloadModule)(int);
 
 static CustomUtilityModule* findCustomModuleById(int id){
-    if (module>=0x0700 || (module&0xFF) >= 0x80){ // custom module
+    if (id>=0x0700 || (id&0xFF) >= 0x80){ // custom module
         for (int i=0; i<NELEMS(custom_utility_modules); i++){
             CustomUtilityModule* module = &custom_utility_modules[i];
             if (module->id == id) return module;
@@ -42,7 +49,7 @@ static CustomUtilityModule* findCustomModuleById(int id){
     return NULL;
 }
 
-static void findModulePath(CustomUtilityModule* module, char* path){
+static int findModulePath(CustomUtilityModule* module, char* path){
     SceIoStat stat;
     char* libname = module->libname? module->libname : module->prxname;
 
@@ -54,7 +61,7 @@ static void findModulePath(CustomUtilityModule* module, char* path){
         if (fname){
             strcpy(fname+1, libname);
 
-            if (sceIoGetstat(path, &stat) >= 0) return; // found
+            if (sceIoGetstat(path, &stat) >= 0) return 0; // found
         }
     }
 
@@ -62,16 +69,19 @@ static void findModulePath(CustomUtilityModule* module, char* path){
     strcpy(path, "ms0:/PSP/LIBS/");
     strcat(path, libname);
 
-    if (sceIoGetstat(path, &stat) >= 0) return; // found
+    if (sceIoGetstat(path, &stat) >= 0) return 0; // found
     
     // try in ark path
     strcpy(path, ark_config->arkpath);
     strcat(path, module->prxname);
 
-    if (sceIoGetstat(path, &stat) >= 0) return; // found
+    if (sceIoGetstat(path, &stat) >= 0) return 0; // found
 
     // try in flash0
-    strcpy(path, module->f0path);
+    strcpy(path, "flash0:/kd/");
+    strcat(path, libname);
+
+    return sceIoGetstat(path, &stat);
 }
 
 static int loadstartCustomUtilityModule(CustomUtilityModule* module){
@@ -136,4 +146,11 @@ void extendUtilityModules(){
 
     HIJACK_FUNCTION(utilityLoadModule, extendedUtilityLoadModule, origUtilityLoadModule);
     HIJACK_FUNCTION(utilityUnloadModule, extendedUtilityUnloadModule, origUtilityUnloadModule);
+}
+
+int sctrlUtilityFindModulePath(int module, char* path){
+    CustomUtilityModule* mod = findCustomModuleById(module);
+    if (mod)
+        return findModulePath(mod, path);
+    return -1;
 }
