@@ -22,8 +22,6 @@ OBJS = \
 	src/nid_660_data.o \
 	src/rebootex.o \
 	src/sysmem.o \
-	src/lz4.o \
-	src/minilzo.o \
 	src/loadexec.o \
 	src/exitgame.o \
 	src/gameinfo.o \
@@ -52,7 +50,7 @@ USE_KERNEL_LIBS=1
 
 LIBDIR =
 LDFLAGS = -nostartfiles
-LIBS = \
+LIBS = -lmicrolz \
 	-lpspsemaphore_660 \
 	-lpspinit_kernel_660   \
 	-lpspsysmem_kernel_660  \
