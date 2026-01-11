@@ -21,7 +21,7 @@ endif
 
 LDFLAGS =  -nostartfiles
 LIBDIR = 
-LIBS = -lpspsystemctrl_kernel
+LIBS = -lcisoread -lpspsystemctrl_kernel
 
 PSP_FW_VERSION = 660
 
