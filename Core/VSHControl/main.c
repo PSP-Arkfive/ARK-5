@@ -82,7 +82,7 @@ int module_start(SceSize args, void* argp)
     
     psp_model = sceKernelGetModel();
     ark_config = sctrlArkGetConfig(NULL);
-    se_config = sctrlSEGetConfig(NULL);
+    se_config = sctrlSEGetConfigInternal();
 
     if (ark_config->recovery) return 0;
 

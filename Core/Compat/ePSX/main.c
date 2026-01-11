@@ -45,7 +45,7 @@ static void processArkConfig(){
 int module_start(SceSize args, void * argp)
 {
 
-    se_config = sctrlSEGetConfig(NULL);
+    se_config = sctrlSEGetConfigInternal();
     ark_config = sctrlArkGetConfig(NULL);
     reboot_config = sctrlHENGetRebootexConfig(NULL);
 

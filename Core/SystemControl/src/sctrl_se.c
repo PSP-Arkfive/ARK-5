@@ -86,10 +86,10 @@ int sctrlSEApplyConfig(SEConfig *config) __attribute__((alias("sctrlSESetConfig"
  * @param config - pointer to a SEConfig structure that receives the SE configuration
  * @returns pointer to original SEConfig structure in SystemControl
 */
-SEConfig* sctrlSEGetConfig(SEConfig *config)
+int sctrlSEGetConfig(SEConfig *config)
 {
     if (config) memcpy(config, &se_config, sizeof(SEConfigARK));
-    return (SEConfig*)&se_config;
+    return 0;
 }
 
 /**
@@ -99,12 +99,12 @@ SEConfig* sctrlSEGetConfig(SEConfig *config)
  * @param size - The size of the structure
  * @returns pointer to original SEConfig structure in SystemControl
 */
-SEConfig* sctrlSEGetConfigEx(SEConfig *config, int size)
+int sctrlSEGetConfigEx(SEConfig *config, int size)
 {
     if (config && size == sizeof(SEConfigARK)){
         memcpy(config, &se_config, size);
     }
-    return (SEConfig*)&se_config;
+    return 0;
 }
 
 /**
@@ -135,6 +135,10 @@ int sctrlSESetConfigEx(SEConfig *config, int size)
         return 0;
     }
     return -1;
+}
+
+SEConfig* sctrlSEGetConfigInternal(){
+    return (SEConfig*)&se_config;
 }
 
 // Return Reboot Configuration UMD File

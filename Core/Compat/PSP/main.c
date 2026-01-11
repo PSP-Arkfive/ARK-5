@@ -37,7 +37,7 @@ int module_start(SceSize args, void * argp)
     // get psp model
     psp_model = sceKernelGetModel();
 
-    se_config = sctrlSEGetConfig(NULL);
+    se_config = sctrlSEGetConfigInternal();
     ark_config = sctrlArkGetConfig(NULL);
 
     if (ark_config == NULL){

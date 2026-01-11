@@ -173,6 +173,7 @@ PSP_EXPORT_FUNC(sctrlHENSetLoadRebootOverrideHandler)
 PSP_EXPORT_FUNC(sctrlHENFindJALGeneric)
 PSP_EXPORT_FUNC(sctrlHENFindFirstBEQ)
 PSP_EXPORT_FUNC(sctrlHENFindRefInGlobals)
+PSP_EXPORT_FUNC(sctrlSEGetConfigInternal)
 PSP_EXPORT_END
 
 
