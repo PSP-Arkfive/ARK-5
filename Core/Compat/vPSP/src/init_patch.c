@@ -16,17 +16,6 @@
 #include "adrenaline_compat.h"
 #include "funcs.h"
 
-typedef struct {
-    char *name;
-    void *buf;
-    int size;
-    int unk_12;
-    int attr;
-    int unk_20;
-    int argSize;
-    int argPartId;
-} SceLoadCoreBootModuleInfo;
-
 // Sony flash0 files
 BootFileList* boot_files = (BootFileList*)BOOT_FILE_LIST_ADDR;
 

@@ -11,26 +11,8 @@
 #include <systemctrl_se.h>
 #include <systemctrl_private.h>
 
-typedef struct PspUsbCamSetupMicParam {
-    int size;
-    int alc;
-    int gain;
-    int noize;
-    int freq;
-} PspUsbCamSetupMicParam;
-
-typedef struct PspUsbCamSetupMicExParam {
-    int size;
-    int alc;
-    int gain;
-    u32 unk2[4]; // noize/hold/decay/attack?
-    int freq;
-    int unk3;
-} PspUsbCamSetupMicExParam;
-
 void sceUsb_driver_0xED8C8695();
 void sceUsb_driver_0x63E55EBE();
-int sceUsbCamSetupMic(void *param, void *workarea, int wasize);
 
 int (* _sceUsbCamSetEvLevel)(int level);
 int (* _sceUsbCamStillInput)(u8 *buf, SceSize size);

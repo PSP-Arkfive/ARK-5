@@ -158,7 +158,7 @@ int _ProbeExec2(u8 *buffer, int *check)
 }
 
 // Executable File Check
-int KernelCheckExecFile(unsigned char * buffer, int * check)
+int KernelCheckExecFile(unsigned char * buffer, SceLoadCoreExecFileInfo * check)
 {
     // Patch Executable
     int result = PatchExec1(buffer, check);

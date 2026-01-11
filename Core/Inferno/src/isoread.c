@@ -32,6 +32,7 @@
 
 #include "inferno.h"
 
+
 #define CSO_MAGIC 0x4F534943 // CISO
 #define ZSO_MAGIC 0x4F53495A // ZISO
 #define DAX_MAGIC 0x00584144 // DAX

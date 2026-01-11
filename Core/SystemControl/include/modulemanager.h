@@ -29,14 +29,16 @@ extern int * kernel_init_apitype;
 // sceModuleManager Patch
 SceModule* patchModuleManager(void);
 
+int _sceKernelCheckExecFile(u8 *buffer, SceLoadCoreExecFileInfo *check);
+
 // Executable Patch #1
-int PatchExec1(unsigned char * buffer, int * check);
+int PatchExec1(unsigned char * buffer, SceLoadCoreExecFileInfo * check);
 
 // Executable Patch #2
-int PatchExec2(unsigned char * buffer, int * check);
+int PatchExec2(unsigned char * buffer, SceLoadCoreExecFileInfo * check);
 
 // Executable Patch #3
-int PatchExec3(unsigned char * buffer, int * check, int isplain, int checkresult);
+int PatchExec3(unsigned char * buffer, SceLoadCoreExecFileInfo * check, int isplain, int checkresult);
 
 #endif
 

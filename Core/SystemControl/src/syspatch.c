@@ -57,7 +57,6 @@ int (* DisplaySetFrameBuf)(void*, int, int, int) = NULL;
 // Return Boot Status
 int isSystemBooted(void)
 {
-
     // Find Function
     int (* _sceKernelGetSystemStatus)(void) = (void *)sctrlHENFindFunction("sceSystemMemoryManager", "SysMemForKernel", 0x452E3696);
     

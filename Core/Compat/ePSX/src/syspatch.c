@@ -18,6 +18,7 @@
 
 #include "popsdisplay.h"
 
+
 extern ARKConfig* ark_config;
 extern RebootConfigARK* reboot_config;
 

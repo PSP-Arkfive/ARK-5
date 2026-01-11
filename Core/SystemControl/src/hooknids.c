@@ -58,7 +58,7 @@ SceLibraryStubTable * sctrlFindImportLib(SceModule * pMod, char * library)
 }
 
 // Find Import Stub Address
-unsigned int sctrlFindImportByNID(SceModule * pMod, char * library, unsigned int nid)
+unsigned int sctrlFindImportByNID(SceModule * pMod, const char * library, unsigned int nid)
 {
     // Find Import Library
     SceLibraryStubTable * pImp = sctrlFindImportLib(pMod, library);
@@ -85,7 +85,7 @@ unsigned int sctrlFindImportByNID(SceModule * pMod, char * library, unsigned int
 // Hook Function in Module Import Stubs
 // This function autodetects whether Syscalls are used or not...
 // Manual exporting in exports.exp is still required however for Syscalls to work.
-int sctrlHookImportByNID(SceModule * pMod, char * library, unsigned int nid, void * func)
+int sctrlHookImportByNID(SceModule * pMod, const char * library, unsigned int nid, void * func)
 {
     // Invalid Arguments
     if(pMod == NULL || library == NULL) return -1;

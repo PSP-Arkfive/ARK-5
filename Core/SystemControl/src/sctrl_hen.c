@@ -154,7 +154,7 @@ STMOD_HANDLER sctrlHENSetStartModuleHandler(STMOD_HANDLER new_handler)
 }
 
 // Find Function Address
-unsigned int sctrlHENFindFunction(char * szMod, char * szLib, unsigned int nid)
+unsigned int sctrlHENFindFunction(const char * szMod, const char * szLib, unsigned int nid)
 {
     // Get NID Resolver
     NidResolverLib * resolver = getNidResolverLib(szLib);

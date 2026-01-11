@@ -150,7 +150,7 @@ int sceUmdUnRegisterUMDCallBack(int cbid)
 {
     u32 k1;
     int ret, intr;
-    uidControlBlock *type;
+    SceUidControlBlock *type;
 
     k1 = pspSdkSetK1(0);
     ret = 0x80010016;

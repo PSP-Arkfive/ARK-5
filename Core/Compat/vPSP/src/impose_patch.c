@@ -12,6 +12,7 @@
 #include "adrenaline.h"
 #include "adrenaline_compat.h"
 
+
 extern SEConfigARK* se_config;
 
 int (* SetIdleCallback)(int flags);

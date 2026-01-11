@@ -33,7 +33,7 @@
 STMOD_HANDLER g_module_start_handler = NULL;
 
 // Partition Check Function
-int (* realPartitionCheck)(unsigned int *, unsigned int *) = NULL;
+int (* realPartitionCheck)(unsigned int *, SceLoadCoreExecFileInfo *) = NULL;
 
 // Internal Module Manager Apitype Field
 int * kernel_init_apitype = NULL;
@@ -41,23 +41,16 @@ int * kernel_init_apitype = NULL;
 // Prologue Module Function
 int (* prologue_module)(void *, SceModule *) = NULL;
 
-// Real Executable Check Function
-int sceKernelCheckExecFile(unsigned char * buffer, int * check);
-
 // Function Prototypes
-int _PartitionCheck(unsigned int * st0, unsigned int *check);
+int _PartitionCheck(unsigned int * st0, SceLoadCoreExecFileInfo *check);
 int prologue_module_hook(void * unk0, SceModule * mod);
-int _sceKernelCheckExecFile(u8 *buffer, int *check);
-int PatchExec1(u8 *buffer, int *check);
-int PatchExec2(u8 *buffer, int *check);
-int PatchExec3(u8 *buffer, int *check, int isplain, int checkresult);
 
-int (* ProbeExec3)(u8 *buffer, int *check) = NULL;
+int (* ProbeExec3)(u8 *buffer, SceLoadCoreExecFileInfo *check) = NULL;
 
 // Leda patch
 extern int leda_running;
 
-int _ProbeExec3(u8 *buffer, int *check)
+int _ProbeExec3(u8 *buffer, SceLoadCoreExecFileInfo *check)
 {
     //check executable
     int result = ProbeExec3(buffer, check);
@@ -66,10 +59,10 @@ int _ProbeExec3(u8 *buffer, int *check)
     unsigned int magic = *(unsigned int *)(buffer);
 
     //patch necessary
-    if(check[2] >= 0x52 && magic == 0x464C457F && IsStaticElf(buffer))
+    if(check->api_type >= 0x52 && magic == 0x464C457F && IsStaticElf(buffer))
     {
         //patch check
-        check[8] = 3;
+        check->elf_type = 3;
 
         //fake result
         result = 0;
@@ -79,7 +72,7 @@ int _ProbeExec3(u8 *buffer, int *check)
 }
 
 // Partition Check
-int _PartitionCheck(unsigned int * st0, unsigned int * check)
+int _PartitionCheck(unsigned int * st0, SceLoadCoreExecFileInfo * check)
 {
     // Get File Descriptor
     SceUID fd = st0[6];
@@ -135,13 +128,13 @@ int _PartitionCheck(unsigned int * st0, unsigned int * check)
         }
         
         // Move to Module Information
-        sceIoLseek(fd, checkBuf[8] + check[19], PSP_SEEK_SET);
+        sceIoLseek(fd, checkBuf[8] + check->module_info_offset, PSP_SEEK_SET);
         
         // Valid PRX File (it's relocateable)
         if(!IsStaticElf(checkBuf))
         {
             // Allow PSAR Files inside EBOOT.PBP Files
-            check[4] = checkBuf[9] - checkBuf[8];
+            check->exec_size = checkBuf[9] - checkBuf[8];
         }
     }
     
@@ -149,7 +142,7 @@ int _PartitionCheck(unsigned int * st0, unsigned int * check)
     else if(checkBuf[0] == 0x464C457F)
     {
         // Move to Module Information
-        sceIoLseek(fd, check[19], PSP_SEEK_SET);
+        sceIoLseek(fd, check->module_info_offset, PSP_SEEK_SET);
     }
     
     // We don't know what this is... let's assume it's encrypted.
@@ -166,16 +159,16 @@ int _PartitionCheck(unsigned int * st0, unsigned int * check)
     sceIoRead(fd, &attributes, 2);
     
     // Static ELF File
-    if(IsStaticElf(checkBuf)) check[17] = 0;
+    if(IsStaticElf(checkBuf)) check->is_kernel_mod = 0;
     
     // PRX File (relocateable)
     else
     {
         // Kernel PRX
-        if(attributes & 0x1000) check[0x44/4] = 1;
+        if(attributes & 0x1000) check->is_kernel_mod = 1;
 
         // User PRX
-        else check[0x44/4] = 0;
+        else check->is_kernel_mod = 0;
     }
     
     // Restore Position
@@ -207,7 +200,7 @@ int prologue_module_hook(void * unk0, SceModule * mod)
 }
 
 // sceKernelCheckExecFile Hook
-int _sceKernelCheckExecFile(unsigned char * buffer, int * check)
+int _sceKernelCheckExecFile(unsigned char * buffer, SceLoadCoreExecFileInfo * check)
 {
 
     if (leda_running) // this patch prevents leda from working
@@ -234,7 +227,7 @@ int _sceKernelCheckExecFile(unsigned char * buffer, int * check)
 }
 
 // PatchExec1
-int PatchExec1(unsigned char * buffer, int * check)
+int PatchExec1(unsigned char * buffer, SceLoadCoreExecFileInfo * check)
 {
     // Grab Magic
     unsigned int magic = *(unsigned int *)(buffer);
@@ -243,14 +236,14 @@ int PatchExec1(unsigned char * buffer, int * check)
     if(magic != 0x464C457F) return -1;
     
     // Possibly Invalid Apitype
-    if(check[2] < 0x120)
+    if(check->api_type < 0x120)
     {
         // Custom Apitype
-        if(check[2] < 0x52)
+        if(check->api_type < 0x52)
         {
-            if(check[17] != 0)
+            if(check->is_kernel_mod != 0)
             {
-                check[18] = 1;
+                check->is_decrypted = 1;
                 return 0;
             }
             
@@ -262,12 +255,12 @@ int PatchExec1(unsigned char * buffer, int * check)
     }
     
     // Predefined Apitypes
-    else if(check[2] == 0x120 || (check[2] >= 0x140 && check[2] <= 0x143))
+    else if(check->api_type == 0x120 || (check->api_type >= 0x140 && check->api_type <= 0x143))
     {
-        if(check[4] != 0)
+        if(check->exec_size != 0)
         {
-            check[17] = 1;
-            check[18] = 1;
+            check->is_kernel_mod = 1;
+            check->is_decrypted = 1;
             
             //PatchExec2
             PatchExec2(buffer, check);
@@ -275,9 +268,9 @@ int PatchExec1(unsigned char * buffer, int * check)
             return 0;
         }
         
-        else if(check[17] != 0)
+        else if(check->is_kernel_mod != 0)
         {
-            check[18] = 1;
+            check->is_decrypted = 1;
             return 0;
         }
         
@@ -292,19 +285,19 @@ int PatchExec1(unsigned char * buffer, int * check)
 }
 
 // PatchExec2
-int PatchExec2(unsigned char * buffer, int * check)
+int PatchExec2(unsigned char * buffer, SceLoadCoreExecFileInfo * check)
 {
     // Patching Result
     int result = 0;
     
     // Find Buffer Index
-    int index = (check[19] < 0) ? (check[19] + 3) : (check[19]);
+    int index = (check->module_info_offset < 0) ? (check->module_info_offset + 3) : (check->module_info_offset);
     
     // Exclude Volatile Memory Range from Patching
     unsigned int address = (unsigned int)(buffer + index);
     if(!(address >= 0x88400000 && address <= 0x88800000))
     {
-        check[22] = *(unsigned short *)(buffer + index);
+        check->mod_info_attribute = *(unsigned short *)(buffer + index);
         result = *(int *)(buffer + index);
     }
     
@@ -313,18 +306,18 @@ int PatchExec2(unsigned char * buffer, int * check)
 }
 
 // PatchExec3
-int PatchExec3(unsigned char * buffer, int * check, int isplain, int checkresult)
+int PatchExec3(unsigned char * buffer, SceLoadCoreExecFileInfo * check, int isplain, int checkresult)
 {
     // ELF Executable
     if(isplain)
     {
         // Custom Apitype
-        if(check[2] < 0x52)
+        if(check->api_type < 0x52)
         {
             // PatchExec2
             if(PatchExec2(buffer, check) & 0xFF00)
             {
-                check[17] = 1;
+                check->is_kernel_mod = 1;
                 checkresult = 0;
             }
         }
@@ -335,7 +328,7 @@ int PatchExec3(unsigned char * buffer, int * check, int isplain, int checkresult
             // Unrelocateable ELF
             if(IsStaticElf(buffer))
             {
-                check[8] = 3;
+                check->elf_type = 3;
             }
         }
     }

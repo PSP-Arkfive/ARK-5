@@ -23,23 +23,12 @@
 #include <pspdebug.h>
 
 
-// From pspinit.h
-#define sceKernelApplicationType InitForKernel_7233B5BC
-
-// sceKernelGetMemoryHead
-void * sceKernelGetBlockHeadAddr(int uid);
-
-// sceKernelCheckExecFile
-int sceKernelCheckExecFile(unsigned char * buffer, int * check);
-
 // KIRK Function
 int sceUtilsBufferCopyWithRange(void * inbuf, SceSize insize, void * outbuf, int outsize, int cmd);
 
 // Query System Call Number of Function
 u32 sceKernelQuerySystemCall(void * funcAddr);
 
-// Register Exception Handler
-int sceKernelRegisterDefaultExceptionHandler(void * exceptionHandler);
 
 #endif
 
