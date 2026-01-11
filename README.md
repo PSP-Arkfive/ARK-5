@@ -8,7 +8,7 @@ Next Generation Custom Firmware for PSP and Vita's ePSP.
 
 ## Building
 - Requires the very `latest pspsdk` development build found here: https://github.com/pspdev/pspdev/releases/tag/latest
-- Requires the latest `ark-dev-sdk` package: `psp-pacman -Syu ark-dev-sdk`
+- Requires the latest `ark-dev-sdk` package: `https://github.com/PSP-Arkfive/ark-dev-sdk/`
 
 ## Features
 
