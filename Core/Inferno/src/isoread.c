@@ -70,7 +70,6 @@ int zlib_inflate(void* dst, int dst_len, void* src){
     return sceKernelDeflateDecompress(dst, dst_len, src, NULL);
 }
 
-
 // 0x00000368
 static void wait_until_ms0_ready(void)
 {

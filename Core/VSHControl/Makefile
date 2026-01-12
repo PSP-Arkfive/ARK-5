@@ -34,8 +34,8 @@ PRX_EXPORTS = exports.exp
 USE_KERNEL_LIBC=1
 USE_KERNEL_LIBS=1
 
-LIBDIR = libs
+LIBDIR = 
 LDFLAGS =  -nostartfiles
-LIBS = -lpspsystemctrl_kernel -lpspusb -lpspusbdevice_driver -lpspreg
+LIBS = -lcisoread -lpspsystemctrl_kernel -lpspusb -lpspusbdevice_driver -lpspreg
 
 include $(PSPSDK)/lib/build.mak
