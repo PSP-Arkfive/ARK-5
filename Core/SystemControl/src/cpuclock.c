@@ -38,8 +38,9 @@ static const u32 cpu_nid_list[] = {
     0x469989AD,
 };
 
-void SetSpeed(int cpu, int bus)
+void sctrlHENSetSpeed(int cpu, int bus)
 {
+    int k1 = pspSdkSetK1(0);
     scePowerSetClockFrequency_k = (void*)sctrlHENFindFunction("scePower_Service", "scePower", 0x737486F2); //scePowerSetClockFrequency
     scePowerSetClockFrequency_k(cpu, cpu, bus);
 
@@ -58,4 +59,5 @@ void SetSpeed(int cpu, int bus)
 
         sctrlFlushCache();
     }
+    pspSdkSetK1(k1);
 }

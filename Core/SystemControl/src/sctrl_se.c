@@ -73,8 +73,6 @@ char *GetUmdFile(void) __attribute__((alias("sctrlSEGetUmdFile")));
 
 void SetUmdFile(const char *file) __attribute__((alias("sctrlSESetUmdFile")));
 
-int sctrlSEApplyConfig(SEConfig *config) __attribute__((alias("sctrlSESetConfig")));
-
 // we keep this here for compatibility
 // ARK doesn't use this and it isn't persistent
 
@@ -135,6 +133,10 @@ int sctrlSESetConfigEx(SEConfig *config, int size)
         return 0;
     }
     return -1;
+}
+
+void sctrlSEApplyConfig(SEConfig *config){
+    sctrlSESetConfig(config);
 }
 
 SEConfig* sctrlSEGetConfigInternal(){

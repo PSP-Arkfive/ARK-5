@@ -23,9 +23,6 @@
 #include "binary.h"
 
 
-#define ClearCaches sctrlFlushCache
-#define FindProc sctrlHENFindFunction
-
 typedef struct {
     void *sasCore;
     int grainSamples;
@@ -157,7 +154,7 @@ int SysEventHandler(int ev_id, char *ev_name, void *param, int *result) {
         	ReInitSasCore();
         	
         	if (adrenaline->pops_mode) {
-        		int (* sceKermitPeripheralInitPops)() = (void *)FindProc("sceKermitPeripheral_Driver", "sceKermitPeripheral", 0xC0EBC631);
+        		int (* sceKermitPeripheralInitPops)() = (void *)sctrlHENFindFunction("sceKermitPeripheral_Driver", "sceKermitPeripheral", 0xC0EBC631);
         		if (sceKermitPeripheralInitPops)
         			sceKermitPeripheralInitPops();
         	}
@@ -171,7 +168,7 @@ void VitaSyncPatched() {
     if (adrenaline->savestate_mode != SAVESTATE_MODE_NONE) {
         void (* SaveStateBinary)() = (void *)0x00010000;
         memcpy((void *)SaveStateBinary, binary, size_binary);
-        ClearCaches();
+        sctrlFlushCache();
 
         SaveStateBinary();
 
@@ -215,19 +212,19 @@ int sceKermitSyncDisplayPatched() {
 }
 
 void PatchSasCore() {
-    sceSasCoreInit = (void *)FindProc("sceSAScore", "sceSasCore_driver", 0xB0F9F98F);
-    sceSasCoreExit = (void *)FindProc("sceSAScore", "sceSasCore_driver", 0xE143A1EA);
+    sceSasCoreInit = (void *)sctrlHENFindFunction("sceSAScore", "sceSasCore_driver", 0xB0F9F98F);
+    sceSasCoreExit = (void *)sctrlHENFindFunction("sceSAScore", "sceSasCore_driver", 0xE143A1EA);
 
-    HIJACK_FUNCTION(FindProc("sceSAScore", "sceSasCore", 0x42778A9F), __sceSasInitPatched, __sceSasInit);
+    HIJACK_FUNCTION(sctrlHENFindFunction("sceSAScore", "sceSasCore", 0x42778A9F), __sceSasInitPatched, __sceSasInit);
 
-    ClearCaches();
+    sctrlFlushCache();
 }
 
 void PatchLowIODriver2(u32 text_addr) {
     HIJACK_FUNCTION(text_addr + 0x880, SetFlag1Patched, SetFlag1);
     HIJACK_FUNCTION(text_addr + 0xCD8, SetFlag2Patched, SetFlag2);
-    HIJACK_FUNCTION(FindProc("sceKermit_Driver", "sceKermit_driver", 0xD69C50BB), sceKermitSyncDisplayPatched, sceKermitSyncDisplay);
-    ClearCaches();
+    HIJACK_FUNCTION(sctrlHENFindFunction("sceKermit_Driver", "sceKermit_driver", 0xD69C50BB), sceKermitSyncDisplayPatched, sceKermitSyncDisplay);
+    sctrlFlushCache();
 }
 
 void PatchPowerService2(u32 text_addr) {

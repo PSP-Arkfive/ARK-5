@@ -23,7 +23,6 @@
 #include "loadercore.h"
 #include "imports.h"
 #include "sysmem.h"
-#include "cpuclock.h"
 
 extern SEConfig se_config;
 
@@ -263,13 +262,6 @@ void sctrlHENLoadModuleOnReboot(char *module_before, void *buf, int size, int fl
     rebootex_config.rtm_mod.buffer = buf;
     rebootex_config.rtm_mod.size = size;
     rebootex_config.rtm_mod.flags = flags;
-}
-
-void sctrlHENSetSpeed(int cpuspd, int busspd)
-{
-    int k1 = pspSdkSetK1(0);
-    SetSpeed(cpuspd, busspd);
-    pspSdkSetK1(k1);
 }
 
 extern void* custom_rebootex;
