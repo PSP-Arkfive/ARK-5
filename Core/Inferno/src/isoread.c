@@ -53,7 +53,6 @@ CisoFile g_ciso_file = {
     .read_data = &read_raw_data,
     .memalign = &oe_memalign,
     .free = &oe_free,
-    .idx_start_block = -1,
 };
 
 // reader functions
