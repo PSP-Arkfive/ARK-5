@@ -77,6 +77,9 @@ void applyFixesByModule(SceModule* mod){
     // disable anti-CFW code
     else if (strcasecmp(mod->modname, "DJMAX") == 0) {
         SEConfigARK* se_config = (SEConfigARK*)sctrlSEGetConfigInternal();
+        
+        // Patch CFW dirs
+        hide_cfw_folder(mod);
 
         if (se_config->umdseek == 0 && se_config->umdspeed == 0){
             // enable UMD reading speed

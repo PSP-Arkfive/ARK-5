@@ -50,8 +50,6 @@ int stargateSyspatchModuleOnStart(SceModule * mod)
     static int booted = 0;
 
     if (booted){
-        // Patch CFW dirs
-        hide_cfw_folder(mod);
         // Patch game-specific modules
         applyFixesByModule(mod);
     }
