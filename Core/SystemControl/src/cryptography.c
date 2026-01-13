@@ -22,13 +22,11 @@
 
 #include <ark.h>
 #include <cfwmacros.h>
-
 #include <systemctrl.h>
 #include <systemctrl_private.h>
 
 #include "imports.h"
 #include "elf.h"
-#include "rebootconfig.h"
 
 // custom user crypto functions
 int (*ExtendDecryption)() = NULL;

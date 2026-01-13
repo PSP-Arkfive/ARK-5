@@ -9,7 +9,7 @@
 #include <ark.h> 
 #include <pspkermit.h>
 #include <cfwmacros.h>
-#include <rebootconfig.h>
+#include <rebootexconfig.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <systemctrl_private.h>

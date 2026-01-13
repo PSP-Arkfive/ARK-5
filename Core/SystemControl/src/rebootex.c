@@ -20,8 +20,8 @@
 #include <pspkernel.h>
 #include <psputilsforkernel.h>
 
+#include <ark.h>
 #include <bootloadex.h>
-#include <rebootconfig.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 
@@ -35,7 +35,7 @@ extern SEConfig se_config;
 int (* OrigLoadReboot)(void * arg1, unsigned int arg2, void * arg3, unsigned int arg4) = NULL;
 
 // Reboot Buffer Backup
-RebootConfigARK rebootex_config = {
+RebootexConfigARK rebootex_config = {
     .magic = ARK_CONFIG_MAGIC,
     .reboot_buffer_size = REBOOTEX_MAX_SIZE
 };
@@ -51,9 +51,9 @@ void backupRebootBuffer(void)
 {
 
     // Copy Reboot Buffer Configuration
-    RebootConfigARK* backup_conf = (RebootConfigARK*)REBOOTEX_CONFIG;
+    RebootexConfigARK* backup_conf = (RebootexConfigARK*)REBOOTEX_CONFIG;
     if (IS_ARK_CONFIG(backup_conf) && backup_conf->reboot_buffer_size){
-        memcpy(&rebootex_config, backup_conf, sizeof(RebootConfigARK));
+        memcpy(&rebootex_config, backup_conf, sizeof(RebootexConfigARK));
     }
     
     // Copy ARK runtime Config
@@ -83,7 +83,7 @@ void restoreRebootBuffer(void)
     rebootex_config.boot_from_fw_version = sceKernelDevkitVersion();
         
     // Restore Reboot Buffer Configuration
-    memcpy((void *)REBOOTEX_CONFIG, &rebootex_config, sizeof(RebootConfigARK));
+    memcpy((void *)REBOOTEX_CONFIG, &rebootex_config, sizeof(RebootexConfigARK));
 
     // Restore ARK Configuration
     memcpy((void*)ARK_CONFIG, ark_config, sizeof(ARKConfig));

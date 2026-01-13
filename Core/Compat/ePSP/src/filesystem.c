@@ -24,7 +24,7 @@
 #include <ark.h>
 #include <cfwmacros.h>
 
-#include <rebootconfig.h>
+#include <rebootexconfig.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <systemctrl_private.h>
@@ -34,7 +34,7 @@
 #include "fatef.h"
 #include "flashfs.h" // TODO: get rid of this
 
-extern RebootConfigARK* reboot_config;
+extern RebootexConfigARK* reboot_config;
 
 // sceIoDread Open List Item
 typedef struct OpenDirectory

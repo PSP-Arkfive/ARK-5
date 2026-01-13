@@ -7,7 +7,7 @@
 #include <pspdisplay.h>
 
 #include <ark.h>
-#include <rebootconfig.h>
+#include <rebootexconfig.h>
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
@@ -17,7 +17,7 @@
 #include "popspatch.h"
 
 extern SEConfigARK* se_config;
-extern RebootConfigARK* reboot_config;
+extern RebootexConfigARK* reboot_config;
 
 extern int sceKernelSuspendThreadPatched(SceUID thid);
 extern void patchVLF(SceModule * mod);

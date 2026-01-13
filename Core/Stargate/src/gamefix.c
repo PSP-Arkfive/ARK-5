@@ -25,7 +25,7 @@
 
 #include <ark.h>
 #include <cfwmacros.h>
-#include <rebootconfig.h>
+#include <rebootexconfig.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <systemctrl_private.h>
@@ -107,7 +107,7 @@ void applyFixesByModule(SceModule* mod){
 
 void applyFixesByGameId(){
     // Obtain game ID for other patches
-    RebootConfigARK* reboot_config = sctrlHENGetRebootexConfig(NULL);
+    RebootexConfigARK* reboot_config = (RebootexConfigARK*)sctrlHENGetRebootexConfig(NULL);
     char gameid[10]; memset(gameid, 0, sizeof(gameid));
     strncpy(gameid, reboot_config->game_id, 9);
 

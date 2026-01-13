@@ -18,10 +18,10 @@
 #ifndef _REBOOTEX_H_
 #define _REBOOTEX_H_
 
-#include <rebootconfig.h>
+#include <rebootexconfig.h>
 
 // Reboot Buffer Configuration
-extern RebootConfigARK rebootex_config;
+extern RebootexConfigARK rebootex_config;
 
 extern int (* OrigLoadReboot)(void * arg1, unsigned int arg2, void * arg3, unsigned int arg4);
 int LoadReboot(void * arg1, unsigned int arg2, void * arg3, unsigned int arg4);

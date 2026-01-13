@@ -25,9 +25,9 @@
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_private.h>
-#include <rebootconfig.h>
+#include <rebootexconfig.h>
 
-extern RebootConfigARK rebootex_config;
+extern RebootexConfigARK rebootex_config;
 
 // Patch mediasync.prx
 void patchMediaSync(SceModule* mod)

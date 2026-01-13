@@ -29,12 +29,12 @@
 #include <psputility_sysparam.h>
 
 #include <ark.h>
-#include <cfwmacros.h>
-#include <kubridge.h>
 #include <vshctrl.h>
+#include <kubridge.h>
+#include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <rebootconfig.h>
+#include <rebootexconfig.h>
 
 #include "main.h"
 #include "utils.h"
@@ -48,7 +48,7 @@
 extern int scePowerRequestColdReset(int unk);
 
 ARKConfig ark_config;
-RebootConfigARK rebootex_config;
+RebootexConfigARK rebootex_config;
 extern List plugins;
 
 STMOD_HANDLER previous = NULL;

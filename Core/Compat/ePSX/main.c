@@ -7,21 +7,19 @@
 
 #include <ark.h>
 #include <cfwmacros.h>
-
-#include <rebootconfig.h>
+#include <rebootexconfig.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <systemctrl_private.h>
 
 #include "popsdisplay.h"
-
-#include <payload.h>
+#include "payload.h"
 
 PSP_MODULE_INFO("ARKCompatLayer", 0x3007, 1, 0);
 
 ARKConfig* ark_config = NULL;
 SEConfig* se_config = NULL;
-RebootConfigARK* reboot_config = NULL;
+RebootexConfigARK* reboot_config = NULL;
 
 extern void initVitaPopsSysPatch();
 
@@ -47,7 +45,7 @@ int module_start(SceSize args, void * argp)
 
     se_config = sctrlSEGetConfigInternal();
     ark_config = sctrlArkGetConfig(NULL);
-    reboot_config = sctrlHENGetRebootexConfig(NULL);
+    reboot_config = (RebootexConfigARK*)sctrlHENGetRebootexConfig(NULL);
 
     if (ark_config == NULL){
         return 1;

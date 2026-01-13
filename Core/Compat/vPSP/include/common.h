@@ -111,25 +111,6 @@ typedef struct ModuleEntry {
     u8  hash[0x10]; // 16
 } __attribute__((packed)) ModuleEntry; // 32
 
-typedef struct {
-    char *name;
-    void *buffer;
-    u32 size;
-} BootFile;
-
-typedef struct {
-    int bootfileindex;
-
-    char *module_after;
-    void *buf;
-    int size;
-    int flags;
-
-    u32 ram2;
-    u32 ram11;
-
-    char umdfilename[256];
-} RebootexConfig;
 
 int sctrlGetUsbState();
 int sctrlStartUsb();

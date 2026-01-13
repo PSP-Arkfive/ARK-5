@@ -33,7 +33,6 @@
 #include "mediasync.h"
 #include "msstor_cache.h"
 #include "rebootex.h"
-#include "rebootconfig.h"
 #include "sysmem.h"
 #include "psnfix.h"
 #include "loadexec.h"

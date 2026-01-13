@@ -10,8 +10,7 @@
 
 #include <ark.h>
 #include <cfwmacros.h>
-
-#include <rebootconfig.h>
+#include <rebootexconfig.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <systemctrl_private.h>
@@ -20,7 +19,7 @@
 
 
 extern ARKConfig* ark_config;
-extern RebootConfigARK* reboot_config;
+extern RebootexConfigARK* reboot_config;
 
 // Previous Module Start Handler
 STMOD_HANDLER previous = NULL;

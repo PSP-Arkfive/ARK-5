@@ -314,16 +314,16 @@ void* sctrlHENSetPluginHandler(void* handler){
     return ret;
 }
 
-RebootConfigARK* sctrlHENGetRebootexConfig(RebootConfigARK* config){
+RebootexConfig* sctrlHENGetRebootexConfig(RebootexConfig* config){
     if (config){
-        memcpy(config, &rebootex_config, sizeof(RebootConfigARK));
+        memcpy(config, &rebootex_config, sizeof(RebootexConfigARK));
     }
-    return &rebootex_config;
+    return (RebootexConfig*)&rebootex_config;
 }
 
-void sctrlHENSetRebootexConfig(RebootConfigARK* config){
+void sctrlHENSetRebootexConfig(RebootexConfig* config){
     if (config){
-        memcpy(&rebootex_config, config, sizeof(RebootConfigARK));
+        memcpy(&rebootex_config, config, sizeof(RebootexConfigARK));
     }
 }
 

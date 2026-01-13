@@ -7,7 +7,7 @@
 
 #include <ark.h> 
 #include <cfwmacros.h>
-#include <rebootconfig.h>
+#include <rebootexconfig.h>
 #include <bootloadex.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
