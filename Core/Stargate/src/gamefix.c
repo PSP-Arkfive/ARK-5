@@ -31,6 +31,7 @@
 #include <systemctrl_private.h>
 
 extern SEConfig* se_config;
+void hide_cfw_folder(SceModule * mod);
 
 static STMOD_HANDLER game_previous;
 
