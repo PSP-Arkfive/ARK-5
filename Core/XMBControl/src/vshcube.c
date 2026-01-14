@@ -147,6 +147,11 @@ int displaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelformat, int syn
       
       sceGuFinish();
       sceGuSync(GU_SYNC_FINISH, GU_SYNC_WHAT_DONE);
+
+      {
+          u32 a=0xfff;
+          while(--a) {__asm__("nop; sync");}
+      }
       
       sceKernelCpuResumeIntrWithSync(intr);
       sceKernelResumeDispatchThread(state);
