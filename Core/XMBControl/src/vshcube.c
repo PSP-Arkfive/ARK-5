@@ -275,5 +275,6 @@ int vshcube_stop() {
     vshcube_running = 0;
     sceDisplayWaitVblankStart();
     user_free(list);
+    list = NULL;
     return 0;
 }
