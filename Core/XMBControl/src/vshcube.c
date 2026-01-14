@@ -30,7 +30,6 @@ void* vramBackup     = NULL;
 int vshcube_running  = 0;
 
 u8 list[2048];
-PspGeContext gectx;
 struct Vertex cube[CUBE_VERT_COUNT];
 
 int (*_displaySetFrameBuf)(void*, int, int, int);
@@ -52,11 +51,12 @@ int displaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelformat, int syn
     
     if (list && magic == 1) {
 
+      PspGeContext* gectx = user_memalign(64, sizeof(PspGeContext));
       vramBackup = user_memalign(64, VRAM_BACKUP_BYTE_COUNT);
       
       magic = 2;
       
-      sceGeSaveContext(&gectx);
+      sceGeSaveContext(gectx);
       int state = sceKernelSuspendDispatchThread();
       int intr = sceKernelCpuSuspendIntr();
         
@@ -150,11 +150,12 @@ int displaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelformat, int syn
       
       sceKernelCpuResumeIntrWithSync(intr);
       sceKernelResumeDispatchThread(state);
-      sceGeRestoreContext(&gectx);
+      sceGeRestoreContext(gectx);
       
       magic = 1;
 
       user_free(vramBackup);
+      user_free(gectx);
     }
   }
   
