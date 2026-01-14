@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <pspsdk.h>
 #include <pspkernel.h>
+#include <pspgu.h>
 #include <psputility_sysparam.h>
 
 #include <ark.h>
@@ -21,15 +22,6 @@
 
 PSP_MODULE_INFO("XmbControl", 0x0007, 2, 1);
 
-extern int psp_model;
-extern ARKConfig ark_config;
-extern SEConfig se_config;
-extern RebootexConfigARK rebootex_config;
-extern STMOD_HANDLER previous;
-
-extern void findAllTranslatableStrings();
-extern int OnModuleStart(SceModule *mod);
-
 int module_start(SceSize args, void *argp)
 {
 
@@ -41,13 +33,15 @@ int module_start(SceSize args, void *argp)
 
     psp_model = kuKernelGetModel();
 
-    sctrlSEGetConfig(&se_config);
+    sctrlSEGetConfig((SEConfig*)&se_config);
 
     sctrlArkGetConfig(&ark_config);
 
     findAllTranslatableStrings();
     
     previous = sctrlHENSetStartModuleHandler(OnModuleStart);
+
+    vshcube_init();
 
     return 0;
 }

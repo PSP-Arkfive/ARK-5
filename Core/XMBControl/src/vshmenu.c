@@ -30,6 +30,7 @@ struct {
 u32 patch_addr;
 char info_string[128];
 
+
 int (*scePafAddClockOrig)(ScePspDateTime*, wchar_t*, int, wchar_t*) = NULL;
 
 int EatKey(SceCtrlData *pad_data, int count)
@@ -157,6 +158,8 @@ int TSRThread(SceSize args, void *argp)
     }
     vshmenu.is_registered = 0;
 
+    vshcube_stop();
+    
 	vctrlVSHExitVSHMenu(NULL, NULL, 0);
     return sceKernelExitDeleteThread(0);
 }
@@ -172,6 +175,8 @@ int xmbctrlEnterVshMenuMode(){
         sceKernelDcacheWritebackAll();
         kuKernelIcacheInvalidateAll();
     }
+
+    vshcube_start();
 
     SceUID thread_id = sceKernelCreateThread("VshMenu_Thread", (void*)KERNELIFY(TSRThread), 16 , 0x1000 , 0 , 0);
     return sceKernelStartThread(thread_id, 0, 0);

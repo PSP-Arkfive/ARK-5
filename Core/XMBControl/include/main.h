@@ -22,6 +22,11 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
+#include <ark.h>
+#include <rebootexconfig.h>
+#include <systemctrl.h>
+#include <systemctrl_se.h>
+
 #define STAR "★"
 #define WSTAR L"★"
 
@@ -123,6 +128,18 @@ typedef struct
     u32 parent;
     u32 unknown[2];
 } SceRcoEntry;
+
+extern int psp_model;
+extern ARKConfig ark_config;
+extern SEConfigARK se_config;
+extern RebootexConfigARK rebootex_config;
+extern STMOD_HANDLER previous;
+
+int vshcube_init();
+int vshcube_start();
+int vshcube_stop();
+void findAllTranslatableStrings();
+int OnModuleStart(SceModule *mod);
 
 int sce_paf_private_wcslen(wchar_t *);
 int sce_paf_private_wcscpy(wchar_t* str1, wchar_t* str2);

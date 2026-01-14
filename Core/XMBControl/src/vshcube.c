@@ -1,5 +1,3 @@
-// credits to mcidclan
-
 #include <psppower.h>
 #include <pspdisplay.h>
 #include <pspkernel.h>
@@ -8,20 +6,9 @@
 #include <pspgum.h>
 #include <psputilsforkernel.h>
 
+#include <cfwmacros.h>
 #include <systemctrl.h>
-#include <vshctrl.h>
 
-static inline void* hook(char* mod, char* lib, u32 nid, void* hf) {
-  void* f = (void*)sctrlHENFindFunction(mod, lib, nid);
-  if (f) {
-    sctrlHENPatchSyscall(f, hf);
-    return f;
-  }
-  return NULL;
-}
-static inline void unhook(void* hook_orig, void* hook_patch){
-  sctrlHENPatchSyscall(hook_patch, hook_orig);
-}
 
 struct Vertex {
   unsigned int color;
@@ -41,16 +28,24 @@ u32* list            = NULL;
 void* vramBackup     = NULL;
 struct Vertex* cube  = NULL;
 PspGeContext* ctx    = NULL;
-
-static int vsh_cube_running = 0;
+int vshcube_running = 0;
 
 int (*_displaySetFrameBuf)(void*, int, int, int);
+
+static inline void* hook(char* mod, char* lib, u32 nid, void* hf) {
+  unsigned int* const f = (unsigned int*)sctrlHENFindFunction(mod, lib, nid);
+  if (f) {
+    sctrlHENPatchSyscall(f, (void*)KERNELIFY(hf));
+    return f;
+  }
+  return NULL;
+}
 
 int displaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelformat, int sync) {
   
   void* frame = (void*)(0x1fffffff & (u32)frameBuf);
 
-  if (frame) {
+  if (vshcube_running && frame) {
     
     if (list && magic == 1) {
       
@@ -166,9 +161,9 @@ int displaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelformat, int syn
 }
 
 int thread(SceSize ags, void *agp) {
-  void *frame = NULL;
+ void *frame = NULL;
   int width, format;
-  while (vsh_cube_running && !frame) {
+  while (!frame) {
     sceDisplayGetFrameBuf(&frame, &width, &format, 0);
     if (frame) {
       magic = 1;
@@ -179,19 +174,26 @@ int thread(SceSize ags, void *agp) {
   return 0;
 }
 
-int vshcube_start() {
+void* getUserMemoryBlock(unsigned int align, char* name, int mp, unsigned int size) {
+  SceUID uid = sceKernelAllocPartitionMemory(mp, name, PSP_SMEM_Low, size + align, NULL);
+  return (void*)((((align - 1) + (unsigned int)sceKernelGetBlockHeadAddr(uid)) & ~(align - 1)));
+}
+
+int vshcube_init() {
   magic = 0;
   vramBackup = NULL;
   list = NULL;
   cube = NULL;
   ctx = NULL;
+
+  #define MP PSP_MEMORY_PARTITION_USER
   
-  vramBackup = user_memalign(64, VRAM_BACKUP_BYTE_COUNT);
-  list = (u32*)user_memalign(64, 2048);
-  ctx = user_memalign(64, sizeof(PspGeContext));
+  vramBackup = getUserMemoryBlock(64, "vram_block", MP, VRAM_BACKUP_BYTE_COUNT);
+  list = (u32*)getUserMemoryBlock(64, "list_block", MP, 2048);
+  ctx = getUserMemoryBlock(64, "ctx_block", MP, sizeof(PspGeContext));
   
   const unsigned int cubeSize = CUBE_VERT_COUNT * sizeof(struct Vertex);
-  cube = (struct Vertex*)user_memalign(64, cubeSize);
+  cube = (struct Vertex*)getUserMemoryBlock(64, "cube_block", MP, cubeSize);
   
   unsigned int cubeColor = 0x808b4513;
 
@@ -246,6 +248,9 @@ int vshcube_start() {
 
   sceKernelDcacheWritebackRange(cube, (cubeSize + 63) & ~63);
   
+  sceGuInit();
+  sceGuDisplay(GU_FALSE);
+  
   // pspDebugScreenInitEx(0, PSP_DISPLAY_PIXEL_FORMAT_8888, 1);
   // pspDebugScreenEnableBackColor(0);
   
@@ -259,9 +264,12 @@ int vshcube_start() {
   return 0;
 }
 
-int vshcube_stop(SceSize args, void *argp) {
+int vshcube_start() {
+    vshcube_running = 1;
+    return 0;
+}
 
-  unhook(_displaySetFrameBuf, displaySetFrameBuf);
-
-  return 0;
+int vshcube_stop() {
+    vshcube_running = 0;
+    return 0;
 }
