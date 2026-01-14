@@ -54,7 +54,6 @@ $/kd/mediasync.prx VGUPAEM
 $/kd/vshbridge.prx VU
 $/kd/mlnbridge.prx M
 $/kd/mlnbridge_msapp.prx M
-$/kd/ark_xmbctrl.prx V
 $/kd/ark_vshctrl.prx V
 $%/kd/usersystemlib.prx VGUPAEM
 $%/vsh/module/mlncmn.prx M
@@ -69,4 +68,5 @@ $%/vsh/module/common_gui.prx V
 $%/vsh/module/common_util.prx VP
 $%/vsh/module/libpspvmc.prx P
 %%/kd/dummy_anchor_IhariUafaayk98.prx P
+$/kd/ark_xmbctrl.prx V
 $%%/vsh/module/vshmain.prx V
