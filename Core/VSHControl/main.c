@@ -73,15 +73,6 @@ int get_device_name(char *device, int size, const char* path)
     return 0;
 }
 
-void unlockGeMemory() {
-    const unsigned int start = 0xbc000000;
-    const unsigned int end   = 0xbc00002c;
-    for (unsigned int reg = start; reg <= end; reg += 4) {
-        (*((volatile unsigned int*)(reg))) = -1;
-    }
-    asm volatile("sync");
-}
-
 int module_start(SceSize args, void* argp)
 {
     #ifdef DEBUG
@@ -112,8 +103,6 @@ int module_start(SceSize args, void* argp)
     }
 
     enable_150_addon();
-
-    unlockGeMemory();
 
     return 0;
 }
