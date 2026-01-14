@@ -8,6 +8,7 @@
 
 #include <cfwmacros.h>
 #include <systemctrl.h>
+#include <vshctrl.h>
 
 
 struct Vertex {
@@ -174,26 +175,19 @@ int thread(SceSize ags, void *agp) {
   return 0;
 }
 
-void* getUserMemoryBlock(unsigned int align, char* name, int mp, unsigned int size) {
-  SceUID uid = sceKernelAllocPartitionMemory(mp, name, PSP_SMEM_Low, size + align, NULL);
-  return (void*)((((align - 1) + (unsigned int)sceKernelGetBlockHeadAddr(uid)) & ~(align - 1)));
-}
-
 int vshcube_init() {
   magic = 0;
   vramBackup = NULL;
   list = NULL;
   cube = NULL;
   ctx = NULL;
-
-  #define MP PSP_MEMORY_PARTITION_USER
   
-  vramBackup = getUserMemoryBlock(64, "vram_block", MP, VRAM_BACKUP_BYTE_COUNT);
-  list = (u32*)getUserMemoryBlock(64, "list_block", MP, 2048);
-  ctx = getUserMemoryBlock(64, "ctx_block", MP, sizeof(PspGeContext));
+  vramBackup = user_memalign(64, VRAM_BACKUP_BYTE_COUNT);
+  list = (u32*)user_memalign(64, 2048);
+  ctx = user_memalign(64, sizeof(PspGeContext));
   
   const unsigned int cubeSize = CUBE_VERT_COUNT * sizeof(struct Vertex);
-  cube = (struct Vertex*)getUserMemoryBlock(64, "cube_block", MP, cubeSize);
+  cube = (struct Vertex*)user_memalign(64, cubeSize);
   
   unsigned int cubeColor = 0x808b4513;
 
