@@ -29,7 +29,7 @@ u32 magic            = 0;
 void* vramBackup     = NULL;
 int vshcube_running  = 0;
 
-u8 list[2048];
+void* list = NULL;
 struct Vertex cube[CUBE_VERT_COUNT];
 
 int (*_displaySetFrameBuf)(void*, int, int, int);
@@ -245,11 +245,14 @@ int vshcube_init() {
 }
 
 int vshcube_start() {
+    list = user_memalign(64, 2048);
     vshcube_running = 1;
     return 0;
 }
 
 int vshcube_stop() {
     vshcube_running = 0;
+    sceDisplayWaitVblankStart();
+    user_free(list);
     return 0;
 }
