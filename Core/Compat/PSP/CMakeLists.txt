@@ -5,7 +5,7 @@ project(pspcompat VERSION 1.0 LANGUAGES C ASM)
 set(DEBUG "" CACHE STRING "Debug level (1,2,3)")
 message(STATUS "DEBUG LEVEL = ${DEBUG}")
 
-set(ARK_REPOS ark-dev-sdk BootLoadEx)
+set(ARK_REPOS psp-cfw-sdk BootLoadEx)
 
 include(FetchContent)
 foreach(ARK_REPO ${ARK_REPOS})
@@ -18,7 +18,7 @@ foreach(ARK_REPO ${ARK_REPOS})
 endforeach()
 FetchContent_MakeAvailable(${ARK_REPOS})
 
-set(ARKSDK ${ark-dev-sdk_SOURCE_DIR})
+set(CFWSDK ${psp-cfw-sdk_SOURCE_DIR})
 
 add_prx_module(pspcompat exports.exp)
 
@@ -40,8 +40,8 @@ remove_definitions("-D_PSP_FW_VERSION=600")
 add_definitions("-D_PSP_FW_VERSION=660")
 
 target_compile_options(pspcompat PRIVATE -std=c99 -Os -G0 -Wall -fno-pic)
-target_include_directories(pspcompat PRIVATE include ${ARKSDK}/include ${CMAKE_CURRENT_BINARY_DIR})
-target_link_directories(pspcompat PRIVATE ${ARKSDK}/libs)
+target_include_directories(pspcompat PRIVATE include ${CFWSDK}/include ${CMAKE_CURRENT_BINARY_DIR})
+target_link_directories(pspcompat PRIVATE ${CFWSDK}/libs)
 target_link_libraries(pspcompat PRIVATE
    -nostartfiles
    -nostdlib

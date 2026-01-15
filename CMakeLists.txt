@@ -8,7 +8,7 @@ set(DIST_DIR ${CMAKE_CURRENT_LIST_DIR}/dist)
 set(FLASH0_DIR ${DIST_DIR}/flash0)
 
 set(ARK_REPOS
-   ark-dev-sdk
+   psp-cfw-sdk
    SystemControl
    Inferno2
    PopCorn
@@ -33,8 +33,8 @@ endforeach()
 
 FetchContent_MakeAvailable(${ARK_REPOS})
 
-set(ARKSDK ${ark-dev-sdk_SOURCE_DIR})
-set(BUILDTOOLS ${ARKSDK}/build-tools)
+set(CFWSDK ${psp-cfw-sdk_SOURCE_DIR})
+set(BUILDTOOLS ${CFWSDK}/build-tools)
 
 add_custom_target(BuildARK5 ALL
    DEPENDS 

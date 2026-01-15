@@ -1,6 +1,6 @@
 PY = $(shell which python3)
 PSPDEV = $(shell psp-config --pspdev-path)
-BUILDTOOLS = $(PSPDEV)/share/ark-dev-sdk/build-tools
+BUILDTOOLS = $(PSPDEV)/share/psp-cfw-sdk/build-tools
 
 .PHONY : mkdist FlashPackage \
 	SystemControl VSHControl XMBControl Inferno PopCorn Stargate \

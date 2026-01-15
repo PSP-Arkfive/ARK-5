@@ -7,8 +7,8 @@ message(STATUS "DEBUG LEVEL = ${DEBUG}")
 
 include(FetchContent)
 FetchContent_Declare(
-    ark-dev-sdk
-    GIT_REPOSITORY https://github.com/PSP-Arkfive/ark-dev-sdk.git
+    psp-cfw-sdk
+    GIT_REPOSITORY https://github.com/PSP-Arkfive/psp-cfw-sdk.git
     GIT_TAG main
     EXCLUDE_FROM_ALL
 )
@@ -18,9 +18,9 @@ FetchContent_Declare(
     GIT_TAG main
     EXCLUDE_FROM_ALL
 )
-FetchContent_MakeAvailable(ark-dev-sdk BootLoadEx)
+FetchContent_MakeAvailable(psp-cfw-sdk BootLoadEx)
 
-set(ARKSDK ${ark-dev-sdk_SOURCE_DIR})
+set(CFWSDK ${psp-cfw-sdk_SOURCE_DIR})
 
 add_prx_module(vitapopscompat exports.exp)
 
@@ -37,8 +37,8 @@ remove_definitions("-D_PSP_FW_VERSION=600")
 add_definitions("-D_PSP_FW_VERSION=660")
 
 target_compile_options(vitapopscompat PRIVATE -std=c99 -Os -G0 -Wall -fno-pic)
-target_include_directories(vitapopscompat PRIVATE include ${ARKSDK}/include ${CMAKE_CURRENT_BINARY_DIR})
-target_link_directories(vitapopscompat PRIVATE ${ARKSDK}/libs)
+target_include_directories(vitapopscompat PRIVATE include ${CFWSDK}/include ${CMAKE_CURRENT_BINARY_DIR})
+target_link_directories(vitapopscompat PRIVATE ${CFWSDK}/libs)
 target_link_libraries(vitapopscompat PRIVATE
    -nostartfiles
    -nostdlib
