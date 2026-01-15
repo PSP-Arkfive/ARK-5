@@ -25,6 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <vshctrl.h>
+#include <kubridge.h>
 
 
 #define VRAM_BACKUP_BYTE_COUNT  0x00044000
@@ -41,70 +42,61 @@ struct Vertex {
 } __attribute__((aligned(4), packed));
 
 
-u32 magic            = 0;
-void* vramBackup     = NULL;
-int vshcube_running  = 0;
+static void* vramBackup     = NULL;
+static int vshcube_running  = 0;
+static void* list = NULL;
+static struct Vertex cube[CUBE_VERT_COUNT];
 
-void* list = NULL;
-struct Vertex cube[CUBE_VERT_COUNT];
+static int (*_displaySetFrameBuf)(void*, int, int, int) = NULL;
 
-int (*_displaySetFrameBuf)(void*, int, int, int);
-
-static inline void* hook(char* mod, char* lib, u32 nid, void* hf) {
-  unsigned int* const f = (unsigned int*)sctrlHENFindFunction(mod, lib, nid);
-  if (f) {
-    sctrlHENPatchSyscall(f, (void*)KERNELIFY(hf));
-    return f;
-  }
-  return NULL;
+static void khook(char* mod, char* lib, u32 nid, void* hf, void** ptr) {
+    unsigned int* const addr = (unsigned int*)sctrlHENFindFunction(mod, lib, nid);
+    if (addr) {
+        void* ret = NULL;
+        void* kf = (void*)KERNELIFY(hf);
+        HIJACK_FUNCTION(addr, kf, ret);
+        *ptr = (void*)KERNELIFY(ret);
+    }
 }
 
-int displaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelformat, int sync) {
-  
-  void* frame = (void*)(0x1fffffff & (u32)frameBuf);
+static void vshcube_draw(void* frame) {
 
-  if (vshcube_running && frame) {
-    
-    if (list && magic == 1) {
+    PspGeContext* gectx = user_memalign(64, sizeof(PspGeContext));
+    vramBackup = user_memalign(64, VRAM_BACKUP_BYTE_COUNT);
 
-      PspGeContext* gectx = user_memalign(64, sizeof(PspGeContext));
-      vramBackup = user_memalign(64, VRAM_BACKUP_BYTE_COUNT);
-      
-      magic = 2;
-      
-      sceGeSaveContext(gectx);
-      int state = sceKernelSuspendDispatchThread();
-      int intr = sceKernelCpuSuspendIntr();
-        
-      // frame = (void*)(0x40000000 | (u32)frame);
-      void* const depthBuf = (void*)(DEPTH_BUFFER + (u32)frame);
+    sceGeSaveContext(gectx);
+    int state = sceKernelSuspendDispatchThread();
+    int intr = sceKernelCpuSuspendIntr();
 
-      sceGuStart(GU_DIRECT, list);
-      
-      sceGuDisable(GU_DEPTH_TEST);
-      sceGuDisable(GU_BLEND);
-      sceGuDisable(GU_TEXTURE_2D);
-      sceGuDisable(GU_CULL_FACE);
-      
-      sceGuCopyImage(GU_PSM_8888,
+    // frame = (void*)(0x40000000 | (u32)frame);
+    void* const depthBuf = (void*)(DEPTH_BUFFER + (u32)frame);
+
+    sceGuStart(GU_DIRECT, list);
+
+    sceGuDisable(GU_DEPTH_TEST);
+    sceGuDisable(GU_BLEND);
+    sceGuDisable(GU_TEXTURE_2D);
+    sceGuDisable(GU_CULL_FACE);
+
+    sceGuCopyImage(GU_PSM_8888,
         0, 0, 480, 64, 512, depthBuf,
         0, 0, 512, vramBackup
-      );
+    );
 
-      sceGuOffset(2048 - (SCR_WIDTH/2), 2048 - (SCR_HEIGHT/2));
-      sceGuViewport(2048, 2048, SCR_WIDTH, SCR_HEIGHT);
+    sceGuOffset(2048 - (SCR_WIDTH/2), 2048 - (SCR_HEIGHT/2));
+    sceGuViewport(2048, 2048, SCR_WIDTH, SCR_HEIGHT);
 
-      sceGumMatrixMode(GU_PROJECTION);
-      sceGumLoadIdentity();
-      sceGumPerspective(50.0f, 16.0f/9.0f, 1.0f, 100.0f);
+    sceGumMatrixMode(GU_PROJECTION);
+    sceGumLoadIdentity();
+    sceGumPerspective(50.0f, 16.0f/9.0f, 1.0f, 100.0f);
 
-      sceGumMatrixMode(GU_VIEW);
-      sceGumLoadIdentity();
+    sceGumMatrixMode(GU_VIEW);
+    sceGumLoadIdentity();
 
-      sceGumMatrixMode(GU_MODEL);
-      sceGumLoadIdentity();
+    sceGumMatrixMode(GU_MODEL);
+    sceGumLoadIdentity();
 
-      {
+    {
         static float deg = 45.0f;
         const float rad = 3.14f/180.0f;
         const ScePspFVector3 t = {1.435f, -0.72f, -2.0f};
@@ -114,89 +106,82 @@ int displaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelformat, int syn
         sceGumRotateY(rad * deg * 1.2f);
         sceGumRotateZ(rad * deg * 1.4f);
         deg += 0.25f;
-      }
-      
-      sceGuDepthBuffer(depthBuf, 64);
-      sceGuDepthRange(65535, 0);
-      sceGuClearDepth(0.0f);
-      sceGuDepthFunc(GU_GEQUAL);
-      sceGuEnable(GU_DEPTH_TEST);
+    }
 
-      sceGuDisable(GU_STENCIL_TEST);
+    sceGuDepthBuffer(depthBuf, 64);
+    sceGuDepthRange(65535, 0);
+    sceGuClearDepth(0.0f);
+    sceGuDepthFunc(GU_GEQUAL);
+    sceGuEnable(GU_DEPTH_TEST);
 
-      sceGuDrawBuffer(GU_PSM_8888, frame, BUF_WIDTH);
-      sceGuEnable(GU_SCISSOR_TEST);
-      sceGuScissor(416, 208, 64, 64);
-      // sceGuClearColor(0);
-      
-      sceGuClear(/*GU_COLOR_BUFFER_BIT | */GU_DEPTH_BUFFER_BIT);
-      
-      sceGuEnable(GU_LIGHTING);
-      sceGuEnable(GU_LIGHT0);
-      sceGuAmbient(0xffeeeeee);
-      sceGuLightColor(GU_LIGHT0, GU_DIFFUSE, 0xffffffff);
+    sceGuDisable(GU_STENCIL_TEST);
 
-      ScePspFVector3 lightDir = { 0.0f, -1.0f, -1.0f };
-      sceGuLight(GU_LIGHT0, GU_DIRECTIONAL, GU_DIFFUSE_AND_SPECULAR, &lightDir);
+    sceGuDrawBuffer(GU_PSM_8888, frame, BUF_WIDTH);
+    sceGuEnable(GU_SCISSOR_TEST);
+    sceGuScissor(416, 208, 64, 64);
+    // sceGuClearColor(0);
 
-      sceGumDrawArray(GU_TRIANGLES, GU_COLOR_8888 | GU_NORMAL_32BITF |
-      GU_VERTEX_32BITF | GU_TRANSFORM_3D, CUBE_VERT_COUNT, NULL, cube);
-      
-      sceGuDisable(GU_LIGHT0);
-      sceGuDisable(GU_LIGHTING);
-       
-      {
+    sceGuClear(/*GU_COLOR_BUFFER_BIT | */GU_DEPTH_BUFFER_BIT);
+
+    sceGuEnable(GU_LIGHTING);
+    sceGuEnable(GU_LIGHT0);
+    sceGuAmbient(0xffeeeeee);
+    sceGuLightColor(GU_LIGHT0, GU_DIFFUSE, 0xffffffff);
+
+    ScePspFVector3 lightDir = { 0.0f, -1.0f, -1.0f };
+    sceGuLight(GU_LIGHT0, GU_DIRECTIONAL, GU_DIFFUSE_AND_SPECULAR, &lightDir);
+
+    sceGumDrawArray(GU_TRIANGLES, GU_COLOR_8888 | GU_NORMAL_32BITF |
+    GU_VERTEX_32BITF | GU_TRANSFORM_3D, CUBE_VERT_COUNT, NULL, cube);
+
+    sceGuDisable(GU_LIGHT0);
+    sceGuDisable(GU_LIGHTING);
+
+    {
         const ScePspFVector3 s = {1.09f, 1.09f, 1.09f};
         sceGumScale(&s);
-      }
-      
-      sceGuEnable(GU_BLEND);
-      sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
-  
-      sceGumDrawArray(GU_TRIANGLES, GU_COLOR_8888 | GU_NORMAL_32BITF |
-      GU_VERTEX_32BITF | GU_TRANSFORM_3D, CUBE_VERT_COUNT, NULL, cube);
-      
-      sceGuCopyImage(GU_PSM_8888,
+    }
+
+    sceGuEnable(GU_BLEND);
+    sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
+
+    sceGumDrawArray(GU_TRIANGLES, GU_COLOR_8888 | GU_NORMAL_32BITF |
+    GU_VERTEX_32BITF | GU_TRANSFORM_3D, CUBE_VERT_COUNT, NULL, cube);
+
+    sceGuCopyImage(GU_PSM_8888,
         0, 0, 480, 64, 512, vramBackup,
         0, 0, 512, depthBuf
-      );
-      
-      sceGuFinish();
-      sceGuSync(GU_SYNC_FINISH, GU_SYNC_WHAT_DONE);
+    );
 
-      {
-          u32 a=0xfff;
-          while(--a) {__asm__("nop; sync");}
-      }
-      
-      sceKernelCpuResumeIntrWithSync(intr);
-      sceKernelResumeDispatchThread(state);
-      sceGeRestoreContext(gectx);
-      
-      magic = 1;
+    sceGuFinish();
+    sceGuSync(GU_SYNC_FINISH, GU_SYNC_WHAT_DONE);
 
-      user_free(vramBackup);
-      user_free(gectx);
+    {
+        u32 a=0xfff;
+        while(--a) {__asm__("nop; sync");}
     }
-  }
-  
-  int ret = _displaySetFrameBuf(frameBuf, bufferwidth, pixelformat, sync);
 
-  return ret;
+    sceKernelCpuResumeIntrWithSync(intr);
+    sceKernelResumeDispatchThread(state);
+    sceGeRestoreContext(gectx);
+
+    user_free(vramBackup);
+    user_free(gectx);
 }
 
-static int vshcube_thread(SceSize ags, void *agp) {
- void *frame = NULL;
-  int width, format;
-  while (!frame) {
-    sceDisplayGetFrameBuf(&frame, &width, &format, 0);
-    if (frame) {
-      magic = 1;
+static int vshDisplaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelformat, int sync) {
+  
+    void* frame = (void*)(0x1fffffff & (u32)frameBuf);
+
+    if (frame){
+        if (vshcube_running && list){
+            vshcube_draw(frame);
+        }
     }
-    sceKernelDelayThread(1);
-  }
-  sceKernelExitDeleteThread(0);
-  return 0;
+
+    int ret = _displaySetFrameBuf(frameBuf, bufferwidth, pixelformat, sync);
+
+    return ret;
 }
 
 int vshcube_init() {
@@ -255,12 +240,13 @@ int vshcube_init() {
     sceGuInit();
     sceGuDisplay(GU_FALSE);
 
-    _displaySetFrameBuf = hook("sceDisplay_Service", "sceDisplay", 0x289D82FE, (void*)displaySetFrameBuf);
-
-    SceUID id = sceKernelCreateThread("vshcube_thread", vshcube_thread, 0x12, 0x10000, 0, NULL);
-        if (id >= 0) {
-        sceKernelStartThread(id, 0, NULL);
-    }
+    struct KernelCallArg kargs;
+    kargs.arg1 = (u32)"sceDisplay_Service";
+    kargs.arg2 = (u32)"sceDisplay";
+    kargs.arg3 = (u32)0x289D82FE;
+    kargs.arg4 = (u32)vshDisplaySetFrameBuf;
+    kargs.arg5 = (u32)&_displaySetFrameBuf;
+    kuKernelCall(khook, &kargs);
 
     return 0;
 }
