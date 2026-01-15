@@ -123,9 +123,11 @@ static int StartModuleHandler(int modid, SceSize argsize, void * argp, int * mod
     SceModule* mod = (SceModule*) sceKernelFindModuleByUID(modid);
 
     if (mod && strcmp(mod->modname, "vsh_module") == 0) {
-        // Load XMB Control
-        SceUID modid = sceKernelLoadModule(XMBCTRL_PRX_FLASH, 0, NULL);
-        if (modid >= 0) sceKernelStartModule(modid, 0, NULL, NULL, NULL);
+        if (sceKernelFindModuleByName("XmbControl") == NULL){
+            // Load XMB Control
+            SceUID modid = sceKernelLoadModule(XMBCTRL_PRX_FLASH, 0, NULL);
+            if (modid >= 0) sceKernelStartModule(modid, 0, NULL, NULL, NULL);
+        }
     }
 
     // forward to previous or default StartModule
