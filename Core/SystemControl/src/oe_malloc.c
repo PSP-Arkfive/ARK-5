@@ -31,7 +31,7 @@ static void* generic_malloc(int partition, int size){
     return NULL;
 }
 
-void* generic_memalign(int partition, unsigned int align, unsigned int size){
+static void* generic_memalign(int partition, unsigned int align, unsigned int size){
     int uid = sceKernelAllocPartitionMemory(partition, "", PSP_SMEM_High, size+align+sizeof(int), NULL);
     int* ptr = sceKernelGetBlockHeadAddr(uid);
     if (ptr){
