@@ -7,6 +7,16 @@
 #include <bootloadex_ark.h>
 
 
+int pspemuLfatOpenArkEPSX(BootFile* file)
+{
+    char* p = file->name;
+    if (strcmp(p, "pspbtcnf.bin") == 0){
+        p[2] = 'x'; // custom btcnf for VitaPops
+    }
+    return -1;
+}
+
+
 BootLoadExConfig bleconf = {
     .boot_type = TYPE_REBOOTEX,
     .boot_storage = FLASH_BOOT,
