@@ -251,9 +251,33 @@ unsigned int sctrlHENFindImport(const char *szMod, const char *szLib, unsigned i
     return 0;
 }
 
-void* sctrlArkGetConfig(ARKConfig* conf){
-    if (conf) memcpy(conf, ark_config, sizeof(ARKConfig));
-    return ark_config;
+void sctrlHENHijackFunction(FunctionPatchData* patch_data, void* func_addr, void* patch_func, void** orig_func){
+
+    void* ptr = patch_data;
+    
+    int is_kernel_patch = IS_KERNEL_ADDR(func_addr);
+    if (is_kernel_patch){
+        patch_func = (void*)KERNELIFY(patch_func);
+        ptr = (void*)KERNELIFY(ptr);
+    }
+
+    // do hijack
+    {
+        u32 _pb_ = (u32)patch_data;
+        u32 a = (u32)func_addr;
+        u32 f = (u32)patch_func;
+
+        _sw(_lw(a), _pb_);
+        _sw(_lw(a + 4), _pb_ + 4);
+        _sw(NOP, _pb_ + 8);
+        _sw(NOP, _pb_ + 16);
+        MAKE_JUMP_PATCH(_pb_ + 12, a + 8);
+        _sw(0x08000000 | ((f >> 2) & 0x03FFFFFF), a); \
+        _sw(NOP, a + 4);
+
+    }
+
+    *orig_func = ptr;
 }
 
 void sctrlHENLoadModuleOnReboot(char *module_before, void *buf, int size, int flags)

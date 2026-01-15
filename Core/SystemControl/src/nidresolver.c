@@ -161,7 +161,7 @@ NidMissingResolver *g_missing_resolver[] =
 /////////////////////////////////////////////////////////////////////////
 
 // Missing NID Resolver
-unsigned int resolveMissingNid(const char * libName, unsigned int nid)
+unsigned int sctrlKernelResolveNid(const char * libName, unsigned int nid)
 {
     // Iterate Missing Library Resolver
     int i = 0; for(; i < NELEMS(g_missing_resolver); ++i)
@@ -222,7 +222,7 @@ int fillLibraryStubs(void * lib, unsigned int nid, void * stub, unsigned int nid
     
     if (!is_user_mode){
         // Resolve Missing NID
-        unsigned int targetAddress = resolveMissingNid(name, nid);
+        unsigned int targetAddress = sctrlKernelResolveNid(name, nid);
         // Missing Function
         if(targetAddress != 0)
         {

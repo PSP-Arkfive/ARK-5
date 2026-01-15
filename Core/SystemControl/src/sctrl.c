@@ -623,6 +623,7 @@ int sctrlKernelQuerySystemCall(void *func_addr)
     return ret;
 }
 
-u32 sctrlKernelResolveNid(const char *szLib, u32 nid){
-    return resolveMissingNid(szLib, nid);
+void* sctrlArkGetConfig(ARKConfig* conf){
+    if (conf) memcpy(conf, ark_config, sizeof(ARKConfig));
+    return ark_config;
 }

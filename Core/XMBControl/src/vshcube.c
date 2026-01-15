@@ -47,17 +47,8 @@ static int vshcube_running  = 0;
 static void* list = NULL;
 static struct Vertex cube[CUBE_VERT_COUNT];
 
-static int (*_displaySetFrameBuf)(void*, int, int, int) = NULL;
-
-static void khook(char* mod, char* lib, u32 nid, void* hf, void** ptr) {
-    unsigned int* const addr = (unsigned int*)sctrlHENFindFunction(mod, lib, nid);
-    if (addr) {
-        void* ret = NULL;
-        void* kf = (void*)KERNELIFY(hf);
-        HIJACK_FUNCTION(addr, kf, ret);
-        *ptr = (void*)KERNELIFY(ret);
-    }
-}
+FunctionPatchData display_patch;
+static int (*prevDisplaySetFrameBuf)(void*, int, int, int) = NULL;
 
 static void vshcube_draw(void* frame) {
 
@@ -179,9 +170,7 @@ static int vshDisplaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelforma
         }
     }
 
-    int ret = _displaySetFrameBuf(frameBuf, bufferwidth, pixelformat, sync);
-
-    return ret;
+    return prevDisplaySetFrameBuf(frameBuf, bufferwidth, pixelformat, sync);
 }
 
 int vshcube_init() {
@@ -240,13 +229,8 @@ int vshcube_init() {
     sceGuInit();
     sceGuDisplay(GU_FALSE);
 
-    struct KernelCallArg kargs;
-    kargs.arg1 = (u32)"sceDisplay_Service";
-    kargs.arg2 = (u32)"sceDisplay";
-    kargs.arg3 = (u32)0x289D82FE;
-    kargs.arg4 = (u32)vshDisplaySetFrameBuf;
-    kargs.arg5 = (u32)&_displaySetFrameBuf;
-    kuKernelCall(khook, &kargs);
+    void* func_addr = (void*)sctrlHENFindFunction("sceDisplay_Service", "sceDisplay", 0x289D82FE);
+    sctrlHENHijackFunction(&display_patch, func_addr, vshDisplaySetFrameBuf, (void**)&prevDisplaySetFrameBuf);
 
     return 0;
 }
