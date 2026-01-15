@@ -23,7 +23,7 @@
 #include <pspthreadman_kernel.h>
 #include <psputility_sysparam.h>
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 #include <rebootexconfig.h>
 #include <systemctrl.h>

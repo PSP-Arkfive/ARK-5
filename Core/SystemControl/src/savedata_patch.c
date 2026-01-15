@@ -19,7 +19,7 @@
 #include <pspkernel.h>
 #include <psputility.h>
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 
 #include <systemctrl.h>
 

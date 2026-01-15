@@ -3,7 +3,7 @@
 #include <pspiofilemgr.h>
 #include <pspkermit.h>
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 #include <systemctrl.h>
 

@@ -6,7 +6,7 @@
 #include <pspsdk.h>
 #include <pspkernel.h>
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 
 #include "list.h"

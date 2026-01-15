@@ -24,7 +24,7 @@
 #include <psputilsforkernel.h>
 #include <pspthreadman_kernel.h>
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 #include <ciso.h>
 #include <cfwmacros.h>
 #include <systemctrl.h>

@@ -20,7 +20,7 @@
 #include <systemctrl.h>
 #include <cfwmacros.h>
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 
 #if DEBUG >= 2
 

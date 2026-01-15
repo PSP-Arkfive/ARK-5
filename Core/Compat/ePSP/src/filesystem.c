@@ -21,7 +21,7 @@
 #include <pspkernel.h>
 #include <psputilsforkernel.h>
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 
 #include <rebootexconfig.h>

@@ -28,7 +28,7 @@
 #include <psppower.h>
 #include <psputility_sysparam.h>
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 #include <vshctrl.h>
 #include <kubridge.h>
 #include <cfwmacros.h>

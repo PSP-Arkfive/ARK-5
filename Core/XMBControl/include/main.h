@@ -22,7 +22,7 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 #include <rebootexconfig.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>

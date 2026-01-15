@@ -17,7 +17,7 @@
 
 #include <pspsdk.h>
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 #include <systemctrl.h>
 #include <systemctrl_private.h>
 

@@ -38,7 +38,7 @@
 #include <systemctrl_private.h>
 #include <stdarg.h>
 #include <string.h>
-#include <ark.h>
+#include <systemctrl_ark.h>
 
 #if DEBUG >= 3
 

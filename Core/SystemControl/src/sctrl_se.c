@@ -29,7 +29,7 @@
 #include <systemctrl_se.h>
 #include <systemctrl_private.h>
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 
 

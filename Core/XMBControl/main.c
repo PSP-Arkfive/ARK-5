@@ -6,7 +6,7 @@
 #include <pspgu.h>
 #include <psputility_sysparam.h>
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 #include <kubridge.h>
 #include <vshctrl.h>

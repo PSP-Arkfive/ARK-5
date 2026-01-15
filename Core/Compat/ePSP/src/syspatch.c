@@ -6,7 +6,7 @@
 #include <pspkernel.h>
 #include <pspdisplay.h>
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 #include <rebootexconfig.h>
 #include <cfwmacros.h>
 #include <systemctrl.h>

@@ -1,7 +1,7 @@
 #include <pspsdk.h>
 #include <systemctrl.h>
 #include <systemctrl_private.h>
-#include <ark.h> 
+#include <systemctrl_ark.h> 
 #include "rebootex.h"
 #include "modulemanager.h"
 #include "loadercore.h"

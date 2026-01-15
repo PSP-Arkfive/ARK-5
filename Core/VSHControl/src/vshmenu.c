@@ -26,7 +26,7 @@
 #include <pspiofilemgr.h>
 #include <pspctrl.h>
 
-#include <ark.h>
+#include <systemctrl_ark.h>
 #include <vshctrl.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
