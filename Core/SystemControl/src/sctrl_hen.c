@@ -278,6 +278,8 @@ void sctrlHENHijackFunction(FunctionPatchData* patch_data, void* func_addr, void
     }
 
     *orig_func = ptr;
+
+    sctrlFlushCache();
 }
 
 void sctrlHENLoadModuleOnReboot(char *module_before, void *buf, int size, int flags)
