@@ -1,0 +1,49 @@
+name: ARK-5
+on:
+  push:
+    branches: [ main ]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: pspdev/pspsdk
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4 
+
+      - name: Build
+        run:  make clean && make -j($nproc)
+
+      - name: Compress
+        run: |
+          cd dist
+          zip -r ARK-5.zip .
+      
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: dist/*.zip
+
+    release:
+      needs: build
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Download artifacts
+          uses: actions/download-artifact@v4
+          with:
+            name: release-zip
+            path: dist/*.zip
+        - name:
+          uses: softprops/actions-gh-release@v2
+          with:
+            prerelease: true
+            files: dist/*.zip
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+    
