@@ -32,37 +32,37 @@ SceLibraryStubTable * sctrlFindImportLib(SceModule * pMod, char * library)
 {
     // Invalid Arguments
     if(pMod == NULL || library == NULL) return NULL;
-    
+
     // Import Stub Table Start Address
     void * stubTab = pMod->stub_top;
-    
+
     // Iterate Stubs
     int i = 0; while(i < pMod->stub_size)
     {
         // Cast Import Table
         SceLibraryStubTable * pImp = (SceLibraryStubTable *)(stubTab + i);
-        
+
         // Matching Library discovered
         if(pImp->libname != NULL && strcmp(pImp->libname, library) == 0)
         {
             // Return Address
             return pImp;
         }
-        
+
         // Move Pointer
         i += pImp->len * 4;
     }
-    
+
     // Import Library not found
     return NULL;
 }
 
 // Find Import Stub Address
-unsigned int sctrlFindImportByNID(SceModule * pMod, const char * library, unsigned int nid)
+u32 sctrlFindImportByNID(SceModule * pMod, const char * library, u32 nid)
 {
     // Find Import Library
     SceLibraryStubTable * pImp = sctrlFindImportLib(pMod, library);
-    
+
     // Found Import Library
     if(pImp != NULL)
     {
@@ -73,11 +73,11 @@ unsigned int sctrlFindImportByNID(SceModule * pMod, const char * library, unsign
             if(pImp->nidtable[i] == nid)
             {
                 // Return Function Stub Address
-                return (unsigned int)(pImp->stubtable + 8 * i);
+                return (u32)(pImp->stubtable + 8 * i);
             }
         }
     }
-    
+
     // Import Stub not found
     return 0;
 }
@@ -85,40 +85,40 @@ unsigned int sctrlFindImportByNID(SceModule * pMod, const char * library, unsign
 // Hook Function in Module Import Stubs
 // This function autodetects whether Syscalls are used or not...
 // Manual exporting in exports.exp is still required however for Syscalls to work.
-int sctrlHookImportByNID(SceModule * pMod, const char * library, unsigned int nid, void * func)
+int sctrlHookImportByNID(SceModule * pMod, const char * library, u32 nid, void * func)
 {
     // Invalid Arguments
     if(pMod == NULL || library == NULL) return -1;
-    
+
     // Find Module Import Stub
-    unsigned int stub = sctrlFindImportByNID(pMod, library, nid);
-    
+    u32 stub = sctrlFindImportByNID(pMod, library, nid);
+
     // Import Stub not found
     if(stub == 0)
     {
         // Get NID Resolver
         NidResolverLib * resolver = getNidResolverLib(library);
-        
+
         // Found Resolver for Library
         if(resolver != NULL)
         {
             // Resolve NID
             nid = getNidReplacement(resolver, nid);
-            
+
             // Attempt it again...
             stub = sctrlFindImportByNID(pMod, library, nid);
-            
+
             // Import Stub not found
             if(stub == 0) return -3;
         }
-        
+
         // Resolver Library not found
         else return -2;
     }
-    
+
     // Function as 16-Bit Unsigned Integer
     unsigned int func_int = (unsigned int)func;
-    
+
     // Dummy Return
     if(func_int <= 0xFFFF)
     {
@@ -126,7 +126,7 @@ int sctrlHookImportByNID(SceModule * pMod, const char * library, unsigned int ni
         _sw(JR_RA, stub);
         _sw(LI_V0(func_int), stub + 4);
     }
-    
+
     // Normal Hook
     else
     {
@@ -135,15 +135,15 @@ int sctrlHookImportByNID(SceModule * pMod, const char * library, unsigned int ni
         {
             // Query Syscall Number
             int syscall = sceKernelQuerySystemCall(func);
-            
+
             // Not properly exported in exports.exp
             if(syscall < 0) return -3;
-            
+
             // Create Syscall Hook
             _sw(JR_RA, stub);
             _sw(SYSCALL(syscall), stub + 4);
         }
-        
+
         // Direct Jump Hook
         else
         {
@@ -152,11 +152,11 @@ int sctrlHookImportByNID(SceModule * pMod, const char * library, unsigned int ni
             _sw(NOP, stub + 4);
         }
     }
-    
+
     // Invalidate Cache
     sceKernelDcacheWritebackInvalidateRange((void *)stub, 8);
     sceKernelIcacheInvalidateRange((void *)stub, 8);
-    
+
     // Return Success
     return 0;
 }

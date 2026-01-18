@@ -78,36 +78,36 @@ PspIoDrv * sctrlHENFindDriver(const char * drvname)
 {
     // Elevate Permission Level
     unsigned int k1 = pspSdkSetK1(0);
-    
+
     // Find Function
     int * (* findDriver)(const char * drvname) = (void*)sctrlHENFindFirstJAL(sctrlHENFindFunction("sceIOFileManager", "IoFileMgrForKernel", 0x76DA16E3));
-    
+
     // Find Driver Wrapper
     int * wrapper = findDriver(drvname);
-    
+
     // Search Result
     PspIoDrv * driver = NULL;
-    
+
     // Found Driver Wrapper
     if(wrapper != NULL)
     {
         // Save Driver Pointer
         driver = (PspIoDrv *)(wrapper[1]);
     }
-    
+
     // Restore Permission Level
     pspSdkSetK1(k1);
 
     if (driver == NULL){
         if(0 == strcasecmp(drvname, "msstor")) {
-        	return sctrlHENFindDriver("eflash0a0f");
+            return sctrlHENFindDriver("eflash0a0f");
         }
 
         if(0 == strcasecmp(drvname, "msstor0p")) {
-        	return sctrlHENFindDriver("eflash0a0f1p");
+            return sctrlHENFindDriver("eflash0a0f1p");
         }
     }
-    
+
     // Return Driver
     return driver;
 }
@@ -117,16 +117,16 @@ void sctrlHENPatchSyscall(void * addr, void * newaddr)
 {
     // Syscall Table
     unsigned int * syscalls = NULL;
-    
+
     // Get Syscall Table Pointer from Coprocessor
     __asm__ volatile("cfc0 %0, $12\n" : "=r"(syscalls));
-    
+
     // Invalid Syscall Table
     if(syscalls == NULL) return;
-    
+
     // Skip Table Header
     syscalls += 4; // 4 * 4 = 16
-    
+
     // Iterate Syscalls
     for(int i = 0; i < 0xFF4; ++i)
     {
@@ -144,20 +144,40 @@ STMOD_HANDLER sctrlHENSetStartModuleHandler(STMOD_HANDLER new_handler)
 {
     // Get Previous Handler
     STMOD_HANDLER on_module_start = g_module_start_handler;
-    
+
     // Register Handler
     g_module_start_handler = (void *)(KERNELIFY(new_handler));
-    
+
     // Return Previous Handler
     return on_module_start;
 }
 
 // Find Function Address
-unsigned int sctrlHENFindFunction(const char * szMod, const char * szLib, unsigned int nid)
-{
+u32 sctrlHENFindFunction(const char * szMod, const char * szLib, u32 nid) {
+    // Find Target Module
+    SceModule * mod = (SceModule *)sceKernelFindModuleByName(szMod);
+
+    // Module not found
+    if(mod == NULL) {
+        // Attempt to find it by Address
+        mod = (SceModule *)sceKernelFindModuleByAddress((unsigned int)szMod);
+
+        // Module not found
+        if(mod == NULL) return 0;
+    }
+
+    return sctrlHENFindFunctionInMod(mod, szLib, nid);
+}
+
+u32 sctrlHENFindFunctionInMod(SceModule * mod, const char *library, u32 nid) {
+    // Invalid Arguments
+    if(mod == NULL) {
+        return 0;
+    }
+
     // Get NID Resolver
-    NidResolverLib * resolver = getNidResolverLib(szLib);
-    
+    NidResolverLib * resolver = getNidResolverLib(library);
+
     // Found Resolver for Library
     if(resolver != NULL)
     {
@@ -165,37 +185,24 @@ unsigned int sctrlHENFindFunction(const char * szMod, const char * szLib, unsign
         nid = getNidReplacement(resolver, nid);
     }
 
-    // Find Target Module
-    SceModule * pMod = (SceModule *)sceKernelFindModuleByName(szMod);
-    
-    // Module not found
-    if(pMod == NULL)
-    {
-        // Attempt to find it by Address
-        pMod = (SceModule *)sceKernelFindModuleByAddress((unsigned int)szMod);
-        
-        // Module not found
-        if(pMod == NULL) return 0;
-    }
-    
     // Fetch Export Table Start Address
-    void * entTab = pMod->ent_top;
-    
+    void * entTab = mod->ent_top;
+
     // Iterate Exports
-    for (int i = 0; i < pMod->ent_size;)
+    for (int i = 0; i < mod->ent_size;)
     {
         // Cast Export Table Entry
         struct SceLibraryEntryTable * entry = (struct SceLibraryEntryTable *)(entTab + i);
-        
+
         // Found Matching Library
-        if(entry->libname != NULL && szLib != NULL && 0 == strcmp(entry->libname, szLib))
+        if(entry->libname != NULL && library != NULL && 0 == strcmp(entry->libname, library))
         {
             // Accumulate Function and Variable Exports
             unsigned int total = entry->stubcount + entry->vstubcount;
-            
+
             // NID + Address Table
             unsigned int * vars = entry->entrytable;
-            
+
             // Exports available
             if(total > 0)
             {
@@ -207,12 +214,38 @@ unsigned int sctrlHENFindFunction(const char * szMod, const char * szLib, unsign
                 }
             }
         }
-        
+
         // Move Pointer
         i += (entry->len * 4);
     }
-    
+
     // Function not found
+    return 0;
+}
+
+u32 sctrlHENFindFunctionOnSystem(const char *libname, u32 nid, int user_mods_only) {
+    SceUID mod_list[128] = {0};
+    u32 mod_count = 0;
+    int res = sceKernelGetModuleIdListForKernel(mod_list, 128, &mod_count, user_mods_only);
+
+    if (res != 0) {
+        return 0;
+    }
+
+    if (mod_count > 128) {
+        // logmsg("[WARN]: %s: System has more than 128 modules, result will be incomplete\n", __func__);
+    }
+
+    for (int i = 0; i < MIN(mod_count, 128); i++) {
+        SceUID mod_id = mod_list[i];
+        SceModule* mod = sceKernelFindModuleByUID(mod_id);
+        u32 fn = sctrlHENFindFunctionInMod(mod, libname, nid);
+
+        if (fn != 0) {
+            return fn;
+        }
+    }
+
     return 0;
 }
 
@@ -223,23 +256,27 @@ u32 sctrlHENGetInitControl()
     return (u32)kernel_init_apitype - 8;
 }
 
-unsigned int sctrlHENFindImport(const char *szMod, const char *szLib, unsigned int nid)
-{
+u32 sctrlHENFindImport(const char *szMod, const char *szLib, u32 nid) {
     SceModule *mod = (SceModule*)sceKernelFindModuleByName(szMod);
     if(!mod) return 0;
 
-    for(int i = 0; i < mod->stub_size;)
-    {
+    return sctrlHENFindImportInMod(mod, szLib, nid);
+}
+
+u32 sctrlHENFindImportInMod(SceModule * mod, const char *library, u32 nid) {
+    // Invalid Arguments
+    if (mod == NULL || library == NULL) {
+        return 0;
+    }
+
+    for(int i = 0; i < mod->stub_size;) {
         SceLibraryStubTable *stub = (SceLibraryStubTable *)(mod->stub_top + i);
 
-        if(stub->libname && strcmp(stub->libname, szLib) == 0)
-        {
+        if(stub->libname && strcmp(stub->libname, library) == 0) {
             unsigned int *table = stub->nidtable;
 
-            for(int j = 0; j < stub->stubcount; j++)
-            {
-                if(table[j] == nid)
-                {
+            for(int j = 0; j < stub->stubcount; j++) {
+                if(table[j] == nid) {
                     return ((u32)stub->stubtable + (j * 8));
                 }
             }
@@ -251,10 +288,10 @@ unsigned int sctrlHENFindImport(const char *szMod, const char *szLib, unsigned i
     return 0;
 }
 
-void sctrlHENHijackFunction(FunctionPatchData* patch_data, void* func_addr, void* patch_func, void** orig_func){
+void sctrlHENHijackFunction(FunctionPatchData* patch_data, void* func_addr, void* patch_func, void** orig_func) {
 
     void* ptr = patch_data;
-    
+
     int is_kernel_patch = IS_KERNEL_ADDR(func_addr);
     if (is_kernel_patch){
         patch_func = (void*)KERNELIFY(patch_func);
@@ -362,7 +399,7 @@ int sctrlHENIsToolKit()
     int ret = 0; // Retail
     int k1 = pspSdkSetK1(0);
     int level = sctrlKernelSetUserLevel(8);
-    
+
     if (ark_config->exec_mode == PSP_ORIG){
         SceIoStat stat;
         if (sceIoGetstat("flash0:/kd/vshbridge_tool.prx", &stat) >= 0)
