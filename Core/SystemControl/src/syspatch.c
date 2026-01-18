@@ -53,22 +53,6 @@ STMOD_HANDLER previous = NULL;
 int (* DisplaySetFrameBuf)(void*, int, int, int) = NULL;
 #endif
 
-// Return Boot Status
-int isSystemBooted(void)
-{
-    // Find Function
-    int (* _sceKernelGetSystemStatus)(void) = (void *)sctrlHENFindFunction("sceSystemMemoryManager", "SysMemForKernel", 0x452E3696);
-    
-    // Get System Status
-    int result = _sceKernelGetSystemStatus();
-        
-    // System booted
-    if(result == 0x20000) return 1;
-    
-    // Still booting
-    return 0;
-}
-
 static unsigned int fakeFindFunction(char * szMod, char * szLib, unsigned int nid){
     if (nid == 0x221400A6 && strcmp(szMod, "SystemControl") == 0)
         return 0; // Popsloader V4 looks for this function to check for ME, let's pretend ARK doesn't have it ;)
@@ -85,9 +69,9 @@ int _sceChkreg_6894A027(u8* a0, u32 a1){
 
 void patch_qaflags(){
     u32 fp;
-   
+
     // sceChkregGetPsCode
-    fp = sctrlHENFindFunction("sceChkreg", "sceChkreg_driver", 0x6894A027); 
+    fp = sctrlHENFindFunction("sceChkreg", "sceChkreg_driver", 0x6894A027);
 
     if (fp) {
         _sw(JUMP(_sceChkreg_6894A027), fp);
@@ -109,7 +93,7 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
         sctrlHookImportByNID(mod, "SysMemForKernel", 0x3FC9AE6A, &sctrlHENFakeDevkitVersion);
         sctrlHookImportByNID(mod, "SysMemUserForUser", 0x3FC9AE6A, &sctrlHENFakeDevkitVersion);
     }
-    
+
     #ifdef DEBUG
     printk("syspatch: %s(0x%04X)\r\n", mod->modname, sceKernelInitApitype());
     sctrlHookImportByNID(mod, "KDebugForKernel", 0x84F370BC, printk);
@@ -161,7 +145,7 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
             sctrlHENApplyMemory(MAX_HIGH_MEMSIZE);
         }
     }
-    
+
     // Media Sync about to start...
     if(strcmp(mod->modname, "sceMediaSync") == 0)
     {
@@ -170,7 +154,7 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
         // Exit Handler
         goto flush;
     }
-    
+
     // MesgLed Cryptography about to start...
     if(strcmp(mod->modname, "sceMesgLed") == 0)
     {
@@ -213,7 +197,7 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
     if(booted == 0)
     {
         // Boot is complete
-        if(isSystemBooted())
+        if(sctrlHENIsSystemBooted())
         {
 
             // remember last played game
@@ -266,7 +250,7 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
                     case 3: sctrlHENSetSpeed(222, 111); break;
                 }
             }
-            
+
             #ifdef DEBUG
             // syncronize printk
             printkSync();
@@ -279,14 +263,14 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
             goto flush;
         }
     }
-    
+
     // No need to flush
     goto exit;
-    
+
 flush:
     // Flush Cache
     sctrlFlushCache();
-    
+
 exit:
     // Forward to previous Handler
     if(previous) return previous(mod);

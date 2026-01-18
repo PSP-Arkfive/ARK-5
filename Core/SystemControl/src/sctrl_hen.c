@@ -35,7 +35,7 @@ int sctrlHENSetMemory(u32 p2, u32 p9){
 int sctrlHENApplyMemory(u32 p2) // stub (to be highjacked and implemented by compat layer)
 {
     // can't modify ram after boot
-    if (isSystemBooted()) return -3;
+    if (sctrlHENIsSystemBooted()) return -3;
     // check for unlock
     if (p2 > 24){
         if (p2_size > 24) return -2; // already enabled
@@ -421,4 +421,10 @@ int sctrlHENIsToolKit()
     sctrlKernelSetUserLevel(level);
     pspSdkSetK1(k1);
     return ret;
+}
+
+int sctrlHENIsSystemBooted() {
+	int res = sceKernelGetSystemStatus();
+
+	return (res == 0x20000) ? 1 : 0;
 }

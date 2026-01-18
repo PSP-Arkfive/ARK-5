@@ -6,7 +6,7 @@
 #include <pspumd.h>
 #include <pspdisplay.h>
 
-#include <systemctrl_ark.h> 
+#include <systemctrl_ark.h>
 #include <pspkermit.h>
 #include <cfwmacros.h>
 #include <rebootexconfig.h>
@@ -75,7 +75,7 @@ int flashLoadPatch(int cmd)
         char archive[ARK_PATH_SIZE];
         strcpy(archive, ark_config->arkpath);
         strcat(archive, FLASH0_ARK);
-        
+
         int fd = sceIoOpen(archive, PSP_O_RDONLY, 0777);
         if (fd >= 0){
             sceIoRead(fd, (void*)VITA_FLASH_ARK, MAX_FLASH0_SIZE);
@@ -119,7 +119,7 @@ static u8 get_pscode_from_region(int region)
     u8 code;
 
     code = region;
-    
+
     if(code < 12) {
         code += 2;
     } else {
@@ -186,7 +186,7 @@ void PatchMemlmd() {
 
     // Allow 6.61 kernel modules
     MAKE_CALL(text_addr + 0x2C8, memcmp_patched);
-    
+
     sctrlFlushCache();
 }
 
@@ -322,7 +322,7 @@ int AdrenalineOnModuleStart(SceModule * mod){
 
     // System fully booted Status
     static int booted = 0;
-    
+
     // Patch Kermit Peripheral Module to load flash0
     if(strcmp(mod->modname, "sceKermitPeripheral_Driver") == 0)
     {
@@ -357,7 +357,7 @@ int AdrenalineOnModuleStart(SceModule * mod){
         PatchPowerService2(mod->text_addr);
         goto flush;
     }
-    
+
     if (strcmp(mod->modname, "sceChkreg") == 0) {
         MAKE_DUMMY_FUNCTION(sctrlHENFindFunction("sceChkreg", "sceChkreg_driver", 0x54495B19), 1);
         HIJACK_FUNCTION(sctrlHENFindFunction("sceChkreg", "sceChkreg_driver", 0x59F8491D), sceChkregGetPsCodePatched, _sceChkregGetPsCode);
@@ -441,12 +441,12 @@ int AdrenalineOnModuleStart(SceModule * mod){
         // Exit Handler
         goto flush;
     }
-       
+
     // Boot Complete Action not done yet
     if(booted == 0)
     {
         // Boot is complete
-        if(isSystemBooted())
+        if(sctrlHENIsSystemBooted())
         {
             // Initialize Memory Stick Speedup Cache
             if (se_config->msspeed)

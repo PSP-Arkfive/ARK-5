@@ -4,7 +4,6 @@
 
 	IMPORT_START "SystemCtrlPrivate",0x00090000
 	IMPORT_FUNC  "SystemCtrlPrivate",0x5D7817CF,msstorCacheInit
-	IMPORT_FUNC  "SystemCtrlPrivate",0x272984FD,isSystemBooted
 
 	IMPORT_START "sceUsbCam",0x40090000
 	IMPORT_FUNC  "sceUsbCam",0x3F0CF289,sceUsbCamSetupStill
