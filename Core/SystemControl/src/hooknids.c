@@ -28,7 +28,7 @@
 #include "imports.h"
 
 // Find Import Library Pointer
-SceLibraryStubTable * sctrlFindImportLib(SceModule * pMod, char * library)
+SceLibraryStubTable * sctrlFindImportLib(SceModule * pMod, const char * library)
 {
     // Invalid Arguments
     if(pMod == NULL || library == NULL) return NULL;
