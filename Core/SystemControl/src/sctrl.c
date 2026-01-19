@@ -74,10 +74,10 @@ int sctrlKernelLoadExecVSHWithApitype(int apitype, const char * file, struct Sce
 
     // Load Execute Module
     int result = _sceLoadExecVSHWithApitype(apitype, file, param, 0x10000);
-    
+
     // Restore Permission Level on Failure
     pspSdkSetK1(k1);
-    
+
     // Return Error Code
     return result;
 }
@@ -128,13 +128,13 @@ int sctrlKernelSetUserLevel(int level)
 {
     // Elevate Permission Level
     unsigned int k1 = pspSdkSetK1(0);
-    
+
     // Backup User Level
     int previouslevel = sceKernelGetUserLevel();
-    
-    
+
+
     u32 _sceKernelReleaseThreadEventHandler = sctrlHENFindFunction("sceThreadManager", "ThreadManForKernel", 0x72F3C145);
-    
+
     u32 addr = _sceKernelReleaseThreadEventHandler + 0x4;
     do {
         addr += 4;
@@ -142,17 +142,17 @@ int sctrlKernelSetUserLevel(int level)
 
     u32 threadman_userlevel_struct = _lh(_sceKernelReleaseThreadEventHandler + 0x4)<<16;
     threadman_userlevel_struct += (short)_lh(addr);
-    
-    
+
+
     // Set User Level
     _sw((level ^ 8) << 28, *(unsigned int *)(threadman_userlevel_struct) + 0x14);
-    
+
     // Flush Cache
     sctrlFlushCache();
-    
+
     // Restore Permission Level
     pspSdkSetK1(k1);
-    
+
     // Return previous User Level
     return previouslevel;
 }
@@ -162,21 +162,21 @@ int sctrlKernelSetDevkitVersion(int version)
 {
     // Elevate Permission Level
     unsigned int k1 = pspSdkSetK1(0);
-    
+
     // Backup Firmware Version
     int previousversion = sceKernelDevkitVersion();
-    
+
     // Overwrite Firmware Version
     u32 DevkitVersion = sctrlHENFindFunction("sceSystemMemoryManager", "SysMemForKernel", 0xC886B169);
     _sh((version >> 16), DevkitVersion);
     _sh((version & 0xFFFF), DevkitVersion+8);
-    
+
     // Flush Cache
     sctrlFlushCache();
-    
+
     // Restore Permission Level
     pspSdkSetK1(k1);
-    
+
     // Return previous Firmware Version
     return previousversion;
 }
@@ -186,29 +186,29 @@ int sctrlPatchModule(char * modname, u32 inst, u32 offset)
 {
     // Poke Result
     int result = 0;
-    
+
     // Elevate Permission Level
     unsigned int k1 = pspSdkSetK1(0);
-    
+
     // Find Target Module
     SceModule * mod = (SceModule *)sceKernelFindModuleByName(modname);
-    
+
     // Found Module
     if(mod != NULL)
     {
         // Poke Dword
         _sw(inst, mod->text_addr + offset);
-        
+
         // Flush Cache
         sctrlFlushCache();
     }
-    
+
     // Module not found
     else result = -1;
-    
+
     // Restore Permission Level
     pspSdkSetK1(k1);
-    
+
     // Return Result
     return result;
 }
@@ -218,61 +218,61 @@ u32 sctrlModuleTextAddr(char * modname)
 {
     // Result Value
     unsigned int text_addr = 0;
-    
+
     // Elevate Permission Level
     unsigned int k1 = pspSdkSetK1(0);
-    
+
     // Find Target Module
     SceModule * mod = (SceModule *)sceKernelFindModuleByName(modname);
-    
+
     // Found Module
     if(mod != NULL)
     {
         // Set Text Address
         text_addr = mod->text_addr;
     }
-    
+
     // Restore Permission Level
     pspSdkSetK1(k1);
-    
+
     // Return Result
     return text_addr;
 }
 
 // Calculate Random Number via KIRK
-unsigned int sctrlKernelRand(void)
+u32 sctrlKernelRand(void)
 {
     // Elevate Permission Level
-    unsigned int k1 = pspSdkSetK1(0);
-    
+    u32 k1 = pspSdkSetK1(0);
+
     // Allocate KIRK Buffer
     unsigned char * alloc = oe_malloc(20 + 4);
-    
+
     // Allocation Error
     if(alloc == NULL) __asm__ volatile ("break");
-    
+
     // Align Buffer to 4 Bytes
-    unsigned char * buffer = (void *)(((unsigned int)alloc & (~(4-1))) + 4);
-    
+    unsigned char * buffer = (void *)(((u32)alloc & (~(4-1))) + 4);
+
     // KIRK Random Generator Opcode
     enum {
         KIRK_PRNG_CMD=0xE,
     };
-    
+
     // Create 20 Random Bytes
     int (*_sceUtilsBufferCopyWithRange)(void * inbuf, SceSize insize, void * outbuf, int outsize, int cmd)
         = (void*)sctrlHENFindFunction("sceMemlmd", "semaphore", 0x4C537C72);
     _sceUtilsBufferCopyWithRange(buffer, 20, NULL, 0, KIRK_PRNG_CMD);
-    
+
     // Fetch Random Number
-    unsigned int random = *(unsigned int *)buffer;
-    
+    u32 random = *(u32 *)buffer;
+
     // Free Buffer
     oe_free(alloc);
-    
+
     // Restore Permission Level
     pspSdkSetK1(k1);
-    
+
     // Return Random Number
     return random;
 }
@@ -288,15 +288,15 @@ int sctrlKernelSetNidResolver(char * libname, u32 enabled)
         {
             // Fetch current Value
             unsigned int old = nidTable[i].enabled;
-            
+
             // Overwrite Value
             nidTable[i].enabled = enabled;
-            
+
             // Return current Value
             return old;
         }
     }
-    
+
     // Library not found
     return -1;
 }
@@ -306,13 +306,13 @@ int sctrlKernelSetInitApitype(int apitype)
 {
     // Field unavailable
     if(kernel_init_apitype == NULL) return -1;
-    
+
     // Read current Value
     int previousapitype = *kernel_init_apitype;
-    
+
     // Set new Apitype
     *kernel_init_apitype = apitype;
-    
+
     // Return old Apitype
     return previousapitype;
 }
@@ -322,14 +322,14 @@ int sctrlKernelSetInitFileName(char * filename)
 {
     // Invalid Argument
     if(filename == NULL) return -1;
-    
+
     // Field unavailable
     if(kernel_init_apitype == NULL) return -2;
-    
+
     // Link Buffer
     char** kernel_init_filename = (char**)(kernel_init_apitype + 4);
     *kernel_init_filename = filename;
-    
+
     // Return Success
     return 0;
 }
@@ -343,7 +343,7 @@ int sctrlKernelSetInitKeyConfig(int key)//old sctrlKernelSetInitMode
         int* kernel_init_keyconfig = (int*)(kernel_init_apitype + 8);
         *kernel_init_keyconfig = key;
     }
-    
+
     pspSdkSetK1(k1);
     return r;
 }
@@ -382,7 +382,7 @@ int sctrlDeflateDecompress(void* dest, void* src, int size){
     pspSdkSetK1(k1);
     return ret;
 }
-    
+
 int sctrlGzipDecompress(void* dest, void* src, int size){
     unsigned int k1 = pspSdkSetK1(0);
     int ret = sceKernelGzipDecompress(dest, size, src, 0);
@@ -393,23 +393,23 @@ int sctrlGzipDecompress(void* dest, void* src, int size){
 int sctrlGetSfoPARAM(const char* sfo_path, const char * paramName, u16 * paramType, u32 * paramLength, void * paramBuffer){
     // Enable Full Kernel Permission for Syscalls
     u32 k1 = pspSdkSetK1(0);
-    
+
     // Invalid Argument
     if (paramName == NULL || paramName[0] == 0 || paramLength == NULL)
     {
         // Restore Syscall Permissions
         pspSdkSetK1(k1);
-        
+
         // Return Error Code
         return 0x800001FF;
     }
-        
+
     // Invalid Size
     if (*paramLength <= 0)
     {
         // Restore Syscall Permissions
         pspSdkSetK1(k1);
-        
+
         // Return Error Code
         return 0x80000104;
     }
@@ -432,23 +432,23 @@ int sctrlGetSfoPARAM(const char* sfo_path, const char * paramName, u16 * paramTy
             sfo_path = "disc0:/PSP_GAME/PARAM.SFO";
         }
     }
-    
+
     // Open PBP File
     int fd = sceIoOpen(sfo_path, PSP_O_RDONLY, 0);
-    
+
     // PBP File not found
     if (fd < 0)
     {
         // Restore Syscall Permissions
         pspSdkSetK1(k1);
-        
+
         // Return Error Code
         return 0x80010002;
     }
 
     int magic = 0;
     sceIoRead(fd, &magic, sizeof(magic));
-    
+
     if (magic == 0x50425000){ // PBP
         // seek to PARAM.SFO offset variable
         sceIoLseek(fd, 0x08, PSP_SEEK_SET);
@@ -463,13 +463,13 @@ int sctrlGetSfoPARAM(const char* sfo_path, const char * paramName, u16 * paramTy
         // Return Error Code
         return 0x80000108;
     }
-    
+
     // seek to PARAM.SFO offset
     sceIoLseek(fd, paramOffset, PSP_SEEK_SET);
-    
+
     // seek to key table offset variable
     sceIoLseek(fd, 0x08, PSP_SEEK_CUR);
-    
+
     // read variables of interest
     u32 keyTableOffset = 0;
     u32 dataTableOffset = 0;
@@ -477,7 +477,7 @@ int sctrlGetSfoPARAM(const char* sfo_path, const char * paramName, u16 * paramTy
     sceIoRead(fd, &keyTableOffset, sizeof(keyTableOffset));
     sceIoRead(fd, &dataTableOffset, sizeof(dataTableOffset));
     sceIoRead(fd, &entryCount, sizeof(entryCount));
-    
+
     // iterate entries
     u32 entry;
     for (entry = 0; entry < entryCount; entry++)
@@ -493,13 +493,13 @@ int sctrlGetSfoPARAM(const char* sfo_path, const char * paramName, u16 * paramTy
         sceIoRead(fd, &entryUsedLength, sizeof(entryUsedLength));
         sceIoRead(fd, &entryFullLength, sizeof(entryFullLength));
         sceIoRead(fd, &entryDataOffset, sizeof(entryDataOffset));
-        
+
         // save offset for next entry
         SceOff nextEntryOffset = sceIoLseek(fd, 0, PSP_SEEK_CUR);
-        
+
         // move to key name
         sceIoLseek(fd, paramOffset + keyTableOffset + entryKeyOffset, PSP_SEEK_SET);
-        
+
         // read key name
         char keyName[128];
         memset(keyName, 0, sizeof(keyName));
@@ -510,77 +510,77 @@ int sctrlGetSfoPARAM(const char* sfo_path, const char * paramName, u16 * paramTy
             if (symbol == 0)
                 break;
         }
-        
+
         // found the parameter
         if (strcmp(keyName, paramName) == 0)
         {
             // Report the normal length
             u32 requiredLength = entryUsedLength;
-            
+
             // We will terminate UTF-8 without terminators as an act of courtesy
             if (entryFormat == 0x0004)
                 requiredLength = entryUsedLength + 1;
-                
+
             // Parameter Output Buffer isn't big enough
             if (paramBuffer != NULL && *paramLength < requiredLength)
             {
                 // Close File
                 sceIoClose(fd);
-                
+
                 // Restore Syscall Permissions
                 pspSdkSetK1(k1);
-                
+
                 // Invalid Size
                 return 0x80000104;
             }
-            
+
             // Buffer Length Request detected
             if (paramLength != NULL)
             {
                 // Output required Buffer Length
                 *paramLength = requiredLength;
             }
-            
+
             // Data Type Request detected
             if (paramType != NULL)
             {
                 // Output Data Type
                 *paramType = entryFormat;
             }
-            
+
             // move to entry data
             sceIoLseek(fd, paramOffset + dataTableOffset + entryDataOffset, PSP_SEEK_SET);
-            
+
             // Output Buffer has been provided
             if (paramBuffer != NULL)
             {
                 // reset buffer (also serves as termination of strings)
                 memset(paramBuffer, 0, *paramLength);
-                
+
                 // read data into buffer
                 sceIoRead(fd, paramBuffer, entryUsedLength);
             }
-            
+
             // Close File
             sceIoClose(fd);
-            
+
             // Restore Syscall Permissions
             pspSdkSetK1(k1);
-            
+
             // Return Success
             return 0;
         }
-        
+
         // resume processing at next entry
         sceIoLseek(fd, nextEntryOffset, PSP_SEEK_SET);
     }
-    
+
     // close pbp file
     sceIoClose(fd);
 
     // Restore Syscall Permissions
     pspSdkSetK1(k1);
-    
+
     // Return Error Code (we just treat a missing parameter as file not found, it should work)
     return 0x80010002;
 }
@@ -595,14 +595,14 @@ int sctrlKernelSetUMDEmuFile(const char *filename)
 {
     // Invalid Argument
     if(filename == NULL) return -1;
-    
+
     // Field unavailable
     if(kernel_init_apitype == NULL) return -2;
-    
+
     // Link Buffer
     char** kernel_init_filename = (char**)(kernel_init_apitype + 4);
     kernel_init_filename[1] = (char*)filename;
-    
+
     // Return Success
     return 0;
 }
