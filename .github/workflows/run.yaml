@@ -15,8 +15,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Update psp-cfw-sdk
+        run: psp-pacman -Syyu --noconfirm && psp-pacman -Rsn ark-dev-sdk libpspexploit --noconfirm && psp-pacman -S psp-cfw-sdk --noconfirm
+
       - name: Build
-        run:  make clean && make
+        run:  mkdir build && cd build && psp-cmake ..
 
       - name: Compress
         run: |
