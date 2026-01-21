@@ -35,7 +35,7 @@ int sctrlHENSetMemory(u32 p2, u32 p9){
 int sctrlHENApplyMemory(u32 p2) // stub (to be highjacked and implemented by compat layer)
 {
     // can't modify ram after boot
-    if (isSystemBooted()) return -3;
+    if (sctrlHENIsSystemBooted()) return -3;
     // check for unlock
     if (p2 > 24){
         if (p2_size > 24) return -2; // already enabled
@@ -153,7 +153,7 @@ STMOD_HANDLER sctrlHENSetStartModuleHandler(STMOD_HANDLER new_handler)
 }
 
 // Find Function Address
-unsigned int sctrlHENFindFunction(const char * szMod, const char * szLib, unsigned int nid)
+u32 sctrlHENFindFunction(const char * szMod, const char * szLib, u32 nid)
 {
     // Get NID Resolver
     NidResolverLib * resolver = getNidResolverLib(szLib);
@@ -194,7 +194,7 @@ unsigned int sctrlHENFindFunction(const char * szMod, const char * szLib, unsign
             unsigned int total = entry->stubcount + entry->vstubcount;
             
             // NID + Address Table
-            unsigned int * vars = entry->entrytable;
+            u32 * vars = entry->entrytable;
             
             // Exports available
             if(total > 0)
@@ -223,7 +223,7 @@ u32 sctrlHENGetInitControl()
     return (u32)kernel_init_apitype - 8;
 }
 
-unsigned int sctrlHENFindImport(const char *szMod, const char *szLib, unsigned int nid)
+u32 sctrlHENFindImport(const char *szMod, const char *szLib, u32 nid)
 {
     SceModule *mod = (SceModule*)sceKernelFindModuleByName(szMod);
     if(!mod) return 0;

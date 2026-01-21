@@ -161,7 +161,7 @@ NidMissingResolver *g_missing_resolver[] =
 /////////////////////////////////////////////////////////////////////////
 
 // Missing NID Resolver
-unsigned int sctrlKernelResolveNid(const char * libName, unsigned int nid)
+u32 sctrlKernelResolveNid(const char * libName, u32 nid)
 {
     // Iterate Missing Library Resolver
     int i = 0; for(; i < NELEMS(g_missing_resolver); ++i)

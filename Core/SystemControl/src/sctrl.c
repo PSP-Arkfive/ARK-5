@@ -240,7 +240,7 @@ u32 sctrlModuleTextAddr(char * modname)
 }
 
 // Calculate Random Number via KIRK
-unsigned int sctrlKernelRand(void)
+u32 sctrlKernelRand(void)
 {
     // Elevate Permission Level
     unsigned int k1 = pspSdkSetK1(0);
@@ -265,7 +265,7 @@ unsigned int sctrlKernelRand(void)
     _sceUtilsBufferCopyWithRange(buffer, 20, NULL, 0, KIRK_PRNG_CMD);
     
     // Fetch Random Number
-    unsigned int random = *(unsigned int *)buffer;
+    u32 random = *(u32 *)buffer;
     
     // Free Buffer
     oe_free(alloc);

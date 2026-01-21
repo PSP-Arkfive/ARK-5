@@ -281,7 +281,7 @@ int PSPOnModuleStart(SceModule * mod){
     if (booted == 0)
     {
         // Boot is complete
-        if (isSystemBooted())
+        if (sctrlHENIsSystemBooted())
         {
 
             // handle mscache

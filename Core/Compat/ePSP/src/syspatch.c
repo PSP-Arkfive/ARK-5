@@ -151,7 +151,7 @@ int ARKVitaOnModuleStart(SceModule * mod){
     if(booted == 0)
     {
         // Boot is complete
-        if(isSystemBooted())
+        if(sctrlHENIsSystemBooted())
         {
 
             // Initialize Memory Stick Speedup Cache

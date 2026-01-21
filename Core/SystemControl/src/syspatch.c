@@ -54,7 +54,7 @@ int (* DisplaySetFrameBuf)(void*, int, int, int) = NULL;
 #endif
 
 // Return Boot Status
-int isSystemBooted(void)
+int sctrlHENIsSystemBooted(void)
 {
     // Find Function
     int (* _sceKernelGetSystemStatus)(void) = (void *)sctrlHENFindFunction("sceSystemMemoryManager", "SysMemForKernel", 0x452E3696);
@@ -213,7 +213,7 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
     if(booted == 0)
     {
         // Boot is complete
-        if(isSystemBooted())
+        if(sctrlHENIsSystemBooted())
         {
 
             // remember last played game
