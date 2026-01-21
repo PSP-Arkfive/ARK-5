@@ -24,11 +24,9 @@ int pspemuLfatOpenArkEPSP(BootFile* file)
 BootLoadExConfig bleconf = {
     .boot_type = TYPE_REBOOTEX,
     .boot_storage = FLASH_BOOT,
-    .extra_io = {
-        .vita_io = {
-            .redirect_flash = 1,
-            .pspemuLfatOpenExtra = &pspemuLfatOpenArkEPSP
-        }
+    .extra_io.vita_io = {
+        .redirect_flash = 1,
+        .pspemuLfatOpenExtra = &pspemuLfatOpenArkEPSP
     }
 };
 

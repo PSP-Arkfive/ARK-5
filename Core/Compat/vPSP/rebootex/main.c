@@ -63,11 +63,9 @@ int pspemuLfatOpenArkVPSP(BootFile* file){
 BootLoadExConfig bleconf = {
     .boot_type = TYPE_REBOOTEX,
     .boot_storage = FLASH_BOOT,
-    .extra_io = {
-        .vita_io = {
-            .redirect_flash = 0,
-            .pspemuLfatOpenExtra = &pspemuLfatOpenArkVPSP
-        }
+    .extra_io.vita_io = {
+        .redirect_flash = 0,
+        .pspemuLfatOpenExtra = &pspemuLfatOpenArkVPSP
     }
 };
 
