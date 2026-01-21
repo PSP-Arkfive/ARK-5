@@ -13,3 +13,4 @@ psvbtknf.bin,dist/flash0/psvbtknf.bin
 /kd/ark_vitacompat.prx,dist/flash0/ark_vitacompat.prx
 /kd/ark_vitapops.prx,dist/flash0/ark_vitapops.prx
 /kd/ark_vitaplus.prx,dist/flash0/ark_vitaplus.prx
+/kd/ark_pentazemin.prx,dist/flash0/ark_pentazemin.prx

@@ -4,7 +4,7 @@ BUILDTOOLS = $(PSPDEV)/share/psp-cfw-sdk/build-tools
 
 .PHONY : mkdist FlashPackage \
 	SystemControl VSHControl XMBControl Inferno PopCorn Stargate \
-	PSPCompat VitaCompat VitaPopsCompat Pentazemin
+	PSPCompat VitaCompat VitaPopsCompat VitaPlusCompat
 
 
 all: mkdist FlashPackage
@@ -17,6 +17,9 @@ mkdist:
 
 SystemControl: 
 	$(MAKE) -C Core/SystemControl
+
+Pentazemin: 
+	$(MAKE) -C Core/Compat/Pentazemin
 
 VSHControl: 
 	$(MAKE) -C Core/VSHControl
@@ -50,7 +53,7 @@ VitaPopsCompat:
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/ePSX/btcnf/psxbtcnf.txt
 	$(Q)mv Core/Compat/ePSX/btcnf/*.bin dist/flash0/
 
-Pentazemin: 
+VitaPlusCompat: 
 	$(MAKE) -C Core/Compat/vPSP/rebootex
 	$(MAKE) -C Core/Compat/vPSP/
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/vPSP/btcnf/psvbtjnf.txt
@@ -59,7 +62,7 @@ Pentazemin:
 
 FlashPackage: mkdist \
 	SystemControl VSHControl XMBControl Inferno PopCorn Stargate \
-	PSPCompat VitaCompat VitaPopsCompat Pentazemin
+	PSPCompat VitaCompat VitaPopsCompat VitaPlusCompat Pentazemin
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_systemctrl.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/SystemControl/systemctrl.prx SystemControl 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vshctrl.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/VSHControl/vshctrl.prx VshControl 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_xmbctrl.prx $(BUILDTOOLS)/gz/UserModule.hdr Core/XMBControl/xmbctrl.prx XmbControl 0x0000
@@ -69,7 +72,8 @@ FlashPackage: mkdist \
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_pspcompat.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/PSP/pspcompat.prx PSPCompat 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vitacompat.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/ePSP/vitacompat.prx VitaCompat 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vitapops.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/ePSX/vitapops.prx VitaPopsCompat 0x3007
-	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vitaplus.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/vPSP/pentazemin.prx Pentazemin 0x3007
+	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vitaplus.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/vPSP/vitaplus.prx VitaPlusCompat 0x3007
+	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_pentazemin.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/Pentazemin/pentazemin.prx Pentazemin 0x3007
 	$(PY) $(BUILDTOOLS)/pack/pack.py -p dist/FLASH0.ARK flash0.txt -s
 
 
@@ -98,5 +102,6 @@ clean:
 	# Pentazemin
 	$(MAKE) -C Core/Compat/vPSP clean
 	$(MAKE) -C Core/Compat/vPSP/rebootex clean
+	$(MAKE) -C Core/Compat/Pentazemin clean
 	# Rest
 	$(Q)rm -rf dist
