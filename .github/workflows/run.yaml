@@ -15,6 +15,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Clone latest pspsdk
+        run: git clone https://github.com/pspdev/pspsdk && cd pspsdk && make && make install && cd ..
+
       - name: Update psp-cfw-sdk
         run: psp-pacman -Syyu --noconfirm && psp-pacman -Rsn ark-dev-sdk libpspexploit --noconfirm && psp-pacman -S psp-cfw-sdk --noconfirm
 
