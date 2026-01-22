@@ -13,8 +13,10 @@ jobs:
       - name: Cloning and Building lastest pspsdk
         run: | 
           git clone https://github.com/pspdev/pspsdk
-          cd pspsdk
-          apk add automake autoconf clang 
+
+      - name: Bootstrap sdk and build
+        working-directory: pspsdk
+        run: |
           ./bootstrap
           make
           make install
