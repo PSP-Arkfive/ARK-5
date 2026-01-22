@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Dependencies
         run: |
-          apk add clang automake autoconf
+          apk add clang automake autoconf zlib-dev
 
       - name: Cloning and Building lastest pspsdk
         run: | 
