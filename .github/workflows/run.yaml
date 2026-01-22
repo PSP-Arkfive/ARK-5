@@ -17,6 +17,7 @@ jobs:
       - name: Bootstrap sdk and build
         working-directory: pspsdk
         run: |
+          apk add clang automake autoconf
           ./bootstrap
           make
           make install
