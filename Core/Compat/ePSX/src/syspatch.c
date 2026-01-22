@@ -40,7 +40,7 @@ int sceDisplaySetFrameBufferInternalHook(int pri, void *topaddr, int width, int 
     int res = 0;
     copyPSPVram(topaddr);
     if (_sceDisplaySetFrameBufferInternal) // passthrough
-        res = _sceDisplaySetFrameBufferInternal(pri, topaddr, width, format, sync); 
+        res = _sceDisplaySetFrameBufferInternal(pri, topaddr, width, format, sync);
     return res;
 }
 
@@ -145,7 +145,7 @@ static int vram_clear(){
 
 int (*arkLauncher)() = NULL;
 int popsLauncher(){
-    
+
     if (draw_thread >= 0) return 0; // disallow exit when plugin screen handler is running
 
     // init pops vram and pause pops, this fixes screen when going back to launcher
@@ -219,7 +219,7 @@ int ARKVitaPopsOnModuleStart(SceModule * mod){
         memset((void *)0x49F40000, 0, 0x80000);
         goto flush;
     }
-    
+
     // Patch Kermit Peripheral Module to load flash0
     if(strcmp(mod->modname, "sceKermitPeripheral_Driver") == 0)
     {

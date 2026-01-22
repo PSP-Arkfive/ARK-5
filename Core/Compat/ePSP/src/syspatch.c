@@ -110,13 +110,13 @@ int ARKVitaOnModuleStart(SceModule * mod){
         patchKermitPeripheral();
         goto flush;
     }
-    
+
     // Patch PSP Popsman
     if (strcmp(mod->modname, "scePops_Manager") == 0){
         patchPspPopsman(mod);
         goto flush;
     }
-    
+
     // Patch PSP POPS to replace SPU code
     if (strcmp(mod->modname, "pops") == 0)
     {
@@ -132,7 +132,7 @@ int ARKVitaOnModuleStart(SceModule * mod){
         // Exit Handler
         goto flush;
     }
-    
+
     if (strcmp(mod->modname, "camera_patch_lite") == 0) {
         sctrlHookImportByNID(mod, "IoFileMgrForKernel", 0x109F50BC, ioOpenForCameraLite);
         sctrlHookImportByNID(mod, "IoFileMgrForKernel", 0x810C4BC3, ioCloseForCameraLite);
@@ -164,14 +164,14 @@ int ARKVitaOnModuleStart(SceModule * mod){
             // Patch sceKernelExitGame Syscalls
             REDIRECT_FUNCTION(sctrlHENFindFunction("sceLoadExec", "LoadExecForUser", 0x05572A5F), K_EXTRACT_IMPORT(sctrlArkExitLauncher));
             REDIRECT_FUNCTION(sctrlHENFindFunction("sceLoadExec", "LoadExecForUser", 0x2AC9954B), K_EXTRACT_IMPORT(sctrlArkExitLauncher));
-            
+
             // Apply Directory IO PSP Emulation
             patchFileSystemDirSyscall();
 
             // patch bug in ePSP volatile mem
             _sceKernelVolatileMemTryLock = (void *)sctrlHENFindFunction("sceSystemMemoryManager", "sceSuspendForUser", 0xA14F40B2);
             sctrlHENPatchSyscall((void*)_sceKernelVolatileMemTryLock, sceKernelVolatileMemTryLockPatched);
-            
+
             // fix sound bug in ePSP (make sceAudioOutput2Release behave like real PSP)
             _sceAudioOutput2GetRestSample = (void *)sctrlHENFindFunction("sceAudio_Driver", "sceAudio", 0x647CEF33);
             _sceAudioOutput2Release = (void *)sctrlHENFindFunction("sceAudio_Driver", "sceAudio", 0x43196845);

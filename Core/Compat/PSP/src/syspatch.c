@@ -158,7 +158,7 @@ void processSettings(){
     if (se_config->usbcharge){
         usb_charge(5000000); // enable usb charging
     }
-    
+
     // check launcher mode
     if (se_config->launcher_mode){
         strcpy(ark_config->launcher, VBOOT_PBP); // set CFW in launcher mode
@@ -229,7 +229,7 @@ int PSPOnModuleStart(SceModule * mod){
         }
         goto flush;
     }
-    
+
     if (strcmp(mod->modname, "sceLoadExec") == 0){
         prepatch_partitions();
         goto flush;
@@ -259,25 +259,25 @@ int PSPOnModuleStart(SceModule * mod){
         }
         goto flush;
     }
-    
+
     if (strcmp(mod->modname, "vsh_module") == 0){
         if (se_config->umdregion){
             patch_vsh_region_check(mod);
         }
         goto flush;
     }
-    
+
     if (strcmp(mod->modname, "Legacy_Software_Loader") == 0 )
     {
         // Missing from SDK
         #define PSP_INIT_APITYPE_EF2 0x152
         if( sceKernelInitApitype() == PSP_INIT_APITYPE_EF2 )
         {
-        	_sw( 0x10000005, mod->text_addr + 0x0000014C );	
+        	_sw( 0x10000005, mod->text_addr + 0x0000014C );
         	goto flush;
         }
     }
-    
+
     if (booted == 0)
     {
         // Boot is complete
@@ -286,7 +286,7 @@ int PSPOnModuleStart(SceModule * mod){
 
             // handle mscache
             if (se_config->msspeed){
-                char* drv = 
+                char* drv =
                     (psp_model == PSP_GO && sctrlKernelBootFrom()==0x50)?
                     "eflash0a0f1p" : "msstor0p";
                 msstorCacheInit(drv);
@@ -302,7 +302,7 @@ int PSPOnModuleStart(SceModule * mod){
             goto flush;
         }
     }
-    
+
 flush:
     sctrlFlushCache();
 
@@ -343,7 +343,7 @@ PspSysEventHandler g_power_event = {
 void PSPSyspatchStart(){
     // Register Module Start Handler
     previous = sctrlHENSetStartModuleHandler(PSPOnModuleStart);
-    
+
     // Register custom start module
     prev_start = sctrlSetStartModuleExtra(StartModuleHandler);
 
