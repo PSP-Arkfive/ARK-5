@@ -156,31 +156,6 @@ void exit_game_patched(){
 }
 
 
-static int (* _sceUtilityGetSystemParamInt)(int id, int *value);
-static int (* _kermitUtilityOskGetStatus)();
-static int (* _kermitUtilityOskInitStart)(SceUtilityOskParams *params);
-int kermitUtilityOskInitStartPatched(SceUtilityOskParams *params) {
-	int k1 = pspSdkSetK1(0);
-
-	if (params->data->language == PSP_UTILITY_OSK_LANGUAGE_DEFAULT) {
-		_sceUtilityGetSystemParamInt(PSP_SYSTEMPARAM_ID_INT_LANGUAGE, &params->data->language);
-		params->data->language++;
-	}
-
-	pspSdkSetK1(k1);
-	return _kermitUtilityOskInitStart(params);
-}
-
-void PatchUtility() {
-
-    _sceUtilityGetSystemParamInt = (void *)sctrlHENFindFunction("sceUtility_Driver", "sceUtility", 0xA5DA2406);
-    _kermitUtilityOskGetStatus = (void *)sctrlHENFindFunction("sceUtility_Driver", "sceUtility_private", 0xB08B2B48);
-
-    HIJACK_FUNCTION(sctrlHENFindFunction("sceUtility_Driver", "sceUtility_private", 0x3B6D7CED), kermitUtilityOskInitStartPatched, _kermitUtilityOskInitStart);
-
-	sctrlFlushCache();
-}
-
 int AdrenalineOnModuleStart(SceModule * mod){
 
     // System fully booted Status
@@ -211,11 +186,6 @@ int AdrenalineOnModuleStart(SceModule * mod){
         se_config->iso_cache_partition = (se_config->force_high_memory)? 2:11;
         goto flush;
     }
-
-    if (strcmp(mod->modname, "sceUtility_Driver") == 0) {
-		PatchUtility();
-		goto flush;
-	}
 
     if(strcmp(mod->modname, "game_plugin_module") == 0) {
         if (se_config->skiplogos == 1 || se_config->skiplogos == 2) {
