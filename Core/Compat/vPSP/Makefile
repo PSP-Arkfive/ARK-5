@@ -1,23 +1,10 @@
 PSPSDK = $(shell psp-config --pspsdk-path)
 
-TARGET = pentazemin
+TARGET = vitaplus
 
 C_OBJS =  \
 	main.o \
-	src/funcs.o \
-	src/usbcam.o \
-	src/vitamem.o \
 	src/syspatch.o \
-	src/flashfs.o  \
-	src/io_patch.o  \
-	src/loadexec.o   \
-	src/adrenaline.o  \
-	src/init_patch.o   \
-	src/power_patch.o   \
-	src/LflashFatfmt.o   \
-	src/impose_patch.o    \
-	src/utility_patch.o    \
-	src/vlf.o \
 		
 OBJS = \
 	$(C_OBJS) imports.o
@@ -38,7 +25,7 @@ USE_KERNEL_LIBS=1
 
 LIBDIR = 
 LDFLAGS =  -nostartfiles
-LIBS = -lpspsystemctrl_kernel
+LIBS = -lpspsystemctrl_kernel -lpspkermit_driver
 
 PSP_FW_VERSION = 660
 

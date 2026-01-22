@@ -152,6 +152,29 @@ STMOD_HANDLER sctrlHENSetStartModuleHandler(STMOD_HANDLER new_handler)
     return on_module_start;
 }
 
+u32 sctrlHENFindFunction(const char * szMod, const char *library, u32 nid){
+    // Find Target Module
+    SceModule * pMod = (SceModule *)sceKernelFindModuleByName(szMod);
+    
+    // Module not found
+    if(pMod == NULL)
+    {
+        // Attempt to find it by Address
+        pMod = (SceModule *)sceKernelFindModuleByAddress((unsigned int)szMod);
+        
+        // Module not found
+        if(pMod == NULL) return 0;
+    }
+
+    return sctrlHENFindFunctionInMod(pMod, library, nid);
+}
+
+// Find Function Address
+u32 sctrlHENFindFunctionInMod(SceModule * pMod, const char * szLib, u32 nid)
+{
+    // Get NID Resolver
+    NidResolverLib * resolver = getNidResolverLib(szLib);
+    
 // Find Function Address
 u32 sctrlHENFindFunction(const char * szMod, const char * szLib, u32 nid)
 {
@@ -164,6 +187,7 @@ u32 sctrlHENFindFunction(const char * szMod, const char * szLib, u32 nid)
         // Resolve NID
         nid = getNidReplacement(resolver, nid);
     }
+    
 
     // Fetch Export Table Start Address
     void * entTab = mod->ent_top;

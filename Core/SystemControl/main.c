@@ -36,8 +36,6 @@
 #include <screenprinter.h>
 #endif
 
-#include <colordebugger.h>
-
 PSP_MODULE_INFO("SystemControl", 0x3007, 4, 0);
 
 // default config when none provided by the bootloader
@@ -50,7 +48,6 @@ static ARKConfig _ark_conf = {
 };
 ARKConfig* ark_config = &_ark_conf;
 
-extern void copyPSPVram(u32* psp_vram);
 
 // Boot Time Entry Point
 int module_start(SceSize args, void * argp)
