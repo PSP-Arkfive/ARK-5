@@ -1,8 +1,8 @@
 name: ARK-5
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
 permissions:
   contents: write
 jobs:
@@ -60,6 +60,8 @@ jobs:
       - name:
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: latest
+          name: ARK-5 pre-release
           prerelease: true
           files: ARK-5.zip
         env:
