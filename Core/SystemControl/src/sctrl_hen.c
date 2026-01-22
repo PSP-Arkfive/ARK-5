@@ -152,32 +152,29 @@ STMOD_HANDLER sctrlHENSetStartModuleHandler(STMOD_HANDLER new_handler)
     return on_module_start;
 }
 
-u32 sctrlHENFindFunction(const char * szMod, const char *library, u32 nid){
+u32 sctrlHENFindFunction(const char * modname, const char *library, u32 nid){
     // Find Target Module
-    SceModule * pMod = (SceModule *)sceKernelFindModuleByName(szMod);
+    SceModule * mod = (SceModule *)sceKernelFindModuleByName(modname);
     
     // Module not found
-    if(pMod == NULL)
+    if (mod == NULL)
     {
         // Attempt to find it by Address
-        pMod = (SceModule *)sceKernelFindModuleByAddress((unsigned int)szMod);
+        mod = (SceModule *)sceKernelFindModuleByAddress((unsigned int)modname);
         
         // Module not found
-        if(pMod == NULL) return 0;
+        if (mod == NULL) return 0;
     }
 
-    return sctrlHENFindFunctionInMod(pMod, library, nid);
+    return sctrlHENFindFunctionInMod(mod, library, nid);
 }
 
 // Find Function Address
-u32 sctrlHENFindFunctionInMod(SceModule * pMod, const char * szLib, u32 nid)
+u32 sctrlHENFindFunctionInMod(SceModule * mod, const char * library, u32 nid)
 {
-    // Get NID Resolver
-    NidResolverLib * resolver = getNidResolverLib(szLib);
-    
-// Find Function Address
-u32 sctrlHENFindFunction(const char * szMod, const char * szLib, u32 nid)
-{
+
+    if (mod == NULL) return 0;
+
     // Get NID Resolver
     NidResolverLib * resolver = getNidResolverLib(library);
 
@@ -431,5 +428,5 @@ int sctrlHENIsToolKit()
 int sctrlHENIsSystemBooted() {
 	int res = sceKernelGetSystemStatus();
 
-	return (res == 0x20000) ? 1 : 0;
+	return (res == 0x20000);
 }
