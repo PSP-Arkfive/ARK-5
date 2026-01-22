@@ -10,20 +10,19 @@ jobs:
     container:
       image: pspdev/pspdev
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4 
-        with:
-          submodules: recursive
-
       - name: Cloning and Building lastest pspsdk
         run: | 
           git clone https://github.com/pspdev/pspsdk
           cd pspsdk
           apk add automake autoconf clang 
-          cd pspsdk
           ./bootstrap
           make
           make install
+
+      - name: Checkout
+        uses: actions/checkout@v4 
+        with:
+          submodules: recursive
 
       - name: Update psp-cfw-sdk
         run: psp-pacman -Syyu --noconfirm && psp-pacman -Rsn ark-dev-sdk libpspexploit --noconfirm && psp-pacman -S psp-cfw-sdk --noconfirm
