@@ -2,9 +2,9 @@
 Next Generation Custom Firmware for PSP and Vita's ePSP.
 
 ## Installation
-- Download the proper version (PSP or Vita) of FasterARK from here: https://github.com/PSP-Arkfive/FasterARK
-- If on PSP: extract `FasterARK_psp.zip` onto the Memory Stick.
-- If on PS Vita: install `FasterARK_vita.vpk` via VitaShell. Requires latest version of `NoPspEmuDrm_mod`.
+- Download `FasterARK` from here: https://github.com/PSP-Arkfive/FasterARK
+- If on `PSP`: extract `FasterARK_psp.zip` onto the Memory Stick.
+- If on `Vita`: install `FasterARK_vita.vpk` via VitaShell. Requires latest version of `NoPspEmuDrm_mod`.
 - Open `FasterARK` app.
 - On PS Vita: you can install extra plugins such as right analog and ef0 support.
 - On PSP: to make it a permanet CFW, use this: https://github.com/PSP-Arkfive/CustomIPL
