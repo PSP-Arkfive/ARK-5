@@ -266,7 +266,7 @@ u32 sctrlKernelRand(void)
 
     // Fetch Random Number
     u32 random = *(u32 *)buffer;
-
+    
     // Free Buffer
     oe_free(alloc);
 

@@ -53,6 +53,22 @@ STMOD_HANDLER previous = NULL;
 int (* DisplaySetFrameBuf)(void*, int, int, int) = NULL;
 #endif
 
+// Return Boot Status
+int sctrlHENIsSystemBooted(void)
+{
+    // Find Function
+    int (* _sceKernelGetSystemStatus)(void) = (void *)sctrlHENFindFunction("sceSystemMemoryManager", "SysMemForKernel", 0x452E3696);
+    
+    // Get System Status
+    int result = _sceKernelGetSystemStatus();
+        
+    // System booted
+    if(result == 0x20000) return 1;
+    
+    // Still booting
+    return 0;
+}
+
 static unsigned int fakeFindFunction(char * szMod, char * szLib, unsigned int nid){
     if (nid == 0x221400A6 && strcmp(szMod, "SystemControl") == 0)
         return 0; // Popsloader V4 looks for this function to check for ME, let's pretend ARK doesn't have it ;)

@@ -26,9 +26,6 @@
 // KIRK Function
 int sceUtilsBufferCopyWithRange(void * inbuf, SceSize insize, void * outbuf, int outsize, int cmd);
 
-// Query System Call Number of Function
-u32 sceKernelQuerySystemCall(void * funcAddr);
-
 
 #endif
 

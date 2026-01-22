@@ -255,7 +255,7 @@ int videoIoDread(SceUID fd, SceIoDirent *dir){
             char* ext = strrchr(dir->d_name, '.');
             if (ext) strcpy(ext, ".mp4"); // replace extension with .mp4
             if (dir->d_private){ // adjust private dirent data
-                SceIoPrivateDirent *pri_dirent = dir->d_private;
+                SceIoFatDirentPrivate *pri_dirent = dir->d_private;
                 ext = strrchr(pri_dirent->l_name, '.'); // long file name
                 if (ext) strcpy(ext, ".mp4"); // change extension to .mp4
                 ext = strrchr(pri_dirent->s_name, '.'); // short file name

@@ -153,28 +153,8 @@ STMOD_HANDLER sctrlHENSetStartModuleHandler(STMOD_HANDLER new_handler)
 }
 
 // Find Function Address
-u32 sctrlHENFindFunction(const char * szMod, const char * szLib, u32 nid) {
-    // Find Target Module
-    SceModule * mod = (SceModule *)sceKernelFindModuleByName(szMod);
-
-    // Module not found
-    if(mod == NULL) {
-        // Attempt to find it by Address
-        mod = (SceModule *)sceKernelFindModuleByAddress((unsigned int)szMod);
-
-        // Module not found
-        if(mod == NULL) return 0;
-    }
-
-    return sctrlHENFindFunctionInMod(mod, szLib, nid);
-}
-
-u32 sctrlHENFindFunctionInMod(SceModule * mod, const char *library, u32 nid) {
-    // Invalid Arguments
-    if(mod == NULL) {
-        return 0;
-    }
-
+u32 sctrlHENFindFunction(const char * szMod, const char * szLib, u32 nid)
+{
     // Get NID Resolver
     NidResolverLib * resolver = getNidResolverLib(library);
 
@@ -201,8 +181,8 @@ u32 sctrlHENFindFunctionInMod(SceModule * mod, const char *library, u32 nid) {
             unsigned int total = entry->stubcount + entry->vstubcount;
 
             // NID + Address Table
-            unsigned int * vars = entry->entrytable;
-
+            u32 * vars = entry->entrytable;
+            
             // Exports available
             if(total > 0)
             {
@@ -256,7 +236,8 @@ u32 sctrlHENGetInitControl()
     return (u32)kernel_init_apitype - 8;
 }
 
-u32 sctrlHENFindImport(const char *szMod, const char *szLib, u32 nid) {
+u32 sctrlHENFindImport(const char *szMod, const char *szLib, u32 nid)
+{
     SceModule *mod = (SceModule*)sceKernelFindModuleByName(szMod);
     if(!mod) return 0;
 
