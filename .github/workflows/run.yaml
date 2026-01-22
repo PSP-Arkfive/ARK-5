@@ -40,13 +40,13 @@ jobs:
       - name: Compress
         run: |
           cd dist
-          zip -r ARK-5.zip .
+          zip -r ../ARK-5.zip .
       
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: build-output
-          path: dist/*.zip
+          name: ark-release
+          path: ARK-5.zip
 
   release:
     needs: build
@@ -55,13 +55,13 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: release-zip
-          path: dist/*.zip
+          name: ark-release
+          path: .
       - name:
         uses: softprops/action-gh-release@v2
         with:
           prerelease: true
-          files: dist/*.zip
+          files: ARK-5.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
