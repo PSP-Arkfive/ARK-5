@@ -15,10 +15,15 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Clone latest pspsdk
-        run: git clone https://github.com/pspdev/pspsdk
-      - name: Building lastest pspsdk
-        run: apk add automake autoconf clang && cd pspsdk && ./bootstrap && make && make install && cd ..
+      - name: Cloning and Building lastest pspsdk
+        run: | 
+          git clone https://github.com/pspdev/pspsdk
+          cd pspsdk
+          apk add automake autoconf clang 
+          cd pspsdk
+          ./bootstrap
+          make
+          make install
 
       - name: Update psp-cfw-sdk
         run: psp-pacman -Syyu --noconfirm && psp-pacman -Rsn ark-dev-sdk libpspexploit --noconfirm && psp-pacman -S psp-cfw-sdk --noconfirm
