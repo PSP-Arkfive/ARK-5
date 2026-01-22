@@ -10,6 +10,10 @@ jobs:
     container:
       image: pspdev/pspdev
     steps:
+      - name: Dependencies
+        run: |
+          apk add clang automake autoconf
+
       - name: Cloning and Building lastest pspsdk
         run: | 
           git clone https://github.com/pspdev/pspsdk
@@ -17,8 +21,7 @@ jobs:
       - name: Bootstrap sdk and build
         working-directory: pspsdk
         run: |
-          apk add clang automake autoconf
-          ./bootstrap
+          bash ./bootstrap
           make
           make install
 
