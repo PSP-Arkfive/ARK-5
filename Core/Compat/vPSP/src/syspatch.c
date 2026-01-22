@@ -48,7 +48,7 @@ int flashLoadPatch(int cmd)
         char archive[ARK_PATH_SIZE];
         strcpy(archive, ark_config->arkpath);
         strcat(archive, FLASH0_ARK);
-        
+
         int fd = sceIoOpen(archive, PSP_O_RDONLY, 0777);
         if (fd >= 0){
             sceIoRead(fd, (void*)VITA_FLASH_ARK, MAX_FLASH0_SIZE);
@@ -76,7 +76,7 @@ static u8 get_pscode_from_region(int region)
     u8 code;
 
     code = region;
-    
+
     if(code < 12) {
         code += 2;
     } else {
@@ -139,7 +139,7 @@ int AdrenalineOnModuleStart(SceModule * mod){
 
     // System fully booted Status
     static int booted = 0;
-    
+
     // Patch Kermit Peripheral Module to load flash0
     if(strcmp(mod->modname, "sceKermitPeripheral_Driver") == 0)
     {

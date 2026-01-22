@@ -53,7 +53,7 @@ NidResolverLib * getNidResolverLib(const char * libName)
             return &nidTable[i];
         }
     }
-    
+
     // Library not found or disabled
     return NULL;
 }
@@ -65,27 +65,27 @@ static int binarySearch(const NidResolverEntry * nids, unsigned int n, unsigned 
     int low = 0;
     int high = n - 1;
     int mid = 0;
-    
+
     // Search Loop
     while (low <= high)
     {
         // Calculate Middle
         mid = (low + high) / 2;
-        
+
         // Found Matching NID
         if(oldNid == nids[mid].old)
         {
             // Return Index
             return mid;
         }
-        
+
         // Target has to be "before" this one...
         else if(oldNid < nids[mid].old)
         {
             // Set Maximum Index
             high = mid - 1;
         }
-        
+
         // Target has to be "after" this one...
         else
         {
@@ -93,7 +93,7 @@ static int binarySearch(const NidResolverEntry * nids, unsigned int n, unsigned 
             low = mid + 1;
         }
     }
-    
+
     // NID not found
     return -1;
 }
@@ -103,17 +103,17 @@ unsigned int getNidReplacement(const NidResolverLib *lib, unsigned int nid)
 {
     // Find NID Index
     int i = binarySearch(lib->nidtable, lib->nidcount, nid);
-    
+
     // Found NID Index
-    if(i >= 0) 
+    if(i >= 0)
     {
         // Get New NID
         unsigned int newNid = lib->nidtable[i].new;
-        
+
         // Valid NID
         if(newNid != UNKNOWNNID) return newNid;
     }
-    
+
     // Return Original NID
     return nid;
 }
@@ -168,7 +168,7 @@ u32 sctrlKernelResolveNid(const char * libName, u32 nid)
     {
         // Fetch Resolver
         NidMissingResolver * cur = g_missing_resolver[i];
-        
+
         // Matching Library
         if(0 == strcmp(cur->libname, libName))
         {
@@ -182,12 +182,12 @@ u32 sctrlKernelResolveNid(const char * libName, u32 nid)
                     return cur->entry[j].fp;
                 }
             }
-            
+
             // Stop Searching
             break;
         }
     }
-    
+
     // Unimplemented NID
     return 0;
 }
@@ -197,7 +197,7 @@ int fillLibraryStubs(void * lib, unsigned int nid, void * stub, unsigned int nid
 {
     // Result
     int result = 0;
-    
+
     u32 stubtable = _lw((unsigned int)stub + 24);
 
     // NidResolverEx
@@ -205,21 +205,21 @@ int fillLibraryStubs(void * lib, unsigned int nid, void * stub, unsigned int nid
     {
         lle_handler((void*)stubtable);
     }
-    
+
     // Calculate Stub Destination Address
     unsigned int dest = nidPos * 8 + stubtable;
-    
+
     // Find Version
     unsigned int * version = (unsigned int *)sctrlHENFindFunction((void *)_lw((unsigned int)stub+36), NULL, 0x11B97506);
-    
+
     // Invalid Version
     if(version != NULL && (*version >> 16) == 0x0606) goto exit;
-    
+
     // Get Module Name
     const char * name = (const char *)_lw((unsigned int)lib + 68);
-    
+
     int is_user_mode = ((u32 *)stub)[0x34/4];
-    
+
     if (!is_user_mode){
         // Resolve Missing NID
         unsigned int targetAddress = sctrlKernelResolveNid(name, nid);
@@ -229,37 +229,37 @@ int fillLibraryStubs(void * lib, unsigned int nid, void * stub, unsigned int nid
             // Write Stub
             _sw(JUMP(targetAddress), dest);
             _sw(NOP, dest + 4);
-            
+
             // Early Exit
             return -1;
         }
     }
-    
+
     // Get Library Resolver
     NidResolverLib * resolver = getNidResolverLib(name);
-    
+
     // Got Library Resolver
     if(resolver != NULL)
     {
         // Resolve NID
         nid = getNidReplacement(resolver, nid);
     }
-    
+
 exit:
     // Forward Call
     result = g_origNIDFiller(lib, nid, -1, 0);
-    
+
     // Original NID Filler failed
     if(result < 0)
     {
         // Store Dummy Stub
         _sw(SYSCALL(0x15), dest);
         _sw(NOP, dest + 4);
-        
+
         // Early Exit
         return -1;
     }
-    
+
     // Return Result
     return result;
 }
@@ -269,22 +269,22 @@ static void NidInsertSort(NidResolverEntry * base, int n, int (* cmp)(const NidR
 {
     // Temporary NID Resolver Entry for Swapping
     NidResolverEntry saved;
-    
+
     // Iterate NIDs
     int j = 1; for(; j < n; ++j)
     {
         // Previous Index
         int i = j - 1;
-        
+
         // Fetch NID Resolver Entry
         NidResolverEntry * value = &base[j];
-        
+
         // Compare Data
         while(i >= 0 && cmp(&base[i], value) > 0) i--;
-        
+
         // Alread sorted
         if(++i == j) continue;
-        
+
         // Exchange NID Resolver Entries
         memmove(&saved, value, sizeof(saved));
         memmove(&base[i + 1], &base[i], sizeof(saved) * (j - i));
@@ -319,10 +319,10 @@ void setupNidResolver(SceModule* mod)
     // Link 660 NID Resolver Table
     nidTable = nidTable660;
     nidTableSize = nidTableSize660;
-    
+
     // Binary Sort Table
     NidSortTable(nidTable, nidTableSize);
-    
+
     u32 text_addr = mod->text_addr;
     u32 topaddr = mod->text_addr+mod->text_size;
     int patches = 5;
@@ -341,7 +341,7 @@ void setupNidResolver(SceModule* mod)
             _sw(JAL(fillLibraryStubs), addr+8);
             _sw(0x02403821, addr + 12);
             patches--;
-            
+
         }
         else if (data == 0x7CC51240){ // sceKernelIcacheClearAll
             missing_LoadCoreForKernel_entries[0].fp = addr-4;
@@ -352,7 +352,7 @@ void setupNidResolver(SceModule* mod)
             patches--;
         }
     }
-    
+
     sctrlFlushCache();
 }
 
