@@ -10,12 +10,12 @@
 #include <pspsysmem_kernel.h>
 #include <pspinit.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
-
 #include <systemctrl.h>
 #include <systemctrl_se.h>
+#include <systemctrl_ark.h>
 #include <systemctrl_private.h>
+#include <vshctrl.h>
 
 #include "rebootex.h"
 #include "nidresolver.h"
