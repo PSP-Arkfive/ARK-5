@@ -32,7 +32,7 @@
 #include <systemctrl_ark.h>
 #include <cfwmacros.h>
 
-
+#include "version.h"
 #include "rebootex.h"
 #include "nidresolver.h"
 #include "modulemanager.h"
@@ -199,7 +199,7 @@ int sctrlSEGetDiscType(void)
 
 int sctrlSEGetVersion()
 {
-    return ( (ARK_MAJOR_VERSION << 24) | (ARK_MINOR_VERSION << 16) | (ARK_MICRO_VERSION << 8) | ARK_REVISION );
+    return ARK_MAJOR_VERSION;
 }
 
 int sctrlSEMountUmdFromFile(char *file, int noumd, int isofs){

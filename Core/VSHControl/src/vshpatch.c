@@ -264,7 +264,7 @@ static void patch_sysconf_plugin_module(SceModule *mod)
     static void* p = NULL;
     if (!p) p = user_malloc(50);
     
-    sprintf(str, "%d.%d%d%s ARK-%d %s", (int)major, (int)minor, (int)micro, tool, ARK_MAJOR_VERSION, ark_config->exploit_id);
+    sprintf(str, "%d.%d%d%s ARK-%d %s", (int)major, (int)minor, (int)micro, tool, sctrlSEGetVersion(), ark_config->exploit_id);
     ascii2utf16(p, str);
     
     _sw(0x3C020000 | ((u32)(p) >> 16), a); // lui $v0, 

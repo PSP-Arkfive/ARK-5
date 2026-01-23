@@ -17,6 +17,7 @@
 #include <systemctrl_private.h>
 #include <vshctrl.h>
 
+#include "version.h"
 #include "rebootex.h"
 #include "nidresolver.h"
 #include "modulemanager.h"
@@ -54,13 +55,13 @@ int sctrlHENApplyMemory(u32 p2) // stub (to be highjacked and implemented by com
 // Get HEN Version
 int sctrlHENGetVersion()
 {
-    return ( (ARK_MAJOR_VERSION << 24) | (ARK_MINOR_VERSION << 16) | (ARK_MICRO_VERSION << 8) );
+    return ARK_MINOR_VERSION;
 }
 
 // Get HEN Minor Version
 int sctrlHENGetMinorVersion()
 {
-    return ARK_REVISION;
+    return ARK_MICRO_VERSION;
 }
 
 int sctrlHENIsSE()
