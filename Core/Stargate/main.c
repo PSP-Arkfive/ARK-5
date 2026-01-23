@@ -26,7 +26,6 @@
 
 #include <cfwmacros.h>
 #include <systemctrl.h>
-#include <systemctrl_private.h>
 
 #include "loadmodule_patch.h"
 #include "nodrm_patch.h"

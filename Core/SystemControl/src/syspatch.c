@@ -22,22 +22,20 @@
 #include <psputilsforkernel.h>
 
 #include <cfwmacros.h>
-
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
 
 #include "imports.h"
 #include "modulemanager.h"
 #include "cryptography.h"
 #include "mediasync.h"
-#include "msstor_cache.h"
 #include "rebootex.h"
 #include "sysmem.h"
 #include "psnfix.h"
 #include "loadexec.h"
 #include "gameinfo.h"
 #include "exitgame.h"
+#include "systemctrl_private.h"
 
 extern u32 sctrlHENFakeDevkitVersion();
 extern int is_plugins_loading;

@@ -8,7 +8,7 @@
 
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
+
 
 typedef struct SceStubLibrary {
     u32 unk0; //0

@@ -20,11 +20,13 @@
 
 #include <pspsdk.h>
 #include <systemctrl_se.h>
+#include <systemctrl_ark.h>
 
 extern u32 psp_model;
 extern u32 psp_fw_version;
 
 extern SEConfig conf;
+extern ARKConfig* ark_config;
 
 #define ISO_RUNLEVEL 0x123
 #define ISO_RUNLEVEL_GO 0x125

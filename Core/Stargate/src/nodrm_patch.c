@@ -22,7 +22,6 @@
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
 
 #include "nodrm_patch.h"
 

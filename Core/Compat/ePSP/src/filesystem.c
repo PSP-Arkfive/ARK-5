@@ -21,13 +21,11 @@
 #include <pspkernel.h>
 #include <psputilsforkernel.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
-
 #include <rebootexconfig.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
+#include <systemctrl_ark.h>
 
 #include "filesystem.h"
 #include "vitaflash.h"

@@ -6,16 +6,16 @@
 #include <pspkernel.h>
 #include <pspdisplay.h>
 
-#include <systemctrl_ark.h>
 #include <rebootexconfig.h>
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
+#include <systemctrl_ark.h>
 
 #include "filesystem.h"
 #include "popspatch.h"
 
+extern ARKConfig* ark_config;
 extern SEConfigARK* se_config;
 extern RebootexConfigARK* reboot_config;
 
@@ -156,7 +156,7 @@ int ARKVitaOnModuleStart(SceModule * mod){
 
             // Initialize Memory Stick Speedup Cache
             if (se_config->msspeed)
-                msstorCacheInit("ms");
+                sctrlMsCacheInit("ms", MSCACHE_BUFSIZE_MIN);
 
             // Apply Directory IO PSP Emulation
             patchFileSystemDirSyscall();

@@ -185,6 +185,8 @@ PSP_EXPORT_FUNC(sctrlGetThreadUIDByName)
 PSP_EXPORT_FUNC(sctrlHENSetLoadRebootOverrideHandler)
 PSP_EXPORT_FUNC(sctrlSEGetConfigInternal)
 PSP_EXPORT_FUNC(sctrlHENIsSystemBooted)
+PSP_EXPORT_FUNC(sctrlMsCacheInit)
+PSP_EXPORT_FUNC(sctrlIsLoadingPlugins)
 PSP_EXPORT_END
 
 
@@ -265,12 +267,10 @@ PSP_EXPORT_FUNC(__udivmoddi4)
 PSP_EXPORT_END
 
 PSP_EXPORT_START(SystemCtrlPrivate, 0, 0x0001)
-PSP_EXPORT_FUNC_NID(msstorCacheInit, 0x5D7817CF)
 PSP_EXPORT_FUNC(msstorCacheStat)
 PSP_EXPORT_FUNC(msstorCacheDisable)
 PSP_EXPORT_FUNC(sctrlHENSetPluginHandler)
 PSP_EXPORT_FUNC(sctrlHENSetRebootexConfig)
-PSP_EXPORT_FUNC(isLoadingPlugins)
 PSP_EXPORT_END
 
 PSP_EXPORT_START(ARKdebug, 0, 0x4001)

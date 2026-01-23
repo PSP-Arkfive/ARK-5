@@ -22,11 +22,10 @@
 #include <pspmodulemgr.h>
 #include <pspiofilemgr.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
+#include <systemctrl_ark.h>
 
 #include "rebootex.h"
 #include "plugin.h"
@@ -64,7 +63,7 @@ int disable_plugins = 0;
 int disable_settings = 0;
 int is_plugins_loading = 0;
 
-int isLoadingPlugins(){
+int sctrlIsLoadingPlugins(){
     return is_plugins_loading;
 }
 

@@ -23,12 +23,12 @@
 #include <pspthreadman_kernel.h>
 #include <psputility_sysparam.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 #include <rebootexconfig.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
+#include <systemctrl_ark.h>
+
 
 extern SEConfig* se_config;
 void hide_cfw_folder(SceModule * mod);
@@ -95,7 +95,7 @@ void applyFixesByModule(SceModule* mod){
         if (CacheInit) CacheInit(0, 0, 0);
 
         // disable memory stick cache
-        msstorCacheInit(NULL);
+        sctrlMsCacheInit(NULL, 0);
 
         // prevent Inferno Cache and MS Cache from being re-enabled
         se_config->iso_cache_type = 0;

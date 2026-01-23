@@ -12,7 +12,6 @@
 
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
 
 #include "high_mem.h"
 #include "region_free.h"
@@ -289,7 +288,7 @@ int PSPOnModuleStart(SceModule * mod){
                 char* drv =
                     (psp_model == PSP_GO && sctrlKernelBootFrom()==0x50)?
                     "eflash0a0f1p" : "msstor0p";
-                msstorCacheInit(drv);
+                sctrlMsCacheInit(drv, MSCACHE_BUFSIZE_MIN);
             }
 
             // fix pops on toolkits

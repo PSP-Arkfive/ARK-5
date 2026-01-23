@@ -26,11 +26,10 @@
 #include <pspiofilemgr.h>
 #include <pspctrl.h>
 
-#include <systemctrl_ark.h>
 #include <vshctrl.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
+#include <systemctrl_ark.h>
 
 extern ARKConfig* ark_config;
 extern SEConfig* se_config;

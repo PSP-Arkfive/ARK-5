@@ -24,11 +24,9 @@
 #include <pspumd.h>
 #include <psprtc.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
 
 #include "inferno.h"
 

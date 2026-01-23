@@ -32,9 +32,9 @@
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <systemctrl_ark.h>
-#include <systemctrl_private.h>
 
 
+extern ARKConfig* ark_config;
 extern SEConfigARK* se_config;
 
 // Previous Module Start Handler
@@ -202,7 +202,7 @@ int AdrenalineOnModuleStart(SceModule * mod){
         {
             // Initialize Memory Stick Speedup Cache
             if (se_config->msspeed)
-        		msstorCacheInit("ms");
+        		sctrlMsCacheInit("ms", MSCACHE_BUFSIZE_MIN);
 
             // Boot Complete Action done
             booted = 1;

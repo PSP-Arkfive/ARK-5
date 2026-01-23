@@ -21,11 +21,9 @@
 #include <pspkernel.h>
 #include <psputilsforkernel.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
-
 #include <systemctrl.h>
-#include <systemctrl_private.h>
+#include <systemctrl_ark.h>
 
 #include "missingfunc.h"
 #include "nidresolver.h"

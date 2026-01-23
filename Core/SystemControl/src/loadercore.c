@@ -21,12 +21,10 @@
 #include <pspkernel.h>
 #include <psputilsforkernel.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
-
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
+#include <systemctrl_ark.h>
 
 #include "imports.h"
 #include "modulemanager.h"
@@ -38,6 +36,7 @@
 #include "rebootex.h"
 #include "gameinfo.h"
 #include "exitgame.h"
+#include "systemctrl_private.h"
 
 extern SEConfigARK se_config;
 

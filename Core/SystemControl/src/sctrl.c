@@ -26,12 +26,10 @@
 #include <pspsysmem_kernel.h>
 #include <pspinit.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
-
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
+#include <systemctrl_ark.h>
 
 #include "rebootex.h"
 #include "nidresolver.h"
@@ -41,6 +39,7 @@
 #include "sysmem.h"
 #include "nidresolver.h"
 #include "gameinfo.h"
+#include "systemctrl_private.h"
 
 // Missing from SDK
 #define PSP_INIT_APITYPE_EF2 0x152

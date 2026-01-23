@@ -19,9 +19,8 @@
 #include <string.h>
 #include <pspsdk.h>
 
-#include <systemctrl_ark.h>
 #include <systemctrl.h>
-#include <systemctrl_private.h>
+#include <systemctrl_ark.h>
 
 #include "sysmem.h"
 

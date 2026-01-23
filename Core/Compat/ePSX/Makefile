@@ -2,14 +2,12 @@ PSPSDK = $(shell psp-config --pspsdk-path)
 
 TARGET = vitapops
 
-C_OBJS = \
+OBJS = \
 	main.o \
 	src/syspatch.o \
 	src/popsdisplay.o \
 	src/vitaflash.o \
-		
-OBJS = \
-	$(C_OBJS) imports.o
+
 
 all: $(TARGET).prx
 INCDIR = include rebootex

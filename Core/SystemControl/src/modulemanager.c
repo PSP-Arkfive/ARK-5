@@ -20,11 +20,10 @@
 #include <pspkernel.h>
 #include <pspiofilemgr.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
+#include <systemctrl_ark.h>
 
 #include "elf.h"
 #include "modulemanager.h"

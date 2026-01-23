@@ -8,12 +8,11 @@
 #include <pspiofilemgr.h>
 #include <pspinit.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 #include <rebootexconfig.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
+#include <systemctrl_ark.h>
 
 #include "popsdisplay.h"
 
@@ -229,7 +228,7 @@ int ARKVitaPopsOnModuleStart(SceModule * mod){
     }
 
     // patch to allow plugins to display (i.e. cwcheat)
-    if (isLoadingPlugins() && sceKernelInitKeyConfig() == PSP_INIT_KEYCONFIG_POPS) {
+    if (sctrlIsLoadingPlugins() && sceKernelInitKeyConfig() == PSP_INIT_KEYCONFIG_POPS) {
         if (mod->text_addr&0x80000000){ // kernel plugin
             sctrlHookImportByNID(mod, "ThreadManForKernel", 0x9944F31F, sceKernelSuspendThreadPatched);
             sctrlHookImportByNID(mod, "ThreadManForKernel", 0x75156E8F, sceKernelResumeThreadPatched);
@@ -270,7 +269,7 @@ int ARKVitaPopsOnModuleStart(SceModule * mod){
 
             // Initialize Memory Stick Speedup Cache
             if (se_config->msspeed)
-                msstorCacheInit("ms");
+                sctrlMsCacheInit("ms", MSCACHE_BUFSIZE_MIN);
 
             if (sceKernelInitKeyConfig() == PSP_INIT_KEYCONFIG_POPS){
                 // Set fake framebuffer so that plugins like cwcheat can be displayed

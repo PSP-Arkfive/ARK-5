@@ -24,7 +24,6 @@
 
 #include <cfwmacros.h>
 #include <systemctrl.h>
-#include <systemctrl_private.h>
 
 PSP_MODULE_INFO("PROPopcornManager", 0x1007, 1, 2);
 

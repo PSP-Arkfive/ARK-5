@@ -24,10 +24,9 @@
 #include <pspsysevent.h>
 #include <pspiofilemgr.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 #include <systemctrl.h>
-#include "systemctrl_private.h"
+#include <systemctrl_ark.h>
 
 #include "imports.h"
 
@@ -47,8 +46,6 @@ unsigned int cacheHit = 0;
 unsigned int cacheMissed = 0;
 unsigned int cacheUncacheable = 0;
 #endif
-
-#define MSCACHE_SIZE (4*1024)
 
 // Cache Structure
 struct MsCache
@@ -359,7 +356,7 @@ static int msstorIoUnk21Cache(PspIoDrvFileArg *arg)
 }
 
 // Initialize "ms" Driver Cache
-int msstorCacheInit(const char* driver)
+int sctrlMsCacheInit(const char* driver, int cache_size)
 {
 
     if (driver == NULL){
@@ -401,7 +398,7 @@ int msstorCacheInit(const char* driver)
     if(pdrv == NULL) return -1;
     
     // Allocate Memory
-    SceUID memid = sceKernelAllocPartitionMemory(1, "MsStorCache", PSP_SMEM_High, MSCACHE_SIZE + 64, NULL);
+    SceUID memid = sceKernelAllocPartitionMemory(1, "MsStorCache", PSP_SMEM_High, cache_size + 64, NULL);
     cache_mem = memid;
     
     // Allocation failed
@@ -417,7 +414,7 @@ int msstorCacheInit(const char* driver)
     g_cache.buf = (void *)(((unsigned int)g_cache.buf & (~(64-1))) + 64);
     
     // Set Cache Size
-    g_cacheSize = MSCACHE_SIZE;
+    g_cacheSize = cache_size;
     
     // Disable Cache
     disableCache(&g_cache);

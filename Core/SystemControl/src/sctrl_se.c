@@ -25,12 +25,11 @@
 #include <pspiofilemgr.h>
 #include <pspsysmem_kernel.h>
 #include <pspinit.h>
+
+#include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <systemctrl_private.h>
-
 #include <systemctrl_ark.h>
-#include <cfwmacros.h>
 
 #include "version.h"
 #include "rebootex.h"

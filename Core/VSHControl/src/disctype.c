@@ -15,12 +15,13 @@
  * along with PRO CFW. If not, see <http://www.gnu.org/licenses/ .
  */
 
-#include "isoreader.h"
 #include <string.h>
 #include <pspiofilemgr.h>
 #include <psputilsforkernel.h>
 #include <pspumd.h>
-#include "systemctrl_private.h"
+
+#include "isoreader.h"
+
 
 static int has_file(char *file)
 {

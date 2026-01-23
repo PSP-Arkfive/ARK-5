@@ -24,7 +24,6 @@
 
 #include <cfwmacros.h>
 #include <systemctrl.h>
-#include <systemctrl_private.h>
 
 extern unsigned char g_icon_png[6108];
 

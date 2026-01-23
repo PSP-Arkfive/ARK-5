@@ -14,7 +14,6 @@
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <systemctrl_ark.h>
-#include <systemctrl_private.h>
 #include <vshctrl.h>
 
 #include "version.h"
@@ -24,6 +23,7 @@
 #include "loadercore.h"
 #include "imports.h"
 #include "sysmem.h"
+#include "systemctrl_private.h"
 
 extern SEConfig se_config;
 

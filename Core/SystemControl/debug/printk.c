@@ -30,14 +30,14 @@
  *
  */
 
+#include <stdarg.h>
+#include <string.h>
 #include <pspsdk.h>
 #include <pspkernel.h>
 #include <pspdebug.h>
 #include <pspdisplay.h>
 #include <pspiofilemgr.h>
-#include <systemctrl_private.h>
-#include <stdarg.h>
-#include <string.h>
+
 #include <systemctrl_ark.h>
 
 #if DEBUG >= 3

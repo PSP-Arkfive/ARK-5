@@ -24,10 +24,10 @@
 #include <pspdebug.h>
 #include <pspinit.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 #include <systemctrl.h>
-#include <systemctrl_private.h>
+#include <systemctrl_ark.h>
+
 
 struct DeviceSize {
     u32 maxClusters;
