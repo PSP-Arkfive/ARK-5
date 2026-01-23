@@ -321,6 +321,23 @@ void sctrlHENHijackFunction(FunctionPatchData* patch_data, void* func_addr, void
     sctrlFlushCache();
 }
 
+u32 sctrlHENMakeSyscallStub(void *function) {
+    
+	u32 stub = (u32)user_malloc(2*sizeof(u32));
+	s32 syscall_num = sceKernelQuerySystemCall(function);
+
+	if (stub == 0) {
+		return 0;
+	}
+
+	if (syscall_num < 0) {
+		return 0;
+	}
+
+	MAKE_SYSCALL_FUNCTION(stub, syscall_num);
+	return stub;
+}
+
 void sctrlHENLoadModuleOnReboot(char *module_before, void *buf, int size, int flags)
 {
     rebootex_config.rtm_mod.before = module_before;
