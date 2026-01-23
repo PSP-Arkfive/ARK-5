@@ -31,7 +31,7 @@ USE_KERNEL_LIBS=1
 
 LIBDIR =
 LDFLAGS =  -nostartfiles
-LIBS = -lpspsystemctrl_kernel -lpspkermit_driver -lpspkermitperipheral_driver
+LIBS = -larkctrl -lpspsystemctrl_kernel -lpspkermit_driver -lpspkermitperipheral_driver
 
 PSP_FW_VERSION = 660
 
