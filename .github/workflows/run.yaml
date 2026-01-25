@@ -35,6 +35,14 @@ jobs:
       - name: Update psp-cfw-sdk
         run: psp-pacman -Syyu --noconfirm && psp-pacman -Rsn ark-dev-sdk libpspexploit --noconfirm && psp-pacman -S psp-cfw-sdk --noconfirm
 
+      - name: Upgrade psp-cfw-sdk via Github
+        run: |
+          git clone https://github.com/pspdev/psp-cfw-sdk.git
+          cd psp-cfw-sdk
+          make
+          make install
+          cd ..
+
       - name: Build
         run:  make clean && make 
 
