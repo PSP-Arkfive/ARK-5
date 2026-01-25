@@ -74,10 +74,10 @@ static int processPlugin(char* runlevel, char* path, char* enabled){
     sce_paf_private_memset(plugin, 0, sizeof(Plugin));
 
     plugin->name = sce_paf_private_malloc(20);
-    sce_paf_private_sprintf(plugin->name, "plugin_%d", n);
+    sce_paf_private_snprintf(plugin->name, sce_paf_private_strlen(plugin->name), "plugin_%d", n);
 
     plugin->surname = sce_paf_private_malloc(20);
-    sce_paf_private_sprintf(plugin->surname, "plugins%d", n);
+    sce_paf_private_snprintf(plugin->surname, sce_paf_private_strlen(plugin->surname), "plugins%d", n);
 
     plugin->path = sce_paf_private_malloc(strlen(path) + 1);
     sce_paf_private_strcpy(plugin->path, path);

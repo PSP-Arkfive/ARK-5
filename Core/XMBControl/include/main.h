@@ -145,6 +145,7 @@ int sce_paf_private_wcslen(wchar_t *);
 int sce_paf_private_wcscpy(wchar_t* str1, wchar_t* str2);
 int sce_paf_private_wcsprintf(wchar_t* string, int len, wchar_t* buf, ...);
 int sce_paf_private_sprintf(char *, const char *, ...);
+int sce_paf_private_snprintf(char *, int, const char *, ...);
 void *sce_paf_private_memcpy(void *, void *, int);
 void *sce_paf_private_memset(void *, char, int);
 int sce_paf_private_strlen(char *);
