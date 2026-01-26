@@ -14,6 +14,7 @@
 	STUB_FUNC  0xB4652CFE,sce_paf_private_memcpy
 	STUB_FUNC  0xD9E2D6E1,sce_paf_private_memset
 	STUB_FUNC  0xD7DCB972,sce_paf_private_strlen
+	STUB_FUNC  0x98BA1D0B,sce_paf_private_strcat
 	STUB_FUNC  0x726DFBA9,sce_paf_private_strcpy
 	STUB_FUNC  0x706ABBFF,sce_paf_private_strncpy
 	STUB_FUNC  0x4CF09BA2,sce_paf_private_strcmp

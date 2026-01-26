@@ -139,12 +139,12 @@ void loadPlugins(){
         Plugin* plugin = (Plugin*)sce_paf_private_malloc(sizeof(Plugin));
         plugin->name = (char*)sce_paf_private_malloc(20);
         plugin->surname = (char*)sce_paf_private_malloc(20);
-        plugin->path = (char*)sce_paf_private_malloc(strlen(sample_plugin_path)+1);
+        plugin->path = (char*)sce_paf_private_malloc(sce_paf_private_strlen(sample_plugin_path)+1);
         plugin->active = 1;
         plugin->place = 0;
-        strcpy(plugin->name, "plugin_0");
-        strcpy(plugin->surname, "plugins0");
-        strcpy(plugin->path, sample_plugin_path);
+        sce_paf_private_strcpy(plugin->name, "plugin_0");
+        sce_paf_private_strcpy(plugin->surname, "plugins0");
+        sce_paf_private_strcpy(plugin->path, sample_plugin_path);
         add_list(&plugins, plugin);
     }
 }

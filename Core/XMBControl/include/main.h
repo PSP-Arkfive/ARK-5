@@ -153,6 +153,7 @@ char *sce_paf_private_strcpy(char *, const char *);
 char *sce_paf_private_strncpy(char *, const char *, int);
 int sce_paf_private_strcmp(const char *, const char *);
 int sce_paf_private_strncmp(const char *, const char *, int);
+int sce_paf_private_strcat(char *, const char *);
 char *sce_paf_private_strchr(const char *, int);
 char *sce_paf_private_strrchr(const char *, int);
 int sce_paf_private_strpbrk(const char *, const char *);

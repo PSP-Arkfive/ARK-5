@@ -531,8 +531,8 @@ void reset_ark_settings(){
     char arkSettingsPath[ARK_PATH_SIZE];
     sce_paf_private_strcpy(arkMenuPath, ark_config.arkpath);
     sce_paf_private_strcpy(arkSettingsPath, ark_config.arkpath);
-    strcat(arkMenuPath, MENU_SETTINGS);
-    strcat(arkSettingsPath, ARK_SETTINGS);
+    sce_paf_private_strcat(arkMenuPath, MENU_SETTINGS);
+    sce_paf_private_strcat(arkSettingsPath, ARK_SETTINGS);
     
     int fd = sceIoOpen(arkMenuPath, PSP_O_RDONLY, 0);
     if(fd) {
@@ -1728,7 +1728,7 @@ void PatchSysconfPlugin(u32 text_addr, u32 text_size)
     }
 
     for (u32 addr=text_addr+0x33000; addr<text_addr+0x40000; addr++){
-        if (strcmp((char*)addr, "fiji") == 0){
+        if (sce_paf_private_strcmp((char*)addr, "fiji") == 0){
             sysconf_unk = addr+216;
             if (_lw(sysconf_unk+4) == 0) sysconf_unk -= 4; // adjust on TT/DT firmware
             sysconf_option = sysconf_unk + 0x4cc; //CHECK
@@ -1746,15 +1746,15 @@ int OnModuleStart(SceModule *mod)
     u32 text_addr = mod->text_addr;
     u32 text_size = mod->text_size;
 
-    if(strcmp(modname, "vsh_module") == 0){
+    if(sce_paf_private_strcmp(modname, "vsh_module") == 0){
         PatchVshMain(text_addr, text_size);
     }
     
-    else if(strcmp(modname, "sceVshAuthPlugin_Module") == 0){
+    else if(sce_paf_private_strcmp(modname, "sceVshAuthPlugin_Module") == 0){
         PatchAuthPlugin(text_addr, text_size);
     }
     
-    else if(strcmp(modname, "sysconf_plugin_module") == 0){
+    else if(sce_paf_private_strcmp(modname, "sysconf_plugin_module") == 0){
         PatchSysconfPlugin(text_addr, text_size);
     }
 
