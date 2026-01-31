@@ -3,14 +3,14 @@
 #include "pspstub.s"
 
 # TODO: send this to pspsdk
-	STUB_START "scePower", 0x40010000, 0x00030005
+	STUB_START "scePower", 0x40010000, 0x00010005
 	STUB_FUNC 0x0442D852, scePowerRequestColdReset
 	STUB_END
 
-	STUB_START "scePaf",0x00090011,0x00120005
+	STUB_START "scePaf",0x00090011,0x00140005
 	STUB_FUNC  0xAF067FA2,sce_paf_private_wcslen
 	STUB_FUNC  0xA138A376,sce_paf_private_sprintf
-    STUB_FUNC  0x7B7133D5,sce_paf_private_snprintf
+	STUB_FUNC  0x7B7133D5,sce_paf_private_snprintf
 	STUB_FUNC  0xB4652CFE,sce_paf_private_memcpy
 	STUB_FUNC  0xD9E2D6E1,sce_paf_private_memset
 	STUB_FUNC  0xD7DCB972,sce_paf_private_strlen
