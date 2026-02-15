@@ -7,51 +7,40 @@ message(STATUS "DEBUG LEVEL = ${DEBUG}")
 set(DIST_DIR ${CMAKE_CURRENT_LIST_DIR}/dist)
 set(FLASH0_DIR ${DIST_DIR}/flash0)
 
-set(ARK_REPOS
-   psp-cfw-sdk
-   SystemControl
-   Inferno2
-   PopCorn
-   Stargate
-   VSHControl
-   PSPCompat
-   VitaCompat
-   VitaPopsCompat
-   Pentazemin
-   XMBControl
-)
-
 include(FetchContent)
-foreach(ARK_REPO ${ARK_REPOS})
-   FetchContent_Declare(
-      ${ARK_REPO}
-      GIT_REPOSITORY https://github.com/PSP-Arkfive/${ARK_REPO}.git
-      GIT_TAG main
-      EXCLUDE_FROM_ALL
-   )
-endforeach()
+FetchContent_Declare(
+   pspcfwsdk
+   GIT_REPOSITORY https://github.com/pspdev/psp-cfw-sdk.git
+   GIT_TAG main
+   EXCLUDE_FROM_ALL
+)
+FetchContent_MakeAvailable(pspcfwsdk)
 
-FetchContent_MakeAvailable(${ARK_REPOS})
-
-set(CFWSDK ${psp-cfw-sdk_SOURCE_DIR})
+set(CFWSDK ${pspcfwsdk_SOURCE_DIR})
 set(BUILDTOOLS ${CFWSDK}/build-tools)
+set(COMPILE_OPS -std=c99 -Os -G0 -Wall -fno-pic)
 
-add_custom_target(BuildARK5 ALL
+remove_definitions("-D_PSP_FW_VERSION=600")
+add_definitions("-D_PSP_FW_VERSION=660")
+
+add_subdirectory(Core)
+
+add_custom_target(dist ALL
    DEPENDS 
+      inferno   
+      popcorn
+      stargate
       systemctrl
       vshcontrol
       xmbcontrol
-      inferno
-      popcorn
-      stargate
       pspcompat
       pspcompat_genbtcnf
       vitacompat
       vitacompat_genbtcnf
-      vitapopscompat
-      vitapopscompat_genbtcnf
-      pentazemin
-      pentazemin_genbtcnf
+      vitapops
+      vitapops_genbtcnf
+      vitaplus
+      vitaplus_genbtcnf
 
    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
    
@@ -66,24 +55,24 @@ add_custom_target(BuildARK5 ALL
 	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_stargate.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:stargate>" Stargate 0x3007
 	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_pspcompat.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:pspcompat>" PSPCompat 0x3007
 	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_vitacompat.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:vitacompat>" VitaCompat 0x3007
-	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_vitapops.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:vitapopscompat>" VitaPopsCompat 0x3007
-	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_vitaplus.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:pentazemin>" Pentazemin 0x3007
+	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_vitapops.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:vitapops>" VitaPopsCompat 0x3007
+	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_vitaplus.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:vitaplus>" VitaPlusCompat 0x3007
 	
    #Copy PSP Compat btcnf files
-   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:pspcompat>/pstbtcnf_dt.bin ${FLASH0_DIR}/
-   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:pspcompat>/pstbtcnf_tt.bin ${FLASH0_DIR}/
+   #COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:pspcompat>/pstbtcnf_dt.bin ${FLASH0_DIR}/
+   #COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:pspcompat>/pstbtcnf_tt.bin ${FLASH0_DIR}/
 
    #Copy Vita Compat btcnf files
    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:vitacompat>/psvbtcnf.bin ${FLASH0_DIR}/
    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:vitacompat>/psvbtinf.bin ${FLASH0_DIR}/
 
    #Copy Vita Pops Compat btcnf files
-   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:vitapopscompat>/psxbtcnf.bin ${FLASH0_DIR}/
+   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:vitapops>/psxbtcnf.bin ${FLASH0_DIR}/
 
    #Copy Vita Adrenaline btcnf files
-   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:pentazemin>/psvbtjnf.bin ${FLASH0_DIR}/
-   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:pentazemin>/psvbtknf.bin ${FLASH0_DIR}/
+   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:vitaplus>/psvbtjnf.bin ${FLASH0_DIR}/
+   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:vitaplus>/psvbtknf.bin ${FLASH0_DIR}/
 
    #Pack FLASH0.ARK
-   COMMAND python3 $<TARGET_PROPERTY:tool_pack,EXEC> -p ${DIST_DIR}/FLASH0.ARK ${BUILDTOOLS}/pack/flash0.txt -s
+   COMMAND python3 $<TARGET_PROPERTY:tool_pack,EXEC> -p ${DIST_DIR}/FLASH0.ARK ${PROJECT_SOURCE_DIR}/flash0.txt -s
 )
