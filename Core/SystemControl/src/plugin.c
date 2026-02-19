@@ -443,24 +443,39 @@ static int ProcessConfigFile(
 
 static void settingsHandler(const char* path, u8 enabled){
     int apitype = sceKernelInitApitype();
-    if (strcasecmp(path, "overclock") == 0){ // set CPU speed to max
+    if (strcasecmp(path, "cpuclock:333") == 0 || strcasecmp(path, "overclock") == 0){ // set CPU speed to max
         if (enabled)
-            se_config.cpubus_clock = 1;
-        else if (se_config.cpubus_clock == 1) se_config.cpubus_clock = 0;
+            se_config.cpubus_clock = CPU_BUS_CLOCK_333;
+        else if (se_config.cpubus_clock == CPU_BUS_CLOCK_333) se_config.cpubus_clock = 0;
     }
-    else if (strcasecmp(path, "powersave") == 0){ // underclock to save battery
+    else if (strcasecmp(path, "cpuclock:133") == 0 || strcasecmp(path, "powersave") == 0){ // underclock to save battery
         if (apitype != 0x144 && apitype != 0x155){ // prevent operation in pops
             if (enabled)
-                se_config.cpubus_clock = 2;
-            else if (se_config.cpubus_clock == 2) se_config.cpubus_clock = 0;
+                se_config.cpubus_clock = CPU_BUS_CLOCK_133;
+            else if (se_config.cpubus_clock == CPU_BUS_CLOCK_133) se_config.cpubus_clock = 0;
         }
     }
-    else if (strcasecmp(path, "defaultclock") == 0){
+    else if (strcasecmp(path, "cpuclock:222") == 0 || strcasecmp(path, "defaultclock") == 0){
         if (apitype != 0x144 && apitype != 0x155){ // prevent operation in pops
             if (enabled)
-                se_config.cpubus_clock = 3;
-            else if (se_config.cpubus_clock == 3) se_config.cpubus_clock = 0;
+                se_config.cpubus_clock = CPU_BUS_CLOCK_222;
+            else if (se_config.cpubus_clock == CPU_BUS_CLOCK_222) se_config.cpubus_clock = 0;
         }
+    }
+    else if (strncasecmp(path, "cpuclock:", 9) == 0){ // custom cpu clock
+        if (enabled){
+            unsigned long r = strtoul(path+9, NULL, 10);
+            se_config.custom_cpu_clock = r;
+            se_config.cpubus_clock = CPU_BUS_CLOCK_CUSTOM;
+        }
+        else se_config.custom_cpu_clock = 0;
+    }
+    else if (strncasecmp(path, "busclock:", 9) == 0){ // custom bus clock
+        if (enabled){
+            unsigned long r = strtoul(path+9, NULL, 10);
+            se_config.custom_bus_clock = r;
+        }
+        else se_config.custom_bus_clock = 0;
     }
     else if (strcasecmp(path, "wpa2") == 0){ // wpa2 support
         se_config.wpa2 = enabled;

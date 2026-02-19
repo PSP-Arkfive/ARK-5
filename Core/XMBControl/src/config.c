@@ -15,12 +15,6 @@
 #include "list.h"
 #include "settings.h"
 
-enum{
-    CLOCK_AUTO,
-    OVERCLOCK,
-    DEFAULTCLOCK,
-    POWERSAVE
-};
 
 extern CFWConfig config;
 extern ARKConfig ark_config;
@@ -54,16 +48,16 @@ static int processConfigLine(char* runlevel, char* path, char* enabled){
         config.usbcharge = opt;
         return 1;
     }
-    else if (strcasecmp(path, "overclock") == 0){
-        convertClockConfig(opt, OVERCLOCK);
+    else if (strcasecmp(path, "cpuclock:333") == 0 || strcasecmp(path, "overclock") == 0){
+        convertClockConfig(opt, CPU_BUS_CLOCK_333);
         return 1;
     }
-    else if (strcasecmp(path, "powersave") == 0){
-        convertClockConfig(opt, POWERSAVE);
+    else if (strcasecmp(path, "cpuclock:133") == 0 || strcasecmp(path, "powersave") == 0){
+        convertClockConfig(opt, CPU_BUS_CLOCK_133);
         return 1;
     }
-    else if (strcasecmp(path, "defaultclock") == 0){
-        convertClockConfig(opt, DEFAULTCLOCK);
+    else if (strcasecmp(path, "cpuclock:222") == 0 || strcasecmp(path, "defaultclock") == 0){
+        convertClockConfig(opt, CPU_BUS_CLOCK_222);
         return 1;
     }
     else if (strcasecmp(path, "wpa2") == 0){
@@ -238,10 +232,10 @@ static void saveClockSetting(int output, char* category, int opt){
         sceIoWrite(output, category, strlen(category));
         sceIoWrite(output, ", ", 2);
         switch (opt){
-            case 1: sceIoWrite(output, "overclock, on", 13); break;
-            case 2: sceIoWrite(output, "defaultclock, on", 16); break;
-            case 3: sceIoWrite(output, "powersave, on", 13); break;
-            default: sceIoWrite(output, "overclock, off", 14); break;
+            case CPU_BUS_CLOCK_333: sceIoWrite(output, "cpuclock:333, on", 16); break;
+            case CPU_BUS_CLOCK_222: sceIoWrite(output, "cpuclock:222, on", 16); break;
+            case CPU_BUS_CLOCK_133: sceIoWrite(output, "cpuclock:133, on", 16); break;
+            default: sceIoWrite(output, "cpuclock:333, off", 14); break;
         }
         sceIoWrite(output, "\n", 1);
     }

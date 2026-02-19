@@ -200,10 +200,10 @@ char* usbdev_settings[] = {
 };
 
 char* clock_settings[] = {
-    "Auto",
-    "OverClock",
-    "Balanced",
-    "PowerSave"
+    "Default",
+    "333",
+    "222",
+    "133",
 };
 
 char* skiplogos_settings[] = {

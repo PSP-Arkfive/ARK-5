@@ -248,9 +248,15 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
             if (sctrlHENIsToolKit() != PSP_TOOLKIT_TYPE_DEV){
                 // handle CPU speed settings
                 switch (se_config.cpubus_clock){
-                    case 1: sctrlHENSetSpeed(333, 166); break;
-                    case 2: sctrlHENSetSpeed(133, 66); break;
-                    case 3: sctrlHENSetSpeed(222, 111); break;
+                    case CPU_BUS_CLOCK_333:    sctrlHENSetSpeed(333, 166); break;
+                    case CPU_BUS_CLOCK_222:    sctrlHENSetSpeed(222, 111); break;
+                    case CPU_BUS_CLOCK_133:    sctrlHENSetSpeed(133, 66);  break;
+                    case CPU_BUS_CLOCK_CUSTOM:
+                        sctrlHENSetSpeed(
+                            se_config.custom_cpu_clock,
+                            se_config.custom_bus_clock
+                        );
+                        break;
                 }
             }
 
