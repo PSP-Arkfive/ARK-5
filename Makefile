@@ -4,7 +4,7 @@ BUILDTOOLS = $(PSPDEV)/share/psp-cfw-sdk/build-tools
 
 .PHONY : mkdist FlashPackage \
 	SystemControl VSHControl XMBControl Inferno PopCorn Stargate \
-	PSPCompat VitaCompat VitaPopsCompat VitaPlusCompat
+	PSPCompat VitaCompat VitaPopsCompat VitaPlusCompat Resources
 
 
 all: mkdist FlashPackage
@@ -57,9 +57,14 @@ VitaPlusCompat:
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/vPSP/btcnf/psvbtknf.txt
 	$(Q)mv Core/Compat/vPSP/btcnf/*.bin dist/flash0/
 
+Resources:
+	$(Q)cp -r Resources/ARK_01234 dist/
+	$(Q)$(PY) $(BUILDTOOLS)/pack/pkg-res.py Resources/Language LANG.ARK
+	$(Q)mv Resources/Language/Translations/LANG.ARK dist/ARK_01234/
+
 FlashPackage: mkdist \
 	SystemControl VSHControl XMBControl Inferno PopCorn Stargate \
-	PSPCompat VitaCompat VitaPopsCompat VitaPlusCompat
+	PSPCompat VitaCompat VitaPopsCompat VitaPlusCompat Resources
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_systemctrl.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/SystemControl/systemctrl.prx SystemControl 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vshctrl.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/VSHControl/vshctrl.prx VshControl 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_xmbctrl.prx $(BUILDTOOLS)/gz/UserModule.hdr Core/XMBControl/xmbctrl.prx XmbControl 0x0000
@@ -70,7 +75,7 @@ FlashPackage: mkdist \
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vitacompat.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/ePSP/vitacompat.prx VitaCompat 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vitapops.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/ePSX/vitapops.prx VitaPopsCompat 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vitaplus.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/Compat/vPSP/vitaplus.prx VitaPlusCompat 0x3007
-	$(PY) $(BUILDTOOLS)/pack/pack.py -p dist/FLASH0.ARK flash0.txt -s
+	$(PY) $(BUILDTOOLS)/pack/pack.py -p dist/ARK_01234/FLASH0.ARK flash0.txt -s
 
 
 clean:
