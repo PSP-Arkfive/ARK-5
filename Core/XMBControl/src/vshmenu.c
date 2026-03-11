@@ -98,13 +98,13 @@ void patchVshClock(u32 addr){
     sce_paf_private_sprintf(info_string, "\n\n\n\n"
         "CFW: ARK %d.%d.%d\n"
         "Built: %s %s\n"
-        "Console: %s FW%d%d%d\n"
+        "Console: %s (%02dg) FW%d%d%d\n"
         "Bootloader: %s",
         sctrlSEGetVersion(),
         sctrlHENGetVersion(),
         sctrlHENGetMinorVersion(),
         __DATE__, __TIME__,
-        console_type, major, minor, micro,
+        console_type, psp_model+1, major, minor, micro,
         ark_config.exploit_id
     );
 
