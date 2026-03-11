@@ -201,9 +201,10 @@ char* usbdev_settings[] = {
 
 char* clock_settings[] = {
     "Default",
-    "333",
-    "222",
     "133",
+    "222",
+    "333",
+    "407"
 };
 
 char* skiplogos_settings[] = {
