@@ -988,6 +988,36 @@ int has_update_file(const char* isopath, char* update_file){
     return 0;
 }
 
+int iso_has_valid_boot(char* path){ // vpbp->name
+    int ret;
+    u32 magic=0, size=0, lba=0;
+
+    int k1 = pspSdkSetK1(0);
+
+    ret = isoOpen(path);
+    if (ret < 0){
+        pspSdkSetK1(k1);
+        return 0;
+    }
+
+    ret = isoGetFileInfo("/PSP_GAME/SYSDIR/BOOT.BIN", &size, &lba);
+    if (ret < 0){
+        pspSdkSetK1(k1);
+        return 0;
+    }
+
+    ret = isoRead(&magic, lba, 0, sizeof(magic));
+    isoClose();
+
+    if (ret < 0 || magic == 0){
+        pspSdkSetK1(k1);
+        return 0;
+    }
+
+    pspSdkSetK1(k1);
+    return 1;
+}
+
 void vpbp_fixisopath(char* path){
 
     char game_id[10];
@@ -1088,6 +1118,8 @@ int vpbp_loadexec(char * file, struct SceKernelLoadExecVSHParam * param)
 
         if (has_prometheus_module(vpbp->name)) {
             param->argp = "disc0:/PSP_GAME/SYSDIR/EBOOT.OLD";
+        } else if (iso_has_valid_boot(vpbp->name)) {
+            param->argp = "disc0:/PSP_GAME/SYSDIR/BOOT.BIN";
         } else {
             param->argp = "disc0:/PSP_GAME/SYSDIR/EBOOT.BIN";
         }
