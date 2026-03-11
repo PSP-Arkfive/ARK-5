@@ -16,6 +16,7 @@
 #include "high_mem.h"
 #include "region_free.h"
 #include "libertas.h"
+#include "overclock.h"
 
 
 extern u32 psp_model;
@@ -351,4 +352,7 @@ void PSPSyspatchStart(){
 
     // Implement extra memory unlock
     HIJACK_FUNCTION(K_EXTRACT_IMPORT(sctrlHENApplyMemory), memoryHandlerPSP, _sctrlHENApplyMemory);
+
+    // Implement overclocking code
+    initOverclock();
 }

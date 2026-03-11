@@ -11,6 +11,7 @@ C_OBJS = \
 	src/libertas.o   \
 	src/usb_charge.o  \
 	src/region_free.o \
+	src/overclock.o \
 	src/pops4tool.o
 		
 OBJS = \
