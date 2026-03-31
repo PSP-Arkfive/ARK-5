@@ -13,7 +13,7 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
+#include <malloc.h>
 #include <psppower.h>
 #include <pspdisplay.h>
 #include <pspkernel.h>
@@ -52,8 +52,8 @@ static int (*prevDisplaySetFrameBuf)(void*, int, int, int) = NULL;
 
 static void vshcube_draw(void* frame) {
 
-    PspGeContext* gectx = user_memalign(64, sizeof(PspGeContext));
-    vramBackup = user_memalign(64, VRAM_BACKUP_BYTE_COUNT);
+    PspGeContext* gectx = memalign(64, sizeof(PspGeContext));
+    vramBackup = memalign(64, VRAM_BACKUP_BYTE_COUNT);
 
     sceGeSaveContext(gectx);
     int state = sceKernelSuspendDispatchThread();
@@ -156,8 +156,8 @@ static void vshcube_draw(void* frame) {
     sceKernelResumeDispatchThread(state);
     sceGeRestoreContext(gectx);
 
-    user_free(vramBackup);
-    user_free(gectx);
+    free(vramBackup);
+    free(gectx);
 }
 
 static int vshDisplaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelformat, int sync) {
@@ -236,7 +236,7 @@ int vshcube_init() {
 }
 
 int vshcube_start() {
-    list = user_memalign(64, 2048);
+    list = memalign(64, 2048);
     vshcube_running = 1;
     return 0;
 }
@@ -244,7 +244,7 @@ int vshcube_start() {
 int vshcube_stop() {
     vshcube_running = 0;
     sceDisplayWaitVblankStart();
-    user_free(list);
+    free(list);
     list = NULL;
     return 0;
 }
