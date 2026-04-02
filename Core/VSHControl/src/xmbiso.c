@@ -274,13 +274,13 @@ SceUID gamedopen(const char * dirname)
         int iso_dfd, ret;
         
         get_device_name(path, sizeof(path), dirname);
-        strncat(path, "/ISO", sizeof(path)-128);
+        strcat(path, "/ISO");
 
         p = strstr(dirname, "/PSP/GAME");
 
         if(p != NULL) {
             p += sizeof("/PSP/GAME") - 1;
-            strncat(path, p, sizeof(path)-128);
+            strcat(path, p);
         }
 
         k1 = pspSdkSetK1(0);
