@@ -26,7 +26,6 @@
 #include "libertas.h"
 
 extern int psp_model;
-extern SEConfig* se_config;
 
 // MAC Backup Flag
 int isRealMACSafe = 0;

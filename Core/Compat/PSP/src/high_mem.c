@@ -27,12 +27,14 @@
 #include <systemctrl_ark.h>
 #include <cfwmacros.h>
 #include <systemctrl.h>
+#include <systemctrl_se.h>
 
 #include "high_mem.h"
 
 extern u32 psp_model;
-static u8 g_p8_size = 4;
+extern SEConfigARK* se_config;
 
+static u8 g_p8_size = 4;
 static u32 * (*get_memory_partition)(int pid) = NULL;
 
 static void* findGetPartition(){
@@ -170,3 +172,25 @@ int memoryHandlerPSP(u32 p2){
 
     return res;
 }
+
+/*int (*prevHandlerPlugin)(const char* path, SceUID* modid) = NULL;
+int memoryHandlerPlugin(const char* path, SceUID* modid){
+    // highmem is available but it's not forced into p2
+    if (psp_model > PSP_1000 && !se_config->force_high_memory && sceKernelInitApitype() < 0x200){
+        SceModule* mod = (SceModule*)sceKernelFindModuleByUID(*modid);
+        if (!IS_KERNEL_ADDR(mod->text_addr)){ // user plugin only
+            // try to offload module, safe exit if can't
+            if (sceKernelUnloadModule(*modid)<0) return 0;
+            // load module on p9
+            static const SceKernelLMOption mopts =
+            {
+                .size     = sizeof(SceKernelLMOption),
+                .mpidtext = 9,
+                .mpiddata = 9,
+            };
+            *modid = sceKernelLoadModule(path, 0, &mopts);
+        }
+    }
+    if (prevHandlerPlugin) return prevHandlerPlugin(path, modid);
+    return 0;
+}*/

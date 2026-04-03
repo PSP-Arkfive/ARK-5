@@ -10,10 +10,12 @@ typedef struct _MemPart {
 } MemPart;
 
 extern int (*_sctrlHENApplyMemory)(u32);
+extern int (*prevHandlerPlugin)(const char* path, SceUID* modid);
 
 int prevent_highmem();
 int prepatch_partitions();
 int patch_partitions(u32 p2_size);
 int memoryHandlerPSP(u32 p2);
+int memoryHandlerPlugin(const char* path, SceUID* modid);
 
 #endif

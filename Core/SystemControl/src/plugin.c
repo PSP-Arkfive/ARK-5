@@ -47,8 +47,8 @@ typedef struct{
 
 Plugins* plugins = NULL;
 
-static int ef0PluginHandler(const char* path, int modid);
-int (*plugin_handler)(const char* path, int modid) = &ef0PluginHandler;
+static int ef0PluginHandler(const char* path, SceUID* modid);
+int (*plugin_handler)(const char* path, SceUID* modid) = &ef0PluginHandler;
 
 enum {
     RUNLEVEL_UNKNOWN,
@@ -98,11 +98,11 @@ static void startPlugins()
         int res = 0;
         char* path = plugins->paths[i];
         // Load Module
-        int uid = sceKernelLoadModule(path, 0, NULL);
+        SceUID uid = sceKernelLoadModule(path, 0, NULL);
         if (uid >= 0){
             // Call handler
             if (plugin_handler){
-                res = plugin_handler(path, uid);
+                res = plugin_handler(path, &uid);
                 // Unload Module on Error
                 if (res < 0){
                     sceKernelUnloadModule(uid);
@@ -696,9 +696,9 @@ static void patch_devicename(SceUID modid)
     sctrlFlushCache();
 }
 
-static int ef0PluginHandler(const char* path, int modid){
+static int ef0PluginHandler(const char* path, SceUID* modid){
     if(se_config.oldplugin && path[0] == 'e' && path[1] == 'f') {
-        patch_devicename(modid);
+        patch_devicename(*modid);
     }
     return 0;
 }

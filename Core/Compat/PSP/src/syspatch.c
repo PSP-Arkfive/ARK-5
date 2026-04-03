@@ -325,11 +325,27 @@ int StartModuleHandler(int modid, SceSize argsize, void * argp, int * modstatus,
 }
 
 static int power_event_handler(int ev_id, char *ev_name, void *param, int *result){
-    if( ev_id == 0x400000) { // resume complete
+
+    if (ev_id == 0x400) // sleep
+    {
+        // disable overclock
+        if (overclock_enabled){
+            cancelOverclock();
+            origSetClockFrequency(333, 166);
+        }
+    }
+
+    if (ev_id == 0x400000) { // resume complete
+        // do overclock
+        if (overclock_enabled){
+            doOverclock();
+        }
+        // disable LEDs
         if (se_config->noled && _sceSysconCtrlLEDOrig){
             for (int i=0; i<4; i++) _sceSysconCtrlLEDOrig(i, 0);
         }
     }
+
     return 0;
 }
 
@@ -355,4 +371,8 @@ void PSPSyspatchStart(){
 
     // Implement overclocking code
     initOverclock();
+
+    // Register plugin loader
+    //extern void* sctrlHENSetPluginHandler(void*);
+    //prevHandlerPlugin = sctrlHENSetPluginHandler(memoryHandlerPlugin);
 }

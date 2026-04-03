@@ -16,6 +16,7 @@
 
 #define    DEFAULT_FREQUENCY        333
 static int THEORETICAL_FREQUENCY  = 444;
+int overclock_enabled = 0;
 
 #define PLL_MUL_MSB               0x0124
 #define PLL_RATIO_INDEX           5
@@ -232,7 +233,7 @@ static inline void adjustDomainRatios() {
   }
 }
 
-void adjustInitialFrequencies() {
+static void adjustInitialFrequencies() {
   
   sceKernelDelayThread(100);
 
@@ -336,10 +337,12 @@ void overclockHandler(int cpu, int bus){
     if (cpu > 333 && cpu <= 466) {
         THEORETICAL_FREQUENCY = cpu;
         doOverclock();
+        overclock_enabled = 1;
     }
     else {
         cancelOverclock();
         origSetClockFrequency(cpu, bus);
+        overclock_enabled = 0;
     }
 }
 
