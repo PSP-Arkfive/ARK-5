@@ -10,7 +10,6 @@ Next Generation Custom Firmware for PSP and Vita's ePSP.
 
 ## Features
 
-Main differences with ARK-4:
 - Compiled with `latest PSPSDK`.
 - Easier installation.
 - Better Plugin Management in the XMB.
