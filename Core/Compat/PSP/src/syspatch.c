@@ -361,7 +361,8 @@ void PSPSyspatchStart(){
     // Implement overclocking code
     initOverclock();
 
-    // Register plugin loader
-    //extern void* sctrlHENSetPluginHandler(void*);
-    //prevHandlerPlugin = sctrlHENSetPluginHandler(memoryHandlerPlugin);
+    // Patch to load user plugins in highmem
+    if (psp_model > PSP_1000){
+        HIJACK_FUNCTION(K_EXTRACT_IMPORT(sceKernelAllocPartitionMemory), extraAllocPartitionMemory, origAllocPartitionMemory);
+    }
 }

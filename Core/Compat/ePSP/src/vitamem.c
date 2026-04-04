@@ -16,6 +16,7 @@
 
 extern SEConfigARK* se_config;
 
+static PspSysMemPartition *(* GetPartition)(int partition) = NULL;
 static u32 findGetPartition(){
     for (u32 addr = SYSMEM_TEXT; ; addr+=4){
         if (_lw(addr) == 0x2C85000D){
@@ -25,13 +26,24 @@ static u32 findGetPartition(){
     return 0;
 }
 
+// modify extra ram partitions to be user-allocateable
+void unprotectVitaMemory(){
+    if (GetPartition == NULL) GetPartition = (void*)findGetPartition();
+    for (int i=8; i<12; i++){
+        PspSysMemPartition* partition = (void*)GetPartition(i);
+        if (partition){
+            partition->address &= 0x7FFFFFFF;
+        }
+    }
+}
+
 int unlockVitaMemory(u32 user_size_mib){
 
     int apitype = sceKernelInitApitype(); // prevent in pops and vsh
     if (apitype == 0x144 || apitype == 0x155 || apitype >= 0x200)
         return -1;
 
-    PspSysMemPartition *(* GetPartition)(int partition) = (void*)findGetPartition();
+    if (GetPartition == NULL) GetPartition = (void*)findGetPartition();
 
     PspSysMemPartition *partition;
     u32 user_size = user_size_mib * 1024 * 1024; // new p2 size
@@ -74,6 +86,22 @@ int memoryHandlerVita(u32 p2){
     
     // unlock fail? revert back to 24MB
     if (res<0) _sctrlHENApplyMemory(24);
+
+    return res;
+}
+
+// This patch forces user plugins to allocate on extra ram
+SceUID (*origAllocPartitionMemory)(int partition, char* name, int place, int size, void* addr) = NULL;
+SceUID extraAllocPartitionMemory(int partition, char* name, int place, int size, void* addr){
+    if (!se_config->force_high_memory && partition == 2 && addr == NULL && sctrlIsLoadingPlugins()){
+        partition = 11;
+    }
+    SceUID res = origAllocPartitionMemory(partition, name, place, size, addr);
+
+    // if memory has been allocated into p11, disable growing of p2
+    if (partition == 11 && res >= 0){
+        MAKE_DUMMY_FUNCTION(memoryHandlerVita, 0xFFFF); // make it return -1
+    }
 
     return res;
 }

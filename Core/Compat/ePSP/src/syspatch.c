@@ -14,6 +14,7 @@
 
 #include "filesystem.h"
 #include "popspatch.h"
+#include "vitamem.h"
 
 extern ARKConfig* ark_config;
 extern SEConfigARK* se_config;
@@ -21,8 +22,6 @@ extern RebootexConfigARK* reboot_config;
 
 extern int sceKernelSuspendThreadPatched(SceUID thid);
 extern void patchVLF(SceModule * mod);
-extern int (*_sctrlHENApplyMemory)(u32);
-extern int memoryHandlerVita(u32 p2);
 
 // Previous Module Start Handler
 STMOD_HANDLER previous = NULL;
@@ -250,4 +249,8 @@ void initVitaSysPatch(){
 
     // Implement extra memory unlock
     HIJACK_FUNCTION(K_EXTRACT_IMPORT(sctrlHENApplyMemory), memoryHandlerVita, _sctrlHENApplyMemory);
+
+    // Patch to load user plugins in highmem
+    unprotectVitaMemory();
+    HIJACK_FUNCTION(K_EXTRACT_IMPORT(sceKernelAllocPartitionMemory), extraAllocPartitionMemory, origAllocPartitionMemory);
 }

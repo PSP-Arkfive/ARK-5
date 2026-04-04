@@ -104,6 +104,14 @@ int prepatch_partitions()
     p11.offset = 56-4;
     modify_partition(&p11);
 
+    // modify extra ram partitions to be user-allocateable
+    for (int i=8; i<12; i++){
+        PspSysMemPartition* partition = (void*)get_partition(i);
+        if (partition){
+            partition->address &= 0x7FFFFFFF;
+        }
+    }
+
     return 0;
 }
 
@@ -173,24 +181,18 @@ int memoryHandlerPSP(u32 p2){
     return res;
 }
 
-/*int (*prevHandlerPlugin)(const char* path, SceUID* modid) = NULL;
-int memoryHandlerPlugin(const char* path, SceUID* modid){
-    // highmem is available but it's not forced into p2
-    if (psp_model > PSP_1000 && !se_config->force_high_memory && sceKernelInitApitype() < 0x200){
-        SceModule* mod = (SceModule*)sceKernelFindModuleByUID(*modid);
-        if (!IS_KERNEL_ADDR(mod->text_addr)){ // user plugin only
-            // try to offload module, safe exit if can't
-            if (sceKernelUnloadModule(*modid)<0) return 0;
-            // load module on p9
-            static const SceKernelLMOption mopts =
-            {
-                .size     = sizeof(SceKernelLMOption),
-                .mpidtext = 9,
-                .mpiddata = 9,
-            };
-            *modid = sceKernelLoadModule(path, 0, &mopts);
-        }
+// This patch forces user plugins to allocate on extra ram
+SceUID (*origAllocPartitionMemory)(int partition, char* name, int place, int size, void* addr) = NULL;
+SceUID extraAllocPartitionMemory(int partition, char* name, int place, int size, void* addr){
+    if (!se_config->force_high_memory && partition == 2 && addr == NULL && sctrlIsLoadingPlugins() && sceKernelInitApitype() < 0x200){
+        partition = 9;
     }
-    if (prevHandlerPlugin) return prevHandlerPlugin(path, modid);
-    return 0;
-}*/
+    SceUID res = origAllocPartitionMemory(partition, name, place, size, addr);
+
+    // if memory has been allocated into p9, disable growing of p2
+    if (partition == 9 && res >= 0){
+        MAKE_DUMMY_FUNCTION(memoryHandlerPSP, 0xFFFF); // make it return -1
+    }
+
+    return res;
+}
