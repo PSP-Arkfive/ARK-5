@@ -251,6 +251,5 @@ void initVitaSysPatch(){
     HIJACK_FUNCTION(K_EXTRACT_IMPORT(sctrlHENApplyMemory), memoryHandlerVita, _sctrlHENApplyMemory);
 
     // Patch to load user plugins in highmem
-    unprotectVitaMemory();
     HIJACK_FUNCTION(K_EXTRACT_IMPORT(sceKernelAllocPartitionMemory), extraAllocPartitionMemory, origAllocPartitionMemory);
 }

@@ -35,26 +35,10 @@ extern u32 psp_model;
 extern SEConfigARK* se_config;
 
 static u8 g_p8_size = 4;
-static u32 * (*get_memory_partition)(int pid) = NULL;
-
-static void* findGetPartition(){
-    for (u32 addr = SYSMEM_TEXT; ; addr+=4){
-        if (_lw(addr) == 0x2C85000D){
-            return (void*)(addr-4);
-        }
-    }
-    return NULL;
-}
-
-static inline u32 *get_partition(int pid)
-{
-    if (get_memory_partition == NULL) get_memory_partition = findGetPartition();
-    return (*get_memory_partition)(pid);
-}
 
 static void modify_partition(MemPart *part)
 {
-    u32 *meminfo;
+    PspSysMemPartition *meminfo;
     u32 offset, size;
 
     meminfo = part->meminfo;
@@ -66,11 +50,11 @@ static void modify_partition(MemPart *part)
     }
 
     if (offset != 0) {
-        meminfo[1] = (offset << 20) + 0x88800000;
+        meminfo->address = (offset << 20) + 0x88800000;
     }
 
-    meminfo[2] = size << 20;
-    ((u32*)(meminfo[4]))[5] = (size << 21) | 0xFC;
+    meminfo->size = size << 20;
+    meminfo->data->size = (size << 21) | 0xFC;
 }
 
 int prevent_highmem(){
@@ -87,8 +71,8 @@ int prepatch_partitions()
 
     MemPart p8, p11;
 
-    p8.meminfo = get_partition(8);
-    p11.meminfo = get_partition(11);
+    p8.meminfo = sctrlGetMemoryPartition(8);
+    p11.meminfo = sctrlGetMemoryPartition(11);
 
     g_p8_size = p8.size = 1;
     
@@ -104,14 +88,6 @@ int prepatch_partitions()
     p11.offset = 56-4;
     modify_partition(&p11);
 
-    // modify extra ram partitions to be user-allocateable
-    for (int i=8; i<12; i++){
-        PspSysMemPartition* partition = (void*)get_partition(i);
-        if (partition){
-            partition->address &= 0x7FFFFFFF;
-        }
-    }
-
     return 0;
 }
 
@@ -125,13 +101,13 @@ int patch_partitions(u32 p2_size)
     MemPart p2, p9;
     int max_user_part_size;
 
-    p2.meminfo = get_partition(2);
-    p9.meminfo = get_partition(9);
+    p2.meminfo = sctrlGetMemoryPartition(2);
+    p9.meminfo = sctrlGetMemoryPartition(9);
 
     p2.size = p2_size;
     p9.size = 0;
 
-    if(get_partition(11) != NULL) {
+    if(sctrlGetMemoryPartition(11) != NULL) {
         max_user_part_size = 56 - 4 - g_p8_size;
     } else {
         max_user_part_size = 56 - g_p8_size;

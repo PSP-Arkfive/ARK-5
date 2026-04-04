@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <pspsdk.h>
-#include <pspsysmem_kernel.h>
 #include <pspkernel.h>
 #include <psputilsforkernel.h>
 #include <pspsysevent.h>
@@ -16,46 +15,23 @@
 
 extern SEConfigARK* se_config;
 
-static PspSysMemPartition *(* GetPartition)(int partition) = NULL;
-static u32 findGetPartition(){
-    for (u32 addr = SYSMEM_TEXT; ; addr+=4){
-        if (_lw(addr) == 0x2C85000D){
-            return addr-4;
-        }
-    }
-    return 0;
-}
-
-// modify extra ram partitions to be user-allocateable
-void unprotectVitaMemory(){
-    if (GetPartition == NULL) GetPartition = (void*)findGetPartition();
-    for (int i=8; i<12; i++){
-        PspSysMemPartition* partition = (void*)GetPartition(i);
-        if (partition){
-            partition->address &= 0x7FFFFFFF;
-        }
-    }
-}
-
 int unlockVitaMemory(u32 user_size_mib){
 
     int apitype = sceKernelInitApitype(); // prevent in pops and vsh
     if (apitype == 0x144 || apitype == 0x155 || apitype >= 0x200)
         return -1;
 
-    if (GetPartition == NULL) GetPartition = (void*)findGetPartition();
-
     PspSysMemPartition *partition;
     u32 user_size = user_size_mib * 1024 * 1024; // new p2 size
 
     // modify p2
-    partition = GetPartition(PSP_MEMORY_PARTITION_USER);
+    partition = sctrlGetMemoryPartition(PSP_MEMORY_PARTITION_USER);
     partition->size = user_size;
     partition->data->size = (((user_size >> 8) << 9) | 0xFC);
 
     // modify p11
     for (int i=8; i<12; i++){
-        partition = GetPartition(i);
+        partition = sctrlGetMemoryPartition(i);
         if (partition){
             partition->size = 0;
             partition->address = 0x88800000 + user_size;

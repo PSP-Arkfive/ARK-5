@@ -4,7 +4,7 @@
 #include <pspsdk.h>
 
 typedef struct _MemPart {
-    u32 *meminfo;
+    PspSysMemPartition *meminfo;
     int offset;
     int size;
 } MemPart;
@@ -16,7 +16,6 @@ int prevent_highmem();
 int prepatch_partitions();
 int patch_partitions(u32 p2_size);
 int memoryHandlerPSP(u32 p2);
-int memoryHandlerPlugin(const char* path, SceUID* modid);
 
 extern SceUID (*origAllocPartitionMemory)(int partition, char* name, int place, int size, void* addr);
 SceUID extraAllocPartitionMemory(int partition, char* name, int place, int size, void* addr);
