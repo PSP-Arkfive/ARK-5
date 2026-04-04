@@ -69,9 +69,14 @@ int memoryHandlerVita(u32 p2){
 // This patch forces user plugins to allocate on extra ram
 SceUID (*origAllocPartitionMemory)(int partition, char* name, int place, int size, void* addr) = NULL;
 SceUID extraAllocPartitionMemory(int partition, char* name, int place, int size, void* addr){
-    if (!se_config->force_high_memory && partition == 2 && addr == NULL && sctrlIsLoadingPlugins()){
+    // adjust partition
+    if (partition == 2 && addr == NULL &&
+        !se_config->force_high_memory &&
+        sctrlIsLoadingPlugins()
+    ){
         partition = 11;
     }
+    
     SceUID res = origAllocPartitionMemory(partition, name, place, size, addr);
 
     // if memory has been allocated into p11, disable growing of p2
