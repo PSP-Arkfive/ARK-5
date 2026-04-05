@@ -15,7 +15,7 @@
 #include <systemctrl.h>
 
 #define    DEFAULT_FREQUENCY        333
-static int THEORETICAL_FREQUENCY  = 444;
+static int THEORETICAL_FREQUENCY  = 466;
 int overclock_enabled = 0;
 extern int psp_model;
 
