@@ -17,6 +17,7 @@
 #define    DEFAULT_FREQUENCY        333
 static int THEORETICAL_FREQUENCY  = 444;
 int overclock_enabled = 0;
+extern int psp_model;
 
 #define PLL_MUL_MSB               0x0124
 #define PLL_RATIO_INDEX           5
@@ -268,7 +269,7 @@ void doOverclock() {
     
     u32 _num = (u32)(((float)(defaultFreq * PLL_DEN)) / ((float)PLL_BASE_FREQ));
     const u32 num = (u32)(((float)(theoreticalFreq * PLL_DEN)) / ((float)PLL_BASE_FREQ));
-    
+
     updatePLLControl();
     
     //const u32 msb = PLL_MUL_MSB | (1 << (PLL_CUSTOM_FLAG - 16));
@@ -276,6 +277,7 @@ void doOverclock() {
       updatePLLMultiplier(_num, PLL_MUL_MSB);
       _num++;
     }
+
     settle();
     
     defaultFreq += freqStep;
@@ -334,6 +336,9 @@ int cancelOverclock() {
 }
 
 void overclockHandler(int cpu, int bus){
+    // disallow changing CPU clock on devkits
+    if (sctrlHENIsToolKit() == PSP_TOOLKIT_TYPE_DEV) return;
+
     if (cpu > 333 && cpu <= 466) {
         THEORETICAL_FREQUENCY = cpu;
         doOverclock();

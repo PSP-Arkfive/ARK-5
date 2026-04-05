@@ -204,7 +204,7 @@ char* clock_settings[] = {
     "133",
     "222",
     "333",
-    "407"
+    "433"
 };
 
 char* skiplogos_settings[] = {
