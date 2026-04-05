@@ -1106,6 +1106,7 @@ int vpbp_loadexec(char * file, struct SceKernelLoadExecVSHParam * param)
     else{
         //reset and configure reboot parameter
         loadexec_file = vpbp->name;
+        param->args = 33;
 
         if (psp_model == PSP_GO) {
             char devicename[20];
@@ -1114,15 +1115,17 @@ int vpbp_loadexec(char * file, struct SceKernelLoadExecVSHParam * param)
                 apitype = ISO_RUNLEVEL_GO;
             }
         }
-
+        
+        SceCtrlData pad_data;
+        sceCtrlPeekBufferPositive(&pad_data, 1);
         if (has_prometheus_module(vpbp->name)) {
             param->argp = "disc0:/PSP_GAME/SYSDIR/EBOOT.OLD";
-        } else if (iso_has_valid_boot(vpbp->name)) {
+        } else if (iso_has_valid_boot(vpbp->name) && ((pad_data.Buttons & PSP_CTRL_RTRIGGER) == PSP_CTRL_RTRIGGER)) {
             param->argp = "disc0:/PSP_GAME/SYSDIR/BOOT.BIN";
+            param->args = 32;
         } else {
             param->argp = "disc0:/PSP_GAME/SYSDIR/EBOOT.BIN";
         }
-        param->args = 33;
     }
 
     //start game image
