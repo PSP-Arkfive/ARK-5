@@ -2,7 +2,7 @@
 #define OVERCLOCK_H
 
 #define    DEFAULT_FREQUENCY        333
-#define    THEORETICAL_FREQUENCY    555
+#define    THEORETICAL_FREQUENCY    463
 
 extern int current_frequency;
 extern void (*origSetClockFrequency)(int cpu, int bus);
