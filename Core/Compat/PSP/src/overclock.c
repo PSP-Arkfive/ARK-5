@@ -17,14 +17,14 @@
 #include "overclock.h"
 
 
-int current_frequency = DEFAULT_FREQUENCY;
-
 #define PLL_MUL_MSB                 0x0124
 #define PLL_RATIO_INDEX             5
 #define PLL_BASE_FREQ               37
 #define PLL_DEN                     17
 #define OVERCLOCK_FREQUENCY_STEP    5
 //#define PLL_CUSTOM_FLAG           27
+
+int current_frequency = DEFAULT_FREQUENCY;
 
 #define updatePLLMultiplier(num, msb)               \
 {                                                   \
@@ -47,8 +47,6 @@ int current_frequency = DEFAULT_FREQUENCY;
     sync();                                         \
   }                                                 \
 }
-
-#define u32 unsigned int
 
 #define hw(addr)                      \
   (*((volatile unsigned int*)(addr)))
