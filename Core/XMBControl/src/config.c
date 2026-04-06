@@ -64,12 +64,12 @@ static int processConfigLine(char* runlevel, char* path, char* enabled){
         convertClockConfig(opt, CPU_BUS_CLOCK_333);
         return 1;
     }
-    else if (strcasecmp(path, "cpuclock:133") == 0 || strcasecmp(path, "powersave") == 0){
-        convertClockConfig(opt, CPU_BUS_CLOCK_133);
-        return 1;
-    }
     else if (strcasecmp(path, "cpuclock:222") == 0 || strcasecmp(path, "defaultclock") == 0){
         convertClockConfig(opt, CPU_BUS_CLOCK_222);
+        return 1;
+    }
+    else if (strcasecmp(path, "cpuclock:133") == 0 || strcasecmp(path, "powersave") == 0){
+        convertClockConfig(opt, CPU_BUS_CLOCK_133);
         return 1;
     }
     else if (strcasecmp(path, "wpa2") == 0){
