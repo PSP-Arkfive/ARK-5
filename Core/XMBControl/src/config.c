@@ -48,8 +48,8 @@ static int processConfigLine(char* runlevel, char* path, char* enabled){
         config.usbcharge = opt;
         return 1;
     }
-    else if (strcasecmp(path, "cpuclock:466") == 0){
-        convertClockConfig(opt, CPU_BUS_CLOCK_466);
+    else if (strcasecmp(path, "cpuclock:463") == 0){
+        convertClockConfig(opt, CPU_BUS_CLOCK_463);
         return 1;
     }
     else if (strcasecmp(path, "cpuclock:433") == 0){
@@ -249,7 +249,7 @@ static void saveClockSetting(int output, char* category, int opt){
             case CPU_BUS_CLOCK_333: sceIoWrite(output, "cpuclock:333, on\n", 17); break;
             case CPU_BUS_CLOCK_418: sceIoWrite(output, "cpuclock:418, on\n", 17); break;
             case CPU_BUS_CLOCK_433: sceIoWrite(output, "cpuclock:433, on\n", 17); break;
-            case CPU_BUS_CLOCK_466: sceIoWrite(output, "cpuclock:466, on\n", 17); break;
+            case CPU_BUS_CLOCK_463: sceIoWrite(output, "cpuclock:463, on\n", 17); break;
             default: sceIoWrite(output, "cpuclock:333, off\n", 18); break;
         }
     }
