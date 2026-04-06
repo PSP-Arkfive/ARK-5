@@ -14,15 +14,16 @@
 #include <cfwmacros.h>
 #include <systemctrl.h>
 
-#define    DEFAULT_FREQUENCY        333
-static int THEORETICAL_FREQUENCY  = 466;
-int overclock_enabled = 0;
-extern int psp_model;
+#include "overclock.h"
 
-#define PLL_MUL_MSB               0x0124
-#define PLL_RATIO_INDEX           5
-#define PLL_BASE_FREQ             37
-#define PLL_DEN                   20
+
+int current_frequency = DEFAULT_FREQUENCY;
+
+#define PLL_MUL_MSB                 0x0124
+#define PLL_RATIO_INDEX             5
+#define PLL_BASE_FREQ               37
+#define PLL_DEN                     17
+#define OVERCLOCK_FREQUENCY_STEP    5
 //#define PLL_CUSTOM_FLAG           27
 
 #define updatePLLMultiplier(num, msb)               \
@@ -181,7 +182,7 @@ static inline void adjustPLLRatio() {
   u32 index = hw(0xbc100068) & 0x0f;
   sync();
 
-  if (index != 5) {
+  if (index != PLL_RATIO_INDEX) {
     
     const int step = (index > 5) ? -1 : 1;
     while (((step < 0) == (index > 5)) || index == 5) {
@@ -256,10 +257,10 @@ void doOverclock() {
   adjustInitialFrequencies();
   
   int defaultFreq = DEFAULT_FREQUENCY;
-  const int freqStep = PLL_BASE_FREQ / 2;
+  const int freqStep = OVERCLOCK_FREQUENCY_STEP;
   int theoreticalFreq = defaultFreq + freqStep;
   
-  while (theoreticalFreq <= THEORETICAL_FREQUENCY) {
+  while (theoreticalFreq <= current_frequency) {
     
     int intr, state;
     state = sceKernelSuspendDispatchThread();
@@ -293,8 +294,8 @@ void doOverclock() {
 
 int cancelOverclock() {
   
-  u32 _num = (u32)(((float)(THEORETICAL_FREQUENCY * PLL_DEN)) / ((float)PLL_BASE_FREQ));
-  const u32 num = (u32)(((float)(DEFAULT_FREQUENCY * PLL_DEN)) / ((float)PLL_BASE_FREQ));
+  u32 _num = (u32)(((float)(current_frequency * PLL_DEN)) / ((float)PLL_BASE_FREQ));
+  const u32 num = (u32)(((float)(current_frequency * PLL_DEN)) / ((float)PLL_BASE_FREQ));
   
   int intr, state;
   state = sceKernelSuspendDispatchThread();
@@ -310,7 +311,7 @@ int cancelOverclock() {
   const float n = (float)((pllMul & 0xff00) >> 8);
   const float d = (float)((pllMul & 0x00ff));
   const float m = (d > 0.0f) ? (n / d) : 9.0f;
-  const int overclocked = ((pllCtl & 5) && (m > 9.0f)) ? 1 : 0;
+  const int overclocked = ((pllCtl & PLL_RATIO_INDEX) && (m > 9.0f)) ? 1 : 0;
   sceKernelDelayThread(1000);
 
   //const u32 pllMul = hw(0xbc1000fc); sync();
@@ -339,15 +340,13 @@ void overclockHandler(int cpu, int bus){
     // disallow changing CPU clock on devkits
     if (sctrlHENIsToolKit() == PSP_TOOLKIT_TYPE_DEV) return;
 
-    if (cpu > 333 && cpu <= 466) {
-        THEORETICAL_FREQUENCY = cpu;
+    if (cpu > DEFAULT_FREQUENCY && cpu <= THEORETICAL_FREQUENCY) {
+        current_frequency = cpu;
         doOverclock();
-        overclock_enabled = 1;
     }
     else {
         cancelOverclock();
         origSetClockFrequency(cpu, bus);
-        overclock_enabled = 0;
     }
 }
 

@@ -1,7 +1,10 @@
 #ifndef OVERCLOCK_H
 #define OVERCLOCK_H
 
-extern int overclock_enabled;
+#define    DEFAULT_FREQUENCY        333
+#define    THEORETICAL_FREQUENCY    555
+
+extern int current_frequency;
 extern void (*origSetClockFrequency)(int cpu, int bus);
 
 void initOverclock();

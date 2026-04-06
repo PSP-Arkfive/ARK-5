@@ -326,8 +326,8 @@ int StartModuleHandler(int modid, SceSize argsize, void * argp, int * modstatus,
 
 static int power_event_handler(int ev_id, char *ev_name, void *param, int *result){
     if (ev_id == 0x400000) { // resume complete
-        // do overclock
-        if (overclock_enabled){
+        // do overclock if enabled
+        if (current_frequency > DEFAULT_FREQUENCY){ // overclock enabled
             doOverclock();
         }
         // disable LEDs
