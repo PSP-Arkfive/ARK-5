@@ -20,7 +20,7 @@
 #define PLL_MUL_MSB                 0x0124
 #define PLL_RATIO_INDEX             5
 #define PLL_BASE_FREQ               37
-#define PLL_DEN                     20 //17
+#define PLL_DEN                     17 // 20
 #define OVERCLOCK_FREQUENCY_STEP    5
 //#define PLL_CUSTOM_FLAG           27
 
