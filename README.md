@@ -13,6 +13,6 @@ Next Generation Custom Firmware for PSP and Vita's ePSP.
 - Compiled with `latest PSPSDK`.
 - Easier installation and usage.
 - Better Plugin Management in the XMB.
+- True overclocking for all PSP models, except Street and Vita.
 - Improved memory management for consoles with extra ram.
-- True overclocking for all PSP models except Street.
 - Lots of under-the-hood fixes and improvements.
