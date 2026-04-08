@@ -1,10 +1,4 @@
 
-
-// Important:
-// - Phat not supported at 444Mhz
-// - tested on 2k and 3k
-// - 407 - 444 MHz ok, approaching the stability limit
-
 // m-c/d 2026, MIT License, for more information on this project see:
 // https://github.com/mcidclan/psp-undocumented-sorcery/tree/main/experimental-overclock
 
