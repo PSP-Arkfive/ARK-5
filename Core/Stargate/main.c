@@ -27,6 +27,7 @@
 #include <cfwmacros.h>
 #include <systemctrl.h>
 
+#include "main.h"
 #include "loadmodule_patch.h"
 #include "nodrm_patch.h"
 
@@ -35,13 +36,6 @@ PSP_MAIN_THREAD_ATTR(0);
 
 // Previous Module Start Handler
 STMOD_HANDLER previous;
-
-extern void patch_ioDevCtl();
-extern void patch_IsoDrivers();
-extern void patch_sceMesgLed();
-extern void applyFixesByGameId();
-extern void applyFixesByModule(SceModule* mod);
-extern void hide_cfw_folder(SceModule * mod);
 
 // Module Start Handler
 int stargateSyspatchModuleOnStart(SceModule * mod)
@@ -58,6 +52,10 @@ int stargateSyspatchModuleOnStart(SceModule * mod)
     {
         booted = 1;
         applyFixesByGameId();
+    }
+
+    if (strcmp(mod->modname, "ISOChange") == 0){
+        patch_ISODriverModule(mod);
     }
 
     // Call Previous Module Start Handler

@@ -32,6 +32,8 @@ char* plugins_paths[] = {
 
 char* plugin_blacklist[] = {
     "popscore.prx",
+    "pops_bridge.prx",
+    "usbhostfs.prx",
     IDSREG_PRX,
     INTRAFONT_PRX,
     LIBPNG_PRX,
@@ -47,6 +49,10 @@ char* plugin_blacklist[] = {
     VLF_PRX,
     VSH_MENU,
     XMBCTRL_PRX,
+};
+
+char* plugin_folder_blacklist[] = {
+    "lib"
 };
 
 void plugin_list_cleaner(void* item){
@@ -74,10 +80,10 @@ static int processPlugin(char* runlevel, char* path, char* enabled){
     sce_paf_private_memset(plugin, 0, sizeof(Plugin));
 
     plugin->name = sce_paf_private_malloc(20);
-    sce_paf_private_snprintf(plugin->name, sce_paf_private_strlen(plugin->name), "plugin_%d", n);
+    sce_paf_private_snprintf(plugin->name, 20, "plugin_%d", n);
 
     plugin->surname = sce_paf_private_malloc(20);
-    sce_paf_private_snprintf(plugin->surname, sce_paf_private_strlen(plugin->surname), "plugins%d", n);
+    sce_paf_private_snprintf(plugin->surname, 20, "plugins%d", n);
 
     plugin->path = sce_paf_private_malloc(strlen(path) + 1);
     sce_paf_private_strcpy(plugin->path, path);
@@ -216,6 +222,15 @@ int isPluginBlacklisted(char* plugin_name){
     return 0;
 }
 
+int isPluginDirBlacklisted(char* plugin_dir){
+    for (int i=0; i<NELEMS(plugin_folder_blacklist); i++){
+        if (strcasecmp(plugin_dir, plugin_folder_blacklist[i]) == 0){
+            return 1;
+        }
+    }
+    return 0;
+}
+
 static void findInstallablePluginsSubfolder(int place, char* subfolder){
     char fullpath[128];
     sce_paf_private_strcpy(fullpath, plugins_paths[place]);
@@ -252,7 +267,8 @@ void findInstallablePlugins(){
         while ((sceIoDread(dir, &dit)) > 0){
             if (dit.d_name[0] == '.') continue;
             if (isFolder(&dit)){
-                findInstallablePluginsSubfolder(i, dit.d_name);
+                if (!isPluginDirBlacklisted(dit.d_name))
+                    findInstallablePluginsSubfolder(i, dit.d_name);
                 continue;
             }
             char* ext = sce_paf_private_strrchr(dit.d_name, '.');

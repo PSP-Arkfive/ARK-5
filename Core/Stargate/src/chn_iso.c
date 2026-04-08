@@ -43,10 +43,14 @@ int myIoOpen_kernel_chn(char *file, int flag, int mode)
     return ret;
 }
 
+void patch_ISODriverModule(SceModule* mod){
+    sctrlHookImportByNID(mod, "IoFileMgrForKernel", 0x109F50BC, &myIoOpen_kernel_chn);
+}
+
 void patch_IsoDrivers(void)
 {
     SceModule *mod = (SceModule*) sceKernelFindModuleByName("PRO_Inferno_Driver");
     if(mod != NULL) {
-        sctrlHookImportByNID(mod, "IoFileMgrForKernel", 0x109F50BC, &myIoOpen_kernel_chn);
+        patch_ISODriverModule(mod);
     }
 }
