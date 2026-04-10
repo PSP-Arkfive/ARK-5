@@ -12,7 +12,6 @@
 #include <systemctrl_se.h>
 
 #include "main.h"
-#include "list.h"
 #include "settings.h"
 
 
@@ -183,8 +182,8 @@ static void processCustomConfig(char* line){
     add_list(&custom_config, line);
 }
 
-static void list_cleaner(void* item){
-    free(item);
+void list_cleaner(void* item){
+    sce_paf_private_free(item);
 }
 
 void loadSettings(){
@@ -274,7 +273,7 @@ void saveSettings(){
         fd = sceIoOpen(path, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, 0777);
     }
 
-    char* line = malloc(LINE_BUFFER_SIZE);
+    char* line = sce_paf_private_malloc(LINE_BUFFER_SIZE);
 
     processSetting(fd, line, "usbcharge", config.usbcharge);
 
@@ -337,5 +336,5 @@ void saveSettings(){
 
     sceIoClose(fd);
 
-    free(line);
+    sce_paf_private_free(line);
 }

@@ -1,6 +1,8 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include "list.h"
+
 #define LINE_BUFFER_SIZE 256
 #define LINE_TOKEN_DELIMITER ','
 #define MAX_LANG_STRINGS 256
@@ -18,6 +20,10 @@ enum{
 };
 
 #define FIX_BOOLEAN(c) {c = (c)?1:0;}
+
+extern List custom_config;
+
+void list_cleaner(void* item);
 
 void loadSettings();
 

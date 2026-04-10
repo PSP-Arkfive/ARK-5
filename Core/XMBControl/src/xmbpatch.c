@@ -993,8 +993,9 @@ int UnloadModulePatched(int skip)
     {
         skip = -1;
         unload = 0;
-        //clear_list(&plugins, &plugin_list_cleaner);
-        //clear_list(&iplugins, &plugin_list_cleaner);
+        clear_list(&plugins, &plugin_list_cleaner);
+        clear_list(&iplugins, &plugin_list_cleaner);
+        clear_list(&custom_config, &list_cleaner);
     }
     return UnloadModule(skip);
 }
