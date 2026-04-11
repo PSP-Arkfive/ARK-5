@@ -2,9 +2,7 @@ PY = $(shell which python3)
 PSPDEV = $(shell psp-config --pspdev-path)
 BUILDTOOLS = $(PSPDEV)/share/psp-cfw-sdk/build-tools
 
-.PHONY : mkdist FlashPackage \
-	SystemControl VSHControl XMBControl Inferno PopCorn Stargate \
-	PSPCompat VitaCompat VitaPopsCompat VitaPlusCompat Resources
+.PHONY : mkdist Core Resources FlashPackage
 
 
 all: mkdist FlashPackage
@@ -15,56 +13,47 @@ mkdist:
 	$(Q)mkdir -p dist
 	$(Q)mkdir -p dist/flash0
 
-SystemControl: 
+Core: 
+	# SystemControl
 	$(MAKE) -C Core/SystemControl
-
-VSHControl: 
+	# VSHControl
 	$(MAKE) -C Core/VSHControl
-
-XMBControl: 
+	# XMBCOntrol
 	$(MAKE) -C Core/XMBControl
-
-Inferno: 
+	# Inferno
 	$(MAKE) -C Core/Inferno
-
-PopCorn: 
+	# PopCorn
 	$(MAKE) -C Core/PopCorn
-
-Stargate: 
+	# Stargate
 	$(MAKE) -C Core/Stargate
-
-PSPCompat: 
+	# PSP Compat
 	$(MAKE) -C Core/Compat/PSP/rebootex
 	$(MAKE) -C Core/Compat/PSP/
-
-VitaCompat: 
+	# ePSP Compat
 	$(MAKE) -C Core/Compat/ePSP/rebootex
 	$(MAKE) -C Core/Compat/ePSP/
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/ePSP/btcnf/psvbtcnf.txt
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/ePSP/btcnf/psvbtinf.txt
-	$(Q)mv Core/Compat/ePSP/btcnf/*.bin dist/flash0/
-
-VitaPopsCompat: 
+	# ePSX Compat
 	$(MAKE) -C Core/Compat/ePSX/rebootex
 	$(MAKE) -C Core/Compat/ePSX/
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/ePSX/btcnf/psxbtcnf.txt
-	$(Q)mv Core/Compat/ePSX/btcnf/*.bin dist/flash0/
-
-VitaPlusCompat: 
+	# vPSP Compat
 	$(MAKE) -C Core/Compat/vPSP/rebootex
 	$(MAKE) -C Core/Compat/vPSP/
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/vPSP/btcnf/psvbtjnf.txt
 	$(PY) $(BUILDTOOLS)/btcnf.py build Core/Compat/vPSP/btcnf/psvbtknf.txt
-	$(Q)mv Core/Compat/vPSP/btcnf/*.bin dist/flash0/
+	
 
 Resources:
 	$(Q)cp -r Resources/ARK_01234 dist/
 	$(Q)$(PY) $(BUILDTOOLS)/pack/pkg-res.py Resources/Language LANG.ARK
 	$(Q)mv Resources/Language/Translations/LANG.ARK dist/ARK_01234/
 
-FlashPackage: mkdist \
-	SystemControl VSHControl XMBControl Inferno PopCorn Stargate \
-	PSPCompat VitaCompat VitaPopsCompat VitaPlusCompat Resources
+FlashPackage: mkdist Core Resources
+	$(Q)mv Core/Compat/ePSP/btcnf/*.bin dist/flash0/
+	$(Q)mv Core/Compat/ePSX/btcnf/*.bin dist/flash0/
+	$(Q)mv Core/Compat/vPSP/btcnf/*.bin dist/flash0/
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_systemctrl.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/SystemControl/systemctrl.prx SystemControl 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vshctrl.prx $(BUILDTOOLS)/gz/SystemControl.hdr Core/VSHControl/vshctrl.prx VshControl 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_xmbctrl.prx $(BUILDTOOLS)/gz/UserModule.hdr Core/XMBControl/xmbctrl.prx XmbControl 0x0000
