@@ -148,7 +148,7 @@ static void vshcube_draw(void* frame) {
     sceGuSync(GU_SYNC_FINISH, GU_SYNC_WHAT_DONE);
 
     {
-        u32 a=0xfff;
+        u32 a=0x1fff;
         while(--a) {__asm__("nop; sync");}
     }
 
