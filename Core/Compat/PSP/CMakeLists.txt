@@ -1,6 +1,7 @@
 add_compat_prx(pspcompat psp
    SRC_FILES
       main.c
+      src/overclock.c
       src/syspatch.c
       src/wpa2.c
       src/cwpatch.c
