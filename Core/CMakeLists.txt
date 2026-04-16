@@ -1,6 +1,6 @@
 add_subdirectory(Compat)
 add_subdirectory(Inferno)
-add_subdirectory(Popcorn)
+add_subdirectory(PopCorn)
 add_subdirectory(Stargate)
 add_subdirectory(SystemControl)
 add_subdirectory(VSHControl)
