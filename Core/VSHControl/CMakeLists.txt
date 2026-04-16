@@ -24,6 +24,7 @@ target_link_libraries(vshcontrol PRIVATE
    -nostartfiles
    cisoread
    arkctrl
+   pspctrl
    pspsystemctrl_kernel
    pspusb
    pspusbdevice_driver
