@@ -49,7 +49,7 @@ int vctrlVSHRegisterVshMenu(int (*ctrl)(SceCtrlData *, int))
 
 int vctrlVSHUpdateConfig(SEConfig *config)
 {
-    memcpy(se_config, config, sizeof(SEConfig));
+    memcpy(se_config, config, sizeof(SEConfigARK));
     return 0;
 }
 
