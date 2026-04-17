@@ -36,7 +36,6 @@
 #include "nidresolver.h"
 #include "modulemanager.h"
 #include "loadercore.h"
-#include "imports.h"
 
 SEConfigARK se_config = {
     .magic = ARK_CONFIG_MAGIC,
