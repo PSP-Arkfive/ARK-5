@@ -1077,13 +1077,18 @@ void OnInitMenuPspConfigPatched()
                 usbdev_settings[0] = usbdev_settings[n_usbdev-1];
             }
             // remove "Internal Storage" option (if not there)
-            if (n_usbdev == item_opts[USB_DEVICE+PLUGINS_CONTEXT+2].n)
+            if (n_usbdev == item_opts[USB_DEVICE+PLUGINS_CONTEXT+2].n){
                 item_opts[USB_DEVICE+PLUGINS_CONTEXT+2].n--;
-            
+            }
             // remove Shutdown option from PS Vita
-            if (IS_VITA((&ark_config))){
+            if (IS_VITA(&ark_config)){
                 item_opts[SYSTEM_OPTIONS+PLUGINS_CONTEXT+2].n = NELEMS(system_opts_vita);
                 item_opts[SYSTEM_OPTIONS+PLUGINS_CONTEXT+2].c = system_opts_vita;
+            }
+            // remove overclock values from street and vita
+            if (psp_model == PSP_11000 || IS_VITA(&ark_config)){
+                item_opts[CPU_CLOCK_GAME+PLUGINS_CONTEXT+2].n = 3;
+                item_opts[CPU_CLOCK_VSH+PLUGINS_CONTEXT+2].n = 3;
             }
             
             loadSettings();
