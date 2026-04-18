@@ -1092,8 +1092,8 @@ void OnInitMenuPspConfigPatched()
             }
             
             loadSettings();
-            int i;
-            for(i = 0; i < NELEMS(GetItemes); i++)
+            
+            for (int i = 0; i < NELEMS(GetItemes); i++)
             {
                 if (skipSetting(i)){
                     continue;
