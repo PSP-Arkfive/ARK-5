@@ -291,17 +291,11 @@ static int load_cache(void)
         if (fd >= 0) {
             break;
         }
-        #ifdef DEBUG
-        printk("%s: open %s -> 0x%08X\n", __func__, PSP_CACHE_PATH, fd);
-        #endif
         fd = sceIoOpen(PSPGO_CACHE_PATH, PSP_O_RDONLY, 0777);
 
         if (fd >= 0) {
             break;
         }
-        #ifdef DEBUG
-        printk("%s: open %s -> 0x%08X\n", __func__, PSPGO_CACHE_PATH, fd);
-        #endif
     }
 
     if (fd < 0) {
@@ -339,29 +333,19 @@ static int save_cache(void)
     }
 
     if(!g_need_update) {
-        #ifdef DEBUG
-        printk("%s: no need to update\n", __func__);
-        #endif
         return 0;
     }
 
     for(i=0; i<3; ++i) {
         fd = sceIoOpen(PSP_CACHE_PATH, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, 0777);
-
         if (fd >= 0) {
             break;
         }
-        #ifdef DEBUG
-        printk("%s: open %s -> 0x%08X\n", __func__, PSP_CACHE_PATH, fd);
-        #endif
+
         fd = sceIoOpen(PSPGO_CACHE_PATH, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, 0777);
-
         if (fd >= 0) {
             break;
         }
-        #ifdef DEBUG
-        printk("%s: open %s -> 0x%08X\n", __func__, PSPGO_CACHE_PATH, fd);
-        #endif
     }
 
     if (fd < 0) {
@@ -426,9 +410,7 @@ static int build_vpbp(VirtualPBP *vpbp)
 {
     int ret, i;
     u32 off;
-    #ifdef DEBUG
-    printk("Need to build vpbp %s\n", vpbp->name);
-    #endif
+
     memset(vpbp->header, 0, sizeof(vpbp->header));
     memset(vpbp->sects, 0, sizeof(vpbp->sects));
     vpbp->enabled = 1;
@@ -442,9 +424,6 @@ static int build_vpbp(VirtualPBP *vpbp)
     ret = isoOpen(vpbp->name);
 
     if (ret < 0) {
-        #ifdef DEBUG
-        printk("%s: isoOpen -> %d\n", __func__, ret);
-        #endif
         ret = add_cache(vpbp);
         return ret;
     }
@@ -480,9 +459,6 @@ static int build_vpbp(VirtualPBP *vpbp)
     vpbp->pbp_total_size = vpbp->header[9];
     get_iso_file_size(vpbp->name, &vpbp->iso_total_size);
     ret = add_cache(vpbp);
-    #ifdef DEBUG
-    printk("%s: add_cache -> %d\n", __func__, ret);
-    #endif
     isoClose();
 
     return ret;
@@ -532,9 +508,6 @@ static int get_sfo_section(VirtualPBP *vpbp, u32 remaining, void *data)
     buf = user_malloc(SECTOR_SIZE+64);
 
     if (buf == NULL) {
-        #ifdef DEBUG
-        printk("%s: buf cannot allocate\n", __func__);
-        #endif
         return -13;
     }
 
@@ -542,9 +515,6 @@ static int get_sfo_section(VirtualPBP *vpbp, u32 remaining, void *data)
     ret = isoRead(buf_64, vpbp->sects[0].lba, 0, SECTOR_SIZE);
 
     if (ret < 0) {
-        #ifdef DEBUG
-        printk("%s: isoRead -> 0x%08X\n", __func__, ret);
-        #endif
         oe_free(buf);
         return -37;
     }
@@ -610,9 +580,6 @@ static int get_pbp_section(VirtualPBP *vpbp, u32 remaining, int idx, void *data)
     buf = user_malloc(buf_size + 64);
 
     if(buf == NULL) {
-        #ifdef DEBUG
-        printk("%s: buf(2) cannot allocate\n", __func__);
-        #endif
         return -5;
     }
 
@@ -627,9 +594,6 @@ static int get_pbp_section(VirtualPBP *vpbp, u32 remaining, int idx, void *data)
         ret = isoRead(buf_64, vpbp->sects[idx].lba, pos_section, re);
 
         if (ret < 0) {
-            #ifdef DEBUG
-            printk("%s: isoRead -> 0x%08X\n", __func__, ret);
-            #endif
             return -38;
         }
 
@@ -666,9 +630,6 @@ int vpbp_init(void)
 
     if (g_caches == NULL) {
         g_caches_cnt = 0;
-        #ifdef DEBUG
-        printk("%s: g_cache cannot allocate\n", __func__);
-        #endif
         return -27;
     }
 
@@ -685,22 +646,14 @@ SceUID vpbp_open(const char * file, int flags, SceMode mode)
     lock();
 
     if (flags & (PSP_O_WRONLY | PSP_O_TRUNC | PSP_O_CREAT) || !(flags & PSP_O_RDONLY)) {
-        #ifdef DEBUG
-        printk("%s: bad flags 0x%08X\n", __func__, flags);
-        #endif
         unlock();
-
         return -6;
     }
     
     vpbp = get_vpbp_by_path(file);
 
     if (vpbp == NULL) {
-        #ifdef DEBUG
-        printk("%s: Unknown file %s in vpbp list\n", __func__, file);
-        #endif
         unlock();
-
         return -12;
     }
 
@@ -709,20 +662,15 @@ SceUID vpbp_open(const char * file, int flags, SceMode mode)
         ret = isoOpen(vpbp->name);
 
         if (ret < 0) {
-            #ifdef DEBUG
-            printk("%s: isoOpen -> %d\n", __func__, ret);
-            #endif
             unlock();
             return -29;
         }
 
         unlock();
-
         return MAGIC_VPBP_FD+(vpbp-&g_vpbps[0]);
     }
 
     unlock();
-
     return -26;
 }
 
@@ -734,9 +682,6 @@ SceOff vpbp_lseek(SceUID fd, SceOff offset, int whence)
     vpbp = get_vpbp_by_fd(fd);
     
     if (vpbp == NULL) {
-        #ifdef DEBUG
-        printk("%s: unknown fd 0x%08X\n", __func__, fd);
-        #endif
         unlock();
         return -3;
     }
@@ -770,9 +715,6 @@ int vpbp_read(SceUID fd, void * data, SceSize size)
     vpbp = get_vpbp_by_fd(fd);
 
     if (vpbp == NULL) {
-        #ifdef DEBUG
-        printk("%s: unknown fd 0x%08X\n", __func__, fd);
-        #endif
         unlock();
         return -4;
     }
@@ -811,9 +753,6 @@ int vpbp_close(SceUID fd)
     vpbp = get_vpbp_by_fd(fd);
 
     if (vpbp == NULL) {
-        #ifdef DEBUG
-        printk("%s: unknown fd 0x%08X\n", __func__, fd);
-        #endif
         unlock();
         return -7;
     }
@@ -854,9 +793,6 @@ int vpbp_remove(const char * file)
     vpbp = get_vpbp_by_path(file);
 
     if (vpbp == NULL) {
-        #ifdef DEBUG
-        printk("%s: Unknown file %s in vpbp list\n", __func__, file);
-        #endif
         unlock();
         return -14;
     }
@@ -896,9 +832,6 @@ int vpbp_getstat(const char * file, SceIoStat * stat)
     vpbp = get_vpbp_by_path(file);
 
     if (vpbp == NULL) {
-        #ifdef DEBUG
-        printk("%s: Unknown file %s in vpbp list\n", __func__, file);
-        #endif
         unlock();
         return -30;
     }
@@ -1158,9 +1091,7 @@ static int add_fake_dirent(SceIoDirent *dir, int vpbp_idx)
 
     vpbp = &g_vpbps[vpbp_idx];
     sprintf(dir->d_name, "%s%08X", ISO_ID, vpbp_idx);
-    #ifdef DEBUG
-    printk("%s: ISO %s -> %s added\n", __func__, vpbp->name, dir->d_name);
-    #endif
+
     dir->d_stat.st_mode = 0x11FF;
     dir->d_stat.st_attr = 0x10;
 

@@ -43,13 +43,6 @@ extern SEConfigARK se_config;
 // Previous Module Start Handler
 STMOD_HANDLER previous = NULL;
 
-#ifdef DEBUG
-#include <screenprinter.h>
-#include <colordebugger.h>
-// for screen debugging
-int (* DisplaySetFrameBuf)(void*, int, int, int) = NULL;
-#endif
-
 
 static unsigned int fakeFindFunction(char * szMod, char * szLib, unsigned int nid){
     if (nid == 0x221400A6 && strcmp(szMod, "SystemControl") == 0)
@@ -95,24 +88,6 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
             &sctrlHENFakeDevkitVersion
         );
     }
-
-    #ifdef DEBUG
-    printk("syspatch: %s(0x%04X)\r\n", mod->modname, sceKernelInitApitype());
-    sctrlHookImportByNID(mod, "KDebugForKernel", 0x84F370BC, printk);
-
-    if (sceKernelFindModuleByName("vsh_module") == NULL){
-        initScreen(DisplaySetFrameBuf);
-        PRTSTR1("Module: %s", mod->modname);
-    }
-
-    if(strcmp(mod->modname, "sceDisplay_Service") == 0)
-    {
-        // can use screen now
-        DisplaySetFrameBuf = (void*)sctrlHENFindFunction("sceDisplay_Service", "sceDisplay", 0x289D82FE);
-        goto flush;
-    }
-
-    #endif
 
     if (strcmp(mod->modname, "sceController_Service") == 0){
         // Allow exiting through key combo
@@ -256,11 +231,6 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
                     );
                     break;
             }
-
-            #ifdef DEBUG
-            // syncronize printk
-            printkSync();
-            #endif
 
             ark_config->recovery = 0; // reset recovery mode for next reboot
 

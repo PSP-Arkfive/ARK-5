@@ -92,10 +92,6 @@ int init_inferno(void)
 // 0x00000000
 int module_start(SceSize args, void* argp)
 {
-    #ifdef DEBUG
-    printk("Inferno started\n");
-    #endif
-
     int ret = setup_umd_device();
 
     if(ret < 0) {

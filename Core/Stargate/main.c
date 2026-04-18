@@ -121,11 +121,6 @@ static void patchLoadExec(void)
 int module_start(SceSize args, void * argp)
 {
 
-    #ifdef DEBUG
-    // Hello Message
-    printk("stargate started: compiled at %s %s\r\n", __DATE__, __TIME__);
-    #endif
-
     int apitype = sceKernelInitApitype();
 
     if (apitype == 0x141 || apitype == 0x152)

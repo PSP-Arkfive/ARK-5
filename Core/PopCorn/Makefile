@@ -11,10 +11,6 @@ all: $(TARGET).prx
 INCDIR = 
 CFLAGS = -std=c99 -Os -G0 -Wall -fno-pic
 
-ifdef DEBUG
-CFLAGS += -DDEBUG=$(DEBUG)
-endif
-
 PSP_FW_VERSION = 660
 
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti

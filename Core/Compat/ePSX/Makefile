@@ -26,11 +26,6 @@ LIBDIR =
 LDFLAGS =  -nostartfiles
 LIBS = -larkctrl -lpspsystemctrl_kernel -lpspkermit_driver -lpspkermitperipheral_driver
 
-ifdef DEBUG
-CFLAGS += -DDEBUG=$(DEBUG)
-LIBS += -lcolordebugger
-endif
-
 PSP_FW_VERSION = 660
 
 include $(PSPSDK)/lib/build.mak

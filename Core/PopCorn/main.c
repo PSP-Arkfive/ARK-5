@@ -42,17 +42,6 @@ extern void setupPsxFwVersion(unsigned int fw_version);
 
 int module_start(SceSize args, void* argp)
 {
-    #if DEBUG >= 3
-    printk("popcorn: init_file = %s\r\n", sceKernelInitFileName());
-
-    char g_DiscID[32];
-    u16 paramType = 0;
-    u32 paramLength = sizeof(g_DiscID);
-    sctrlGetInitPARAM("DISC_ID", &paramType, &paramLength, g_DiscID);
-    
-    printk("pops disc id: %s\r\n", g_DiscID);
-    #endif
-
     g_pspFwVersion = sceKernelDevkitVersion();
     
     getKeys();

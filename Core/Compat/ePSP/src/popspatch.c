@@ -107,18 +107,10 @@ static int myKernelLoadModule(char * fname, int flag, void * opt)
         sceKernelStartModule(result, strlen(g_DiscID) + 1, g_DiscID, &status, NULL);
     }
     
-    #ifdef DEBUG
-    printk("%s: fname %s load 0x%08X, start 0x%08X -> 0x%08X\r\n", __func__, path, result, startResult, status);
-    #endif
-    
     // load pops module from ARK savedata path
     strcpy(path, ark_config->arkpath);
     strcat(path, "POPS.PRX");
     result = sceKernelLoadModule(path, flag, opt);
-
-    #ifdef DEBUG
-    printk("%s: fname %s flag 0x%08X -> 0x%08X\r\n", __func__, fname, flag, result);
-    #endif
 
     return result;
 }

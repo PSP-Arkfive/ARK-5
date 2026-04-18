@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 
 project(ark5 VERSION 1.0 LANGUAGES C ASM)
 set(PSPCFWSDK_PATH "" CACHE PATH "Path to local psp-cfw-sdk (for local development)")
-set(DEBUG "" CACHE STRING "Debug level (1,2,3)")
-message(STATUS "DEBUG LEVEL = ${DEBUG}")
+
 
 set(DIST_DIR ${CMAKE_CURRENT_LIST_DIR}/dist)
 set(FLASH0_DIR ${DIST_DIR}/flash0)

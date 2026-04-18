@@ -96,20 +96,12 @@ static void wait_until_ms0_ready(void)
     }
 }
 
-#ifdef DEBUG
-static int io_calls = 0;
-#endif
-
 // 0x00000BB4
 static int read_raw_data(void* arg, void* addr, u32 size, u32 offset)
 {
     int ret, i;
     SceOff ofs;
     i = 0;
-
-    #ifdef DEBUG
-    io_calls++;
-    #endif
     
     do {
         i++;
@@ -119,9 +111,6 @@ static int read_raw_data(void* arg, void* addr, u32 size, u32 offset)
             i = 0;
             break;
         } else {
-            #ifdef DEBUG
-            printk("%s: lseek retry %d error 0x%08X\n", __func__, i, (int)ofs);
-            #endif
             iso_open();
         }
     } while(i < 16);
@@ -138,9 +127,6 @@ static int read_raw_data(void* arg, void* addr, u32 size, u32 offset)
             i = 0;
             break;
         } else {
-            #ifdef DEBUG
-            printk("%s: read retry %d error 0x%08X\n", __func__, i, ret);
-            #endif
             iso_open();
         }
     }

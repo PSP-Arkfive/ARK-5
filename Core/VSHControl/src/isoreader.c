@@ -121,9 +121,6 @@ static int read_raw_data(void* arg, void* addr, u32 size, u32 offset)
         if (ofs >= 0) {
             break;
         } else {
-            #ifdef DEBUG
-            printk("%s: sceIoLseek -> 0x%08X\n", __func__, (int)ofs);
-            #endif
             reOpen();
         }
 
@@ -136,9 +133,6 @@ static int read_raw_data(void* arg, void* addr, u32 size, u32 offset)
         if(ret >= 0) {
             break;
         } else {
-            #ifdef DEBUG
-            printk("%s: sceIoRead -> 0x%08X\n", __func__, ret);
-            #endif
             reOpen();
             sceIoLseek(g_isofd, offset, PSP_SEEK_SET);
         }
@@ -198,12 +192,6 @@ static int findFile(const char * file, u32 lba, u32 dir_size, u32 is_dir, Iso966
             re += remaining;
             continue;
         }
-        
-        #ifdef DEBUG
-        if(rec->len_dr < rec->len_fi + sizeof(*rec)) {
-            printk("%s: Corrupted directory record found in %s, LBA %d\n", __func__, g_filename, (int)lba);
-        }
-        #endif
 
         if(rec->len_fi > 32) {
             return -11;
@@ -325,9 +313,6 @@ int isoOpen(const char *path)
     g_filename = path;
 
     if (g_filename == NULL || reOpen() < 0) {
-        #ifdef DEBUG
-        printk("%s: open failed %s -> 0x%08X\n", __func__, g_filename, g_isofd);
-        #endif
         ret = -2;
         goto error;
     }
@@ -357,11 +342,7 @@ int isoOpen(const char *path)
     }
 
     if (memcmp(&g_sector_buffer[1], ISO_STANDARD_ID, sizeof(ISO_STANDARD_ID)-1)) {
-        #ifdef DEBUG
-        printk("%s: vol descriptor not found\n", __func__);
-        #endif
         ret = -10;
-
         goto error;
     }
 

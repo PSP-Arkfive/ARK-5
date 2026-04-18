@@ -29,22 +29,11 @@
 #include <systemctrl_ark.h>
 
 
-//#define CHECK_MODE
-#undef CHECK_MODE
-
 // Original Function Pointer
 int (* msstorRead)(PspIoDrvFileArg * arg, char * data, int len) = NULL;
 int (* msstorWrite)(PspIoDrvFileArg * arg, const char * data, int len) = NULL;
 SceOff (* msstorLseek)(PspIoDrvFileArg * arg, SceOff ofs, int whence) = NULL;
 int(* msstorOpen)(PspIoDrvFileArg *arg, char *file, int flags, SceMode mode) = NULL;
-
-#ifdef DEBUG
-// Cache Statistic
-unsigned int cacheReadTimes = 0;
-unsigned int cacheHit = 0;
-unsigned int cacheMissed = 0;
-unsigned int cacheUncacheable = 0;
-#endif
 
 // Cache Structure
 struct MsCache
@@ -131,7 +120,6 @@ static int msstorReadCache(PspIoDrvFileArg * arg, char * data, int len)
     // Found Cached Portion of File
     if(cache != NULL)
     {
-#ifndef CHECK_MODE
         // Calculate Buffered File Content Size
         read_len = MIN(len, cache->pos + cache->bufSize - pos);
         
@@ -143,23 +131,7 @@ static int msstorReadCache(PspIoDrvFileArg * arg, char * data, int len)
         
         // Move Position in File
         msstorLseek(arg, pos + result, PSP_SEEK_SET);
-#else
-        // Check validate code
-        result = (*msstorRead)(arg, data, len);
 
-        if(0 != memcmp(data, cache->buf + pos - cache->pos, len))
-        {
-            #ifdef DEBUG
-            printk("%s: 0x%08X <%d> cache mismatched!!!\r\n", __func__, (uint)pos, (int)len);
-            #endif
-            _sw(0, 0);
-        }
-#endif
-
-        #ifdef DEBUG        
-        // Log cacheable data
-        cacheHit += len;
-        #endif
     }
     
     // No Cache available
@@ -197,11 +169,6 @@ static int msstorReadCache(PspIoDrvFileArg * arg, char * data, int len)
                 // Forward Call
                 msstorLseek(arg, pos + result, PSP_SEEK_SET);
             }
-            
-            #ifdef DEBUG
-            // Log caching length
-            cacheMissed += len;
-            #endif
         }
         
         // Too big to cache...
@@ -209,18 +176,8 @@ static int msstorReadCache(PspIoDrvFileArg * arg, char * data, int len)
         {
             // Forward Call
             result = msstorRead(arg, data, len);
-            
-            #ifdef DEBUG
-            // Log uncacheable data
-            cacheUncacheable += len;
-            #endif
         }
     }
-
-    #ifdef DEBUG    
-    // Log read data
-    cacheReadTimes += len;
-    #endif
     
     // Return Result
     return result;
@@ -462,49 +419,6 @@ int sctrlMsCacheInit(const char* driver, int cache_size)
     
     // Return Success
     return 0;
-}
-
-// For PSPLink Debugging
-// call @SystemControl:SystemCtrlPrivate,0xFFC9D099@
-void msstorCacheStat(int reset)
-{
-    #ifdef DEBUG
-    // Output Buffer
-    char buf[256];
-    
-    // Statistic available
-    if(cacheReadTimes != 0)
-    {
-        // Output to Stdout
-        sprintf(buf, "Mstor cache size: %dKB\n", g_cacheSize / 1024);
-        sceIoWrite(1, buf, strlen(buf));
-        sprintf(buf, "hit percent: %02d%%/%02d%%/%02d%%, [%d/%d/%d/%d]\n", 
-                (int)(100 * cacheHit / cacheReadTimes), 
-                (int)(100 * cacheMissed / cacheReadTimes), 
-                (int)(100 * cacheUncacheable / cacheReadTimes), 
-                (int)cacheHit, (int)cacheMissed, (int)cacheUncacheable, (int)cacheReadTimes);
-        sceIoWrite(1, buf, strlen(buf));
-        sprintf(buf, "caches stat:\n");
-        sceIoWrite(1, buf, strlen(buf));
-        sprintf(buf, "Cache Pos: 0x%08X bufSize: %d Buf: 0x%08X\n", (uint)g_cache.pos, g_cache.bufSize, (uint)g_cache.buf);
-        sceIoWrite(1, buf, strlen(buf));
-    }
-    
-    // No Statistic available
-    else
-    {
-        // Output to Stdout
-        sprintf(buf, "no msstor cache call yet\n");
-        sceIoWrite(1, buf, strlen(buf));
-    }
-    
-    // Statistic Reset requested
-    if(reset)
-    {
-        // Delete Statistic
-        cacheReadTimes = cacheHit = cacheMissed = cacheUncacheable = 0;
-    }
-    #endif
 }
 
 // For PSPLink Debugging

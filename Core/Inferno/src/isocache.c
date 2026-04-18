@@ -197,10 +197,7 @@ static void reorder_iso_cache(int idx)
     struct ISOCache tmp;
     int i;
 
-    if(idx < 0 && idx >= g_caches_num) {
-        #ifdef DEBUG
-        printk("%s: wrong idx\n", __func__);
-        #endif
+    if (idx < 0 && idx >= g_caches_num) {
         return;
     }
 
@@ -243,9 +240,6 @@ static int add_cache(struct IoReadArg *arg)
 
         if(last_cache != NULL) {
             if(pos + len <= last_cache->pos + last_cache->bufsize) {
-                #ifdef DEBUG
-                printk("%s: error pos\n", __func__);
-                #endif
                 __asm__ volatile("break");
             }
 
@@ -279,9 +273,6 @@ static int add_cache(struct IoReadArg *arg)
             break;
         } else {
             reorder_iso_cache(cache - g_caches);
-            #ifdef DEBUG
-            printk("%s: read -> 0x%08X\n", __func__, ret);
-            #endif
             return ret;
         }
     }
@@ -453,9 +444,6 @@ int infernoCacheInit(int cache_size, int cache_num, int partition)
     cache_ctrl = memid;
 
     if(memid < 0) {
-        #ifdef DEBUG
-        printk("%s: sctrlKernelAllocPartitionMemory -> 0x%08X\n", __func__, memid);
-        #endif
         return -2;
     }
 
@@ -469,9 +457,6 @@ int infernoCacheInit(int cache_size, int cache_num, int partition)
     cache_mem = memid;
 
     if(memid < 0) {
-        #ifdef DEBUG
-        printk("%s: sctrlKernelAllocPartitionMemory -> 0x%08X\n", __func__, memid);
-        #endif
         return -4;
     }
 
@@ -518,46 +503,6 @@ int infernoCacheAdd(u32 pos, int len)
     // TOO BUSY
     return -2;
 }
-
-// call @PRO_Inferno_Driver:CacheCtrl,0x5CC24481@
-#ifdef DEBUG
-void isocache_stat(int reset)
-{
-    char buf[256];
-    int i, used;
-
-    sprintf(buf, "caches stat:\n");
-    sceIoWrite(2, buf, strlen(buf));
-
-    for(i=0, used=0; i<g_caches_num; ++i) {
-        if(g_caches[i].pos != (u32)-1) {
-            used++;
-        }
-
-        sprintf(buf, "%d: 0x%08X size %d age %02d address 0x%08X\n", i+1, (uint)g_caches[i].pos, g_caches[i].bufsize, g_caches[i].age, (int)g_caches[i].buf);
-        sceIoWrite(2, buf, strlen(buf));
-    }
-
-    sprintf(buf, "%dKB per cache, %d caches policy %d\n", g_caches_cap / 1024, g_caches_num, (int)cache_policy);
-    sceIoWrite(2, buf, strlen(buf));
-
-    if (read_call == 0) {
-        sprintf(buf, "hit percent: %02d%%/%02d%%, [%d/%d/%d]\n", (int)(0), (int)(0), (int)read_hit, (int)read_missed, (int)read_call);
-    } else {
-        sprintf(buf, "hit percent: %02d%%/%02d%%, [%d/%d/%d]\n", (int)(100 * read_hit / read_call), (int)(100 * read_missed / read_call), (int)read_hit, (int)read_missed, (int)read_call);
-    }
-
-    sceIoWrite(2, buf, strlen(buf));
-    sprintf(buf, "%d caches used(%02d%%)\n", used, 100 * used / g_caches_num);
-    sceIoWrite(2, buf, strlen(buf));
-
-    if(reset) {
-        read_call = read_hit = read_missed = 0;
-    }
-}
-#else
-void isocache_stat(int reset){}
-#endif
 
 // call @PRO_Inferno_Driver:CacheCtrl,0xC0736FD6@
 void infernoCacheSetPolicy(int policy)

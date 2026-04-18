@@ -30,10 +30,6 @@
 #include "nidresolver.h"
 #include "exception.h"
 
-#ifdef DEBUG
-#include <colordebugger.h>
-#include <screenprinter.h>
-#endif
 
 PSP_MODULE_INFO("SystemControl", 0x3007, 4, 0);
 
@@ -52,9 +48,7 @@ ARKConfig* ark_config = &_ark_conf;
 int module_start(SceSize args, void * argp)
 {
 
-    #ifdef DEBUG
-    printkInit(NULL);
-    printk("ARK SystemControl started.\r\n");
+    #if 0
     // set LCD framebuffer in hardware reg so we can do color debbuging
     _sw(0x44000000, 0xBC800100);
     colorDebug(0xFF00);
@@ -78,11 +72,6 @@ int module_start(SceSize args, void * argp)
 
     // Backup Reboot Buffer (including configuration)
     backupRebootBuffer();
-
-    #ifdef DEBUG
-    // Register Default Exception Handler
-    registerExceptionHandler(NULL, NULL);
-    #endif
 
     uprotectExtraMemory();
 

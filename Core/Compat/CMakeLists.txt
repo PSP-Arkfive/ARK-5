@@ -47,11 +47,6 @@ function(add_compat_prx PRX_NAME REBOOT_BUF_SUFFIX)
    target_compile_options(${REBOOTEX_NAME} PRIVATE ${COMPILE_OPS})
    target_link_libraries(${REBOOTEX_NAME} PRIVATE bootloadex ansic)
 
-   if(DEBUG)
-      target_compile_definitions(${REBOOTEX_NAME} PRIVATE -DDEBUG=${DEBUG})
-      target_link_libraries(${REBOOTEX_NAME} PRIVATE colordebugger)
-   endif()
-
    add_custom_command(
       TARGET ${REBOOTEX_NAME}
       POST_BUILD

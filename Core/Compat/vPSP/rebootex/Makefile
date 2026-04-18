@@ -18,12 +18,6 @@ INCDIR = $(PSPSDK)/include
 CFLAGS = -std=c99 -Wall -Os -G0 -fno-pic $(addprefix -I, $(INCDIR))
 LIBS = -L $(PSPSDK)/lib -lbootloadex -lansic
 
-
-ifdef DEBUG
-CFLAGS += -DDEBUG=$(DEBUG)
-LIBS += -lcolordebugger
-endif
-
 main.elf: $(C_OBJS)
 
 $(TARGET): main.elf

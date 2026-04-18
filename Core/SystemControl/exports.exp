@@ -269,7 +269,6 @@ PSP_EXPORT_FUNC(__udivmoddi4)
 PSP_EXPORT_END
 
 PSP_EXPORT_START(SystemCtrlPrivate, 0, 0x0001)
-PSP_EXPORT_FUNC(msstorCacheStat)
 PSP_EXPORT_FUNC(msstorCacheDisable)
 PSP_EXPORT_FUNC(sctrlHENSetPluginHandler)
 PSP_EXPORT_FUNC(sctrlHENSetRebootexConfig)

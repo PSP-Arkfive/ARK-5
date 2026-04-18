@@ -61,7 +61,7 @@ int module_start(SceSize args, void * argp)
         return 3;
     }
 
-    #ifdef DEBUG
+    #if 0
     _sw(0x44000000, 0xBC800100);
     setScreenHandler(&copyPSPVram);
     initVitaPopsVram();

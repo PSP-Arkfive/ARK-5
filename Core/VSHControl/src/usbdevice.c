@@ -59,9 +59,6 @@ static SceUID load_start_usbdevice(void)
     ret = sceKernelStartModule(modid, 0, NULL, NULL, NULL);
 
     if (ret < 0) {
-        #if DEBUG >= 3
-        printk("%s: sceKernelStartModule -> 0x%08X\n", __func__, ret);
-        #endif
         sceKernelUnloadModule(modid);
         return -1;
     }
@@ -75,19 +72,7 @@ static void stop_unload_usbdevice(void)
 
     ret = sceKernelStopModule(g_usbdevice_modid, 0, NULL, NULL, NULL);
 
-    #if DEBUG >= 3
-    if(ret < 0) {
-        printk("%s: sceKernelStopModule(0x%08X) -> 0x%08X\n", __func__, g_usbdevice_modid, ret);
-    }
-    #endif
-
     ret = sceKernelUnloadModule(g_usbdevice_modid);
-
-    #if DEBUG >= 3
-    if(ret < 0) {
-        printk("%s: sceKernelUnloadModule(0x%08X) -> 0x%08X\n", __func__, g_usbdevice_modid, ret);
-    }
-    #endif
 
     if (ret >= 0) {
         g_usbdevice_modid = -1;

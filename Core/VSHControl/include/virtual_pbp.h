@@ -39,7 +39,6 @@ typedef struct _VirtualPBP {
 #define CACHE_MAX_SIZE 32
 #define MAGIC_VPBP_FD 0x8000
 #define MAX_VPBP 128
-#define PTR_ALIGN_64(p) ((void*)((((u32)p)+64-1)&(~(64-1))))
 
 #define PSP_CACHE_PATH "ms0:/PSP/SYSTEM/ISOCACHE.BIN"
 #define PSPGO_CACHE_PATH "ef0:/PSP/SYSTEM/ISOCACHE.BIN"

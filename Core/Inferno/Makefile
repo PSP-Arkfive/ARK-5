@@ -11,14 +11,8 @@ C_OBJS = \
 
 OBJS = $(C_OBJS) imports.o
 
-all: $(TARGET).prx
 INCDIR = include
 CFLAGS = -std=c99 -Os -G0 -Wall
-
-ifdef DEBUG
-CFLAGS += -DDEBUG=$(DEBUG)
-endif
-
 LDFLAGS =  -nostartfiles
 LIBDIR = 
 LIBS = -lcisoread -lpspsystemctrl_kernel

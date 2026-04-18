@@ -53,9 +53,3 @@ target_link_libraries(systemctrl PRIVATE
    pspkernel
 )
 
-if(DEBUG)
-	target_sources(systemctrl PRIVATE debug/exception.c debug/exception_asm.S debug/printk.c debug/jumper.c)
-   target_link_libraries(systemctrl PRIVATE colordebugger screenprinter)
-else()
-   target_sources(systemctrl PRIVATE debug/dummy.c)
-endif()
