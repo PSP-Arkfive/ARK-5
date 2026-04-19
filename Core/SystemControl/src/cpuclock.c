@@ -61,3 +61,9 @@ void sctrlHENSetSpeed(int cpu, int bus)
     }
     pspSdkSetK1(k1);
 }
+
+u32 sctrlHENGetSpeed(){
+    u32 (*getCpuClockInt)() = (void*)sctrlHENFindFunction("scePower_Service", "scePower", 0xFDB5BFE9);
+    if (getCpuClockInt) return getCpuClockInt();
+    return 222;
+}

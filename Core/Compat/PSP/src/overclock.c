@@ -2,6 +2,8 @@
 // m-c/d 2026, MIT License, for more information on this project see:
 // https://github.com/mcidclan/psp-undocumented-sorcery/tree/main/experimental-overclock
 
+#include <string.h>
+#include <stdio.h>
 #include <pspsdk.h>
 #include <pspkernel.h>
 
@@ -151,6 +153,7 @@ int current_frequency = DEFAULT_FREQUENCY;
 
 
 void (*origSetClockFrequency)(int cpu, int bus) = NULL;
+u32 (*origGetClockFrequency)() = NULL;
 
 static inline void unlockMemory() {
   const u32 start = 0xbc000000;
@@ -332,8 +335,8 @@ void overclockHandler(int cpu, int bus){
     // disallow changing CPU clock on devkits
     if (sctrlHENIsToolKit() == PSP_TOOLKIT_TYPE_DEV) return;
 
+    current_frequency = cpu;
     if (cpu > DEFAULT_FREQUENCY && cpu <= THEORETICAL_FREQUENCY) {
-        current_frequency = cpu;
         doOverclock();
     }
     else {
@@ -342,8 +345,16 @@ void overclockHandler(int cpu, int bus){
     }
 }
 
+u32 getOverclockSpeed(){
+    if (current_frequency > DEFAULT_FREQUENCY) return current_frequency;
+    return origGetClockFrequency();
+}
+
 void initOverclock() {
+  // override clock set/get functions
   HIJACK_FUNCTION(K_EXTRACT_IMPORT(sctrlHENSetSpeed), overclockHandler, origSetClockFrequency);
+  HIJACK_FUNCTION(K_EXTRACT_IMPORT(sctrlHENGetSpeed), getOverclockSpeed, origGetClockFrequency);
+  // set up
   unlockMemory();
   sctrlFlushCache();
 }
