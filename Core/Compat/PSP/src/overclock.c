@@ -332,15 +332,14 @@ int cancelOverclock() {
 }
 
 void overclockHandler(int cpu, int bus){
-    // disallow changing CPU clock on devkits
-    if (sctrlHENIsToolKit() == PSP_TOOLKIT_TYPE_DEV) return;
-
     current_frequency = cpu;
     if (cpu > DEFAULT_FREQUENCY && cpu <= THEORETICAL_FREQUENCY) {
         doOverclock();
     }
     else {
         cancelOverclock();
+        // disallow changing CPU clock on devkits
+        if (sctrlHENIsToolKit() == PSP_TOOLKIT_TYPE_DEV) return;
         origSetClockFrequency(cpu, bus);
     }
 }
