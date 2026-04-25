@@ -124,14 +124,14 @@ int xmbctrlEnterVshMenuMode(){
     menu_mode = 0;
     button_on = 0;
     cur_buttons = 0xFFFFFFFF;
+    vshmenu_draw = NULL;
 
     vctrlVSHRegisterVshMenu(EatKey);
 
     if (scePafAddClockOrig == NULL){
         scePafAddClockOrig = (void*)U_EXTRACT_CALL(patch_addr + 4);
         MAKE_CALL(patch_addr + 4, (u32)&scePafAddClockPatched);
-        sceKernelDcacheWritebackAll();
-        kuKernelIcacheInvalidateAll();
+        sctrlFlushCache();
     }
 
     vshmenu_running = 1;
