@@ -10,7 +10,7 @@ OBJS = main.o stub.o \
 	src/battery.o \
 	src/vshmenu.o \
 	src/utils.o \
-	src/vshcube.o
+	src/vshcube.o \
 
 CFLAGS = -std=c99 -O2 -Os -G0 -Wall -fshort-wchar -fno-pic -mno-check-zero-division
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
@@ -25,7 +25,7 @@ LIBDIR =
 USE_PSPSDK_LIBS = 1
 USE_PSPSDK_LIBC = 1
 
-LIBS = -lpspgum -lpspgu -larkctrl -lpspsystemctrl_user -lpspkubridge -lpspvshctrl -lpspreg -lpspsysc_user -lpsppower
+LIBS = -lya2d -lpspgum -lpspgu -lpspmath -lpspvram -larkctrl -lpspsystemctrl_user -lpspkubridge -lpspvshctrl -lpspreg -lpspsysc_user -lpsppower
 LDFLAGS = -nostartfiles
 
 include $(PSPSDK)/lib/build.mak

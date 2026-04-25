@@ -41,28 +41,28 @@ struct Vertex {
   float x, y, z;
 } __attribute__((aligned(4), packed));
 
+struct vertex_1ui3s
+{
+    unsigned int color;
+    short x, y, z;
+};
 
 static void* vramBackup     = NULL;
-static int vshcube_running  = 0;
 static void* list = NULL;
 static struct Vertex cube[CUBE_VERT_COUNT];
 
 FunctionPatchData display_patch;
 static int (*prevDisplaySetFrameBuf)(void*, int, int, int) = NULL;
 
+extern int vshmenu_running;
+extern void (*vshmenu_draw)(void* frame);
+
 static void vshcube_draw(void* frame) {
 
-    PspGeContext* gectx = memalign(64, sizeof(PspGeContext));
     vramBackup = memalign(64, VRAM_BACKUP_BYTE_COUNT);
-
-    sceGeSaveContext(gectx);
-    int state = sceKernelSuspendDispatchThread();
-    int intr = sceKernelCpuSuspendIntr();
 
     // frame = (void*)(0x40000000 | (u32)frame);
     void* const depthBuf = (void*)(DEPTH_BUFFER + (u32)frame);
-
-    sceGuStart(GU_DIRECT, list);
 
     sceGuDisable(GU_DEPTH_TEST);
     sceGuDisable(GU_BLEND);
@@ -107,7 +107,6 @@ static void vshcube_draw(void* frame) {
 
     sceGuDisable(GU_STENCIL_TEST);
 
-    sceGuDrawBuffer(GU_PSM_8888, frame, BUF_WIDTH);
     sceGuEnable(GU_SCISSOR_TEST);
     sceGuScissor(416, 208, 64, 64);
     // sceGuClearColor(0);
@@ -144,30 +143,38 @@ static void vshcube_draw(void* frame) {
         0, 0, 512, depthBuf
     );
 
-    sceGuFinish();
-    sceGuSync(GU_SYNC_FINISH, GU_SYNC_WHAT_DONE);
-
-    {
-        u32 a=0x1fff;
-        while(--a) {__asm__("nop; sync");}
-    }
-
-    sceKernelCpuResumeIntrWithSync(intr);
-    sceKernelResumeDispatchThread(state);
-    sceGeRestoreContext(gectx);
-
     free(vramBackup);
-    free(gectx);
 }
 
 static int vshDisplaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelformat, int sync) {
   
     void* frame = (void*)(0x1fffffff & (u32)frameBuf);
 
-    if (frame){
-        if (vshcube_running && list){
-            vshcube_draw(frame);
+    if (frame && vshmenu_running){
+        list = memalign(64, 2048);
+        // save context
+        PspGeContext* gectx = memalign(64, sizeof(PspGeContext));
+        int state = sceKernelSuspendDispatchThread();
+        int intr = sceKernelCpuSuspendIntr();
+        sceGeSaveContext(gectx);
+        // draw
+        sceGuStart(GU_DIRECT, list);
+        sceGuDrawBuffer(GU_PSM_8888, frame, BUF_WIDTH);
+        if (vshmenu_draw) vshmenu_draw(frame);
+        vshcube_draw(frame);
+        // sync
+        {
+            u32 a=0x1fff;
+            while(--a) {__asm__("nop; sync");}
         }
+        sceGuFinish();
+        sceGuSync(GU_SYNC_FINISH, GU_SYNC_WHAT_DONE);
+        // restore context
+        sceKernelCpuResumeIntrWithSync(intr);
+        sceKernelResumeDispatchThread(state);
+        sceGeRestoreContext(gectx);
+        free(gectx);
+        free(list);
     }
 
     return prevDisplaySetFrameBuf(frameBuf, bufferwidth, pixelformat, sync);
@@ -236,15 +243,9 @@ int vshcube_init() {
 }
 
 int vshcube_start() {
-    list = memalign(64, 2048);
-    vshcube_running = 1;
     return 0;
 }
 
 int vshcube_stop() {
-    vshcube_running = 0;
-    sceDisplayWaitVblankStart();
-    free(list);
-    list = NULL;
     return 0;
 }

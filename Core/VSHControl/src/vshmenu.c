@@ -35,9 +35,9 @@ extern ARKConfig* ark_config;
 extern SEConfig* se_config;
 
 SceCtrlData *last_control_data = NULL;
+static int vshmenu_running = 0;
 static int (*g_VshMenuCtrl) (SceCtrlData *, int);
 static SceUID g_satelite_mod_id = -1;
-static int xmbctrl_vshmenu = 0;
 
 int (*g_sceCtrlReadBufferPositive) (SceCtrlData *, int) = NULL;
 
@@ -61,7 +61,13 @@ int vctrlVSHExitVSHMenu(SEConfig *config, char *videoiso, int disctype)
     }
 
     g_VshMenuCtrl = NULL;
-    xmbctrl_vshmenu = 0;
+
+    // stop XMBControl VSH overlay
+    int (*xmbctrlExitVshMenuMode)() = (void*)
+        sctrlHENFindFunction("XmbControl", "XmbCtrlLib", 0x43377808);
+    if (xmbctrlExitVshMenuMode != NULL) xmbctrlExitVshMenuMode();
+
+    vshmenu_running = 0;
     
     return 0;
 }
@@ -90,15 +96,6 @@ static SceUID load_satelite(void)
     return modid;
 }
 
-static int enter_xmbctrl_vshmenu(){
-    int (*xmbctrlEnterVshMenuMode)() = (void*)
-        sctrlHENFindFunction("XmbControl", "XmbCtrlLib", 0xBE8D19DA);
-
-    if (xmbctrlEnterVshMenuMode == NULL) return -1;
-
-    return xmbctrlEnterVshMenuMode();
-}
-
 int _sceCtrlReadBufferPositive(SceCtrlData *ctrl, int count)
 {
     int ret;
@@ -109,22 +106,18 @@ int _sceCtrlReadBufferPositive(SceCtrlData *ctrl, int count)
     ret = (*g_sceCtrlReadBufferPositive)(ctrl, count);
     k1 = pspSdkSetK1(0);
 
-    if (xmbctrl_vshmenu){
+    if (vshmenu_running){
         if (g_VshMenuCtrl) {
-            (*g_VshMenuCtrl)(ctrl, count);
+            ret = (*g_VshMenuCtrl)(ctrl, count);
         }
-    }
-    else if (sceKernelFindModuleByName("VshCtrlSatelite")) {
-        if (g_VshMenuCtrl) {
-            (*g_VshMenuCtrl)(ctrl, count);
-        } else {
-            if (g_satelite_mod_id >= 0) {
-                if (sceKernelStopModule(g_satelite_mod_id, 0, 0, 0, 0) >= 0) {
-                    sceKernelUnloadModule(g_satelite_mod_id);
-                }
+        else if (g_satelite_mod_id >= 0) {
+            if (sceKernelStopModule(g_satelite_mod_id, 0, 0, 0, 0) >= 0) {
+                sceKernelUnloadModule(g_satelite_mod_id);
+                g_satelite_mod_id = -1;
             }
         }
-    } else {
+    }
+    else {
         
         if ((ctrl->Buttons & FORCE_LOAD) == FORCE_LOAD){
             goto force_load_satelite;
@@ -183,13 +176,14 @@ int _sceCtrlReadBufferPositive(SceCtrlData *ctrl, int count)
         if (sceKernelFindModuleByName("camera_plugin_module"))
             goto exit;
 
-        if (enter_xmbctrl_vshmenu() == 0){
-            xmbctrl_vshmenu = 1;
-        }
-
-        goto exit;
-
         force_load_satelite:
+
+        vshmenu_running = 1;
+        
+        // start XMBControl VSH overlay
+        int (*xmbctrlEnterVshMenuMode)() = (void*)
+            sctrlHENFindFunction("XmbControl", "XmbCtrlLib", 0xBE8D19DA);
+        if (xmbctrlEnterVshMenuMode != NULL) xmbctrlEnterVshMenuMode();
 
         modid = load_satelite();
 
