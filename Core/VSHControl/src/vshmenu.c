@@ -76,8 +76,6 @@ int vctrlVSHExitVSHMenu(SEConfig *config, char *videoiso, int disctype)
     int (*xmbctrlExitVshMenuMode)() = (void*)
         sctrlHENFindFunction("XmbControl", "XmbCtrlLib", 0x43377808);
     if (xmbctrlExitVshMenuMode != NULL) xmbctrlExitVshMenuMode();
-
-    vshmenu_running = 0;
     
     return 0;
 }
@@ -120,10 +118,14 @@ int _sceCtrlReadBufferPositive(SceCtrlData *ctrl, int count)
         if (g_VshMenuCtrl) {
             ret = (*g_VshMenuCtrl)(ctrl, count);
         }
-        else if (g_satelite_mod_id >= 0) {
-            if (sceKernelStopModule(g_satelite_mod_id, 0, 0, 0, 0) >= 0) {
-                sceKernelUnloadModule(g_satelite_mod_id);
-                g_satelite_mod_id = -1;
+        else {
+            vshmenu_running = 0;
+            if (g_satelite_mod_id >= 0) {
+                if (sceKernelStopModule(g_satelite_mod_id, 0, 0, 0, 0) >= 0) {
+                    sceKernelUnloadModule(g_satelite_mod_id);
+                    g_satelite_mod_id = -1;
+                }
+                else vshmenu_running = 1;
             }
         }
     }
