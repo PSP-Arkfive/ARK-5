@@ -11,7 +11,6 @@
 #include <vshctrl.h>
 #include <kubridge.h>
 #include <systemctrl.h>
-#include <ya2d.h>
 
 #include "main.h"
 #include "utils.h"
@@ -142,4 +141,8 @@ int xmbctrlEnterVshMenuMode(){
 int xmbctrlExitVshMenuMode(){
     vshmenu_running = 0;
     vshcube_stop();
+}
+
+int xmbctrlRegisterVshMenu(void (*draw_func)(void*)){
+    vshmenu_draw = draw_func;
 }

@@ -47,6 +47,16 @@ int vctrlVSHRegisterVshMenu(int (*ctrl)(SceCtrlData *, int))
     return 0;
 }
 
+int vctrlVSHRegisterVshGuMenu(void (*vshmenu_draw)(void*)){
+    int (*xmbctrlRegisterVshMenu)(void*) = (void*)
+        sctrlHENFindFunction("XmbControl", "XmbCtrlLib", 0x9CD59D6A);
+    if (xmbctrlRegisterVshMenu != NULL){
+        xmbctrlRegisterVshMenu(vshmenu_draw);
+        return 0;
+    }
+    return -1;
+}
+
 int vctrlVSHUpdateConfig(SEConfig *config)
 {
     memcpy(se_config, config, sizeof(SEConfigARK));
