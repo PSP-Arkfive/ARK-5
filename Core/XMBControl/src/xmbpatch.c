@@ -526,9 +526,6 @@ void reset_ark_settings(){
         "ULUS10201, infernocache, off\n"
         "# Flat-Out Head On (both US and EU)\n"
         "ULUS10328 ULES00968, infernocache, off\n"
-        "\n"
-        "# Enable Extra RAM on GTA LCS and VCS for CheatDeviceRemastered\n"
-        "ULUS10041 ULUS10160 ULES00151 ULES00502, highmem, on\n"
     ;
 
     char arkMenuPath[ARK_PATH_SIZE];
