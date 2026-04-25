@@ -135,9 +135,8 @@ extern SEConfigARK se_config;
 extern RebootexConfigARK rebootex_config;
 extern STMOD_HANDLER previous;
 
+int vshgu_init();
 int vshcube_init();
-int vshcube_start();
-int vshcube_stop();
 void findAllTranslatableStrings();
 int OnModuleStart(SceModule *mod);
 

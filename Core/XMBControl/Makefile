@@ -8,8 +8,9 @@ OBJS = main.o stub.o \
 	src/config.o \
 	src/plugins.o \
 	src/battery.o \
-	src/vshmenu.o \
 	src/utils.o \
+	src/vshgu.o \
+	src/vshmenu.o \
 	src/vshcube.o \
 
 CFLAGS = -std=c99 -O2 -Os -G0 -Wall -fshort-wchar -fno-pic -mno-check-zero-division

@@ -1,18 +1,3 @@
-/*
-Copyright (c) 2025 m-c/d
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”),
-to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
-and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
-OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-
 #include <malloc.h>
 #include <psppower.h>
 #include <pspdisplay.h>
@@ -22,16 +7,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <pspgum.h>
 #include <psputilsforkernel.h>
 
-#include <cfwmacros.h>
-#include <systemctrl.h>
-#include <vshctrl.h>
-#include <kubridge.h>
-
 
 #define VRAM_BACKUP_BYTE_COUNT  0x00044000
 #define DEPTH_BUFFER            0x00000000 /*0x001c0000*/
 #define CUBE_VERT_COUNT         36
-#define BUF_WIDTH               512
 #define SCR_WIDTH               480
 #define SCR_HEIGHT              272
 
@@ -41,23 +20,65 @@ struct Vertex {
   float x, y, z;
 } __attribute__((aligned(4), packed));
 
-struct vertex_1ui3s
-{
-    unsigned int color;
-    short x, y, z;
-};
-
 static void* vramBackup     = NULL;
-static void* list = NULL;
 static struct Vertex cube[CUBE_VERT_COUNT];
 
-FunctionPatchData display_patch;
-static int (*prevDisplaySetFrameBuf)(void*, int, int, int) = NULL;
 
-extern int vshmenu_running;
-extern void (*vshmenu_draw)(void* frame);
+int vshcube_init(){
+    unsigned int cubeColor = 0x808b4513;
 
-static void vshcube_draw(void* frame) {
+    // front
+    cube[0]  = (struct Vertex){ cubeColor,  0.0f,  0.0f,  1.0f,   1.0f, -1.0f,  1.0f };
+    cube[1]  = (struct Vertex){ cubeColor,  0.0f,  0.0f,  1.0f,  -1.0f,  1.0f,  1.0f };
+    cube[2]  = (struct Vertex){ cubeColor,  0.0f,  0.0f,  1.0f,  -1.0f, -1.0f,  1.0f };
+    cube[3]  = (struct Vertex){ cubeColor,  0.0f,  0.0f,  1.0f,   1.0f,  1.0f,  1.0f };
+    cube[4]  = (struct Vertex){ cubeColor,  0.0f,  0.0f,  1.0f,  -1.0f,  1.0f,  1.0f };
+    cube[5]  = (struct Vertex){ cubeColor,  0.0f,  0.0f,  1.0f,   1.0f, -1.0f,  1.0f };
+
+    // back
+    cube[6]  = (struct Vertex){ cubeColor,  0.0f,  0.0f, -1.0f,  -1.0f,  1.0f, -1.0f };
+    cube[7]  = (struct Vertex){ cubeColor,  0.0f,  0.0f, -1.0f,   1.0f, -1.0f, -1.0f };
+    cube[8]  = (struct Vertex){ cubeColor,  0.0f,  0.0f, -1.0f,  -1.0f, -1.0f, -1.0f };
+    cube[9]  = (struct Vertex){ cubeColor,  0.0f,  0.0f, -1.0f,  -1.0f,  1.0f, -1.0f };
+    cube[10] = (struct Vertex){ cubeColor,  0.0f,  0.0f, -1.0f,   1.0f,  1.0f, -1.0f };
+    cube[11] = (struct Vertex){ cubeColor,  0.0f,  0.0f, -1.0f,   1.0f, -1.0f, -1.0f };
+
+    // left
+    cube[12] = (struct Vertex){ cubeColor, -1.0f,  0.0f,  0.0f,  -1.0f, -1.0f, -1.0f };
+    cube[13] = (struct Vertex){ cubeColor, -1.0f,  0.0f,  0.0f,  -1.0f, -1.0f,  1.0f };
+    cube[14] = (struct Vertex){ cubeColor, -1.0f,  0.0f,  0.0f,  -1.0f,  1.0f, -1.0f };
+    cube[15] = (struct Vertex){ cubeColor, -1.0f,  0.0f,  0.0f,  -1.0f, -1.0f,  1.0f };
+    cube[16] = (struct Vertex){ cubeColor, -1.0f,  0.0f,  0.0f,  -1.0f,  1.0f,  1.0f };
+    cube[17] = (struct Vertex){ cubeColor, -1.0f,  0.0f,  0.0f,  -1.0f,  1.0f, -1.0f };
+
+    // right
+    cube[18] = (struct Vertex){ cubeColor,  1.0f,  0.0f,  0.0f,   1.0f, -1.0f, -1.0f };
+    cube[19] = (struct Vertex){ cubeColor,  1.0f,  0.0f,  0.0f,   1.0f,  1.0f, -1.0f };
+    cube[20] = (struct Vertex){ cubeColor,  1.0f,  0.0f,  0.0f,   1.0f, -1.0f,  1.0f };
+    cube[21] = (struct Vertex){ cubeColor,  1.0f,  0.0f,  0.0f,   1.0f, -1.0f,  1.0f };
+    cube[22] = (struct Vertex){ cubeColor,  1.0f,  0.0f,  0.0f,   1.0f,  1.0f, -1.0f };
+    cube[23] = (struct Vertex){ cubeColor,  1.0f,  0.0f,  0.0f,   1.0f,  1.0f,  1.0f };
+
+    // bottom
+    cube[24] = (struct Vertex){ cubeColor,  0.0f, -1.0f,  0.0f,   1.0f, -1.0f,  1.0f };
+    cube[25] = (struct Vertex){ cubeColor,  0.0f, -1.0f,  0.0f,  -1.0f, -1.0f,  1.0f };
+    cube[26] = (struct Vertex){ cubeColor,  0.0f, -1.0f,  0.0f,   1.0f, -1.0f, -1.0f };
+    cube[27] = (struct Vertex){ cubeColor,  0.0f, -1.0f,  0.0f,   1.0f, -1.0f, -1.0f };
+    cube[28] = (struct Vertex){ cubeColor,  0.0f, -1.0f,  0.0f,  -1.0f, -1.0f,  1.0f };
+    cube[29] = (struct Vertex){ cubeColor,  0.0f, -1.0f,  0.0f,  -1.0f, -1.0f, -1.0f };
+
+    // top
+    cube[30] = (struct Vertex){ cubeColor,  0.0f,  1.0f,  0.0f,  -1.0f,  1.0f,  1.0f };
+    cube[31] = (struct Vertex){ cubeColor,  0.0f,  1.0f,  0.0f,   1.0f,  1.0f, -1.0f };
+    cube[32] = (struct Vertex){ cubeColor,  0.0f,  1.0f,  0.0f,  -1.0f,  1.0f, -1.0f };
+    cube[33] = (struct Vertex){ cubeColor,  0.0f,  1.0f,  0.0f,  -1.0f,  1.0f,  1.0f };
+    cube[34] = (struct Vertex){ cubeColor,  0.0f,  1.0f,  0.0f,   1.0f,  1.0f,  1.0f };
+    cube[35] = (struct Vertex){ cubeColor,  0.0f,  1.0f,  0.0f,   1.0f,  1.0f, -1.0f };
+
+    sceKernelDcacheWritebackRange(cube, (sizeof(cube) + 63) & ~63);
+}
+
+void vshcube_draw(void* frame) {
 
     vramBackup = memalign(64, VRAM_BACKUP_BYTE_COUNT);
 
@@ -144,108 +165,4 @@ static void vshcube_draw(void* frame) {
     );
 
     free(vramBackup);
-}
-
-static int vshDisplaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelformat, int sync) {
-  
-    void* frame = (void*)(0x1fffffff & (u32)frameBuf);
-
-    if (frame && vshmenu_running){
-        list = memalign(64, 2048);
-        // save context
-        PspGeContext* gectx = memalign(64, sizeof(PspGeContext));
-        int state = sceKernelSuspendDispatchThread();
-        int intr = sceKernelCpuSuspendIntr();
-        sceGeSaveContext(gectx);
-        // draw
-        sceGuStart(GU_DIRECT, list);
-        sceGuDrawBuffer(GU_PSM_8888, frame, BUF_WIDTH);
-        if (vshmenu_draw) vshmenu_draw(frame);
-        vshcube_draw(frame);
-        // sync
-        {
-            u32 a=0x1fff;
-            while(--a) {__asm__("nop; sync");}
-        }
-        sceGuFinish();
-        sceGuSync(GU_SYNC_FINISH, GU_SYNC_WHAT_DONE);
-        // restore context
-        sceKernelCpuResumeIntrWithSync(intr);
-        sceKernelResumeDispatchThread(state);
-        sceGeRestoreContext(gectx);
-        free(gectx);
-        free(list);
-    }
-
-    return prevDisplaySetFrameBuf(frameBuf, bufferwidth, pixelformat, sync);
-}
-
-int vshcube_init() {
-    unsigned int cubeColor = 0x808b4513;
-
-    // front
-    cube[0]  = (struct Vertex){ cubeColor,  0.0f,  0.0f,  1.0f,   1.0f, -1.0f,  1.0f };
-    cube[1]  = (struct Vertex){ cubeColor,  0.0f,  0.0f,  1.0f,  -1.0f,  1.0f,  1.0f };
-    cube[2]  = (struct Vertex){ cubeColor,  0.0f,  0.0f,  1.0f,  -1.0f, -1.0f,  1.0f };
-    cube[3]  = (struct Vertex){ cubeColor,  0.0f,  0.0f,  1.0f,   1.0f,  1.0f,  1.0f };
-    cube[4]  = (struct Vertex){ cubeColor,  0.0f,  0.0f,  1.0f,  -1.0f,  1.0f,  1.0f };
-    cube[5]  = (struct Vertex){ cubeColor,  0.0f,  0.0f,  1.0f,   1.0f, -1.0f,  1.0f };
-
-    // back
-    cube[6]  = (struct Vertex){ cubeColor,  0.0f,  0.0f, -1.0f,  -1.0f,  1.0f, -1.0f };
-    cube[7]  = (struct Vertex){ cubeColor,  0.0f,  0.0f, -1.0f,   1.0f, -1.0f, -1.0f };
-    cube[8]  = (struct Vertex){ cubeColor,  0.0f,  0.0f, -1.0f,  -1.0f, -1.0f, -1.0f };
-    cube[9]  = (struct Vertex){ cubeColor,  0.0f,  0.0f, -1.0f,  -1.0f,  1.0f, -1.0f };
-    cube[10] = (struct Vertex){ cubeColor,  0.0f,  0.0f, -1.0f,   1.0f,  1.0f, -1.0f };
-    cube[11] = (struct Vertex){ cubeColor,  0.0f,  0.0f, -1.0f,   1.0f, -1.0f, -1.0f };
-
-    // left
-    cube[12] = (struct Vertex){ cubeColor, -1.0f,  0.0f,  0.0f,  -1.0f, -1.0f, -1.0f };
-    cube[13] = (struct Vertex){ cubeColor, -1.0f,  0.0f,  0.0f,  -1.0f, -1.0f,  1.0f };
-    cube[14] = (struct Vertex){ cubeColor, -1.0f,  0.0f,  0.0f,  -1.0f,  1.0f, -1.0f };
-    cube[15] = (struct Vertex){ cubeColor, -1.0f,  0.0f,  0.0f,  -1.0f, -1.0f,  1.0f };
-    cube[16] = (struct Vertex){ cubeColor, -1.0f,  0.0f,  0.0f,  -1.0f,  1.0f,  1.0f };
-    cube[17] = (struct Vertex){ cubeColor, -1.0f,  0.0f,  0.0f,  -1.0f,  1.0f, -1.0f };
-
-    // right
-    cube[18] = (struct Vertex){ cubeColor,  1.0f,  0.0f,  0.0f,   1.0f, -1.0f, -1.0f };
-    cube[19] = (struct Vertex){ cubeColor,  1.0f,  0.0f,  0.0f,   1.0f,  1.0f, -1.0f };
-    cube[20] = (struct Vertex){ cubeColor,  1.0f,  0.0f,  0.0f,   1.0f, -1.0f,  1.0f };
-    cube[21] = (struct Vertex){ cubeColor,  1.0f,  0.0f,  0.0f,   1.0f, -1.0f,  1.0f };
-    cube[22] = (struct Vertex){ cubeColor,  1.0f,  0.0f,  0.0f,   1.0f,  1.0f, -1.0f };
-    cube[23] = (struct Vertex){ cubeColor,  1.0f,  0.0f,  0.0f,   1.0f,  1.0f,  1.0f };
-
-    // bottom
-    cube[24] = (struct Vertex){ cubeColor,  0.0f, -1.0f,  0.0f,   1.0f, -1.0f,  1.0f };
-    cube[25] = (struct Vertex){ cubeColor,  0.0f, -1.0f,  0.0f,  -1.0f, -1.0f,  1.0f };
-    cube[26] = (struct Vertex){ cubeColor,  0.0f, -1.0f,  0.0f,   1.0f, -1.0f, -1.0f };
-    cube[27] = (struct Vertex){ cubeColor,  0.0f, -1.0f,  0.0f,   1.0f, -1.0f, -1.0f };
-    cube[28] = (struct Vertex){ cubeColor,  0.0f, -1.0f,  0.0f,  -1.0f, -1.0f,  1.0f };
-    cube[29] = (struct Vertex){ cubeColor,  0.0f, -1.0f,  0.0f,  -1.0f, -1.0f, -1.0f };
-
-    // top
-    cube[30] = (struct Vertex){ cubeColor,  0.0f,  1.0f,  0.0f,  -1.0f,  1.0f,  1.0f };
-    cube[31] = (struct Vertex){ cubeColor,  0.0f,  1.0f,  0.0f,   1.0f,  1.0f, -1.0f };
-    cube[32] = (struct Vertex){ cubeColor,  0.0f,  1.0f,  0.0f,  -1.0f,  1.0f, -1.0f };
-    cube[33] = (struct Vertex){ cubeColor,  0.0f,  1.0f,  0.0f,  -1.0f,  1.0f,  1.0f };
-    cube[34] = (struct Vertex){ cubeColor,  0.0f,  1.0f,  0.0f,   1.0f,  1.0f,  1.0f };
-    cube[35] = (struct Vertex){ cubeColor,  0.0f,  1.0f,  0.0f,   1.0f,  1.0f, -1.0f };
-
-    sceKernelDcacheWritebackRange(cube, (sizeof(cube) + 63) & ~63);
-
-    sceGuInit();
-    sceGuDisplay(GU_FALSE);
-
-    void* func_addr = (void*)sctrlHENFindFunction("sceDisplay_Service", "sceDisplay", 0x289D82FE);
-    sctrlHENHijackFunction(&display_patch, func_addr, vshDisplaySetFrameBuf, (void**)&prevDisplaySetFrameBuf);
-
-    return 0;
-}
-
-int vshcube_start() {
-    return 0;
-}
-
-int vshcube_stop() {
-    return 0;
 }

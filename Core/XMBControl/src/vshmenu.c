@@ -134,13 +134,11 @@ int xmbctrlEnterVshMenuMode(){
         kuKernelIcacheInvalidateAll();
     }
 
-    vshcube_start();
     vshmenu_running = 1;
 }
 
 int xmbctrlExitVshMenuMode(){
     vshmenu_running = 0;
-    vshcube_stop();
 }
 
 int xmbctrlRegisterVshMenu(void (*draw_func)(void*)){
