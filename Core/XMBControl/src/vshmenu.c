@@ -97,9 +97,8 @@ int EatKey(SceCtrlData *pad_data, int count)
     // menu control
     switch (menu_mode) {
         case 0:    
-            if ((cur_buttons & ALL_CTRL) == 0) {
+            if ((cur_buttons & ALL_CTRL) == 0)
                 menu_mode = 1;
-            }
             break;
         case 1:
             if ((button_on & PSP_CTRL_SELECT) || (button_on & PSP_CTRL_HOME))
