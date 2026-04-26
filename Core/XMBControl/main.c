@@ -24,7 +24,6 @@ PSP_MODULE_INFO("XmbControl", 0x0007, 2, 1);
 
 int module_start(SceSize args, void *argp)
 {
-
     RebootexConfigARK* (*getRebootexConfig)(RebootexConfigARK*) = 
         (void*)sctrlHENFindFunction("SystemControl", "SystemCtrlForKernel", 0x18B687A6);
     struct KernelCallArg kargs;
