@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2025 m-c/d
+Copyright (c) 2025 m-c/d & Acid_Snake
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”),
 to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
