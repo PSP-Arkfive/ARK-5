@@ -43,11 +43,6 @@ int module_start(SceSize args, void *argp)
 
     vshgu_init();
     vshcube_init();
-    intraFontInit();
 
     return 0;
-}
-
-void _exit(){
-    sctrlKernelExitVSH(NULL);
 }
