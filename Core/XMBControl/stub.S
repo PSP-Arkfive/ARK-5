@@ -2,11 +2,6 @@
 	
 #include "pspstub.s"
 
-# TODO: send this to pspsdk
-	STUB_START "scePower", 0x40010000, 0x00010005
-	STUB_FUNC 0x0442D852, scePowerRequestColdReset
-	STUB_END
-
 	STUB_START "scePaf",0x00090011,0x00140005
 	STUB_FUNC  0xAF067FA2,sce_paf_private_wcslen
 	STUB_FUNC  0xA138A376,sce_paf_private_sprintf

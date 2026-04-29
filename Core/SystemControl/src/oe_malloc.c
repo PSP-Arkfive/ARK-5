@@ -52,7 +52,7 @@ void* oe_memalign(unsigned int align, unsigned int size){
 
 void oe_free(void* ptr){
     if (ptr){
-        SceUID uid = ((SceUID*)ptr)[-1];
+        int uid = ((int*)ptr)[-1];
         sceKernelFreePartitionMemory(uid);
     }
 }
