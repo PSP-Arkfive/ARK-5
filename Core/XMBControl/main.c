@@ -6,13 +6,14 @@
 #include <pspgu.h>
 #include <psputility_sysparam.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 #include <kubridge.h>
 #include <vshctrl.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
+#include <systemctrl_ark.h>
 #include <rebootexconfig.h>
+#include <intraFont.h>
 
 #include "main.h"
 #include "utils.h"
@@ -42,6 +43,11 @@ int module_start(SceSize args, void *argp)
 
     vshgu_init();
     vshcube_init();
+    intraFontInit();
 
     return 0;
+}
+
+void _exit(){
+    sctrlKernelExitVSH(NULL);
 }
