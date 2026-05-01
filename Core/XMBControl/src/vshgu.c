@@ -53,7 +53,9 @@ static int vshDisplaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelforma
         // draw
         sceGuStart(GU_DIRECT, list);
         sceGuDrawBuffer(GU_PSM_8888, frame, BUF_WIDTH);
-        if (vshmenu_draw) vshmenu_draw(frame);
+        if (vshmenu_draw){
+            vshmenu_draw(frame);
+        }
         vshcube_draw(frame);
         // sync
         {
