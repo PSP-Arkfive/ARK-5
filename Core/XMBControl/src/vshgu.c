@@ -44,13 +44,13 @@ static int vshDisplaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelforma
     void* frame = (void*)(0x1fffffff & (u32)frameBuf);
 
     if (frame && vshmenu_running){
-        list = memalign(64, 2048);
+        int intr = sceKernelCpuSuspendIntr();
         // save context
         PspGeContext* gectx = memalign(64, sizeof(PspGeContext));
         int state = sceKernelSuspendDispatchThread();
-        int intr = sceKernelCpuSuspendIntr();
         sceGeSaveContext(gectx);
         // draw
+        list = memalign(64, 2048);
         sceGuStart(GU_DIRECT, list);
         sceGuDrawBuffer(GU_PSM_8888, frame, BUF_WIDTH);
         if (vshmenu_draw){
@@ -59,17 +59,17 @@ static int vshDisplaySetFrameBuf(void *frameBuf, int bufferwidth, int pixelforma
         vshcube_draw(frame);
         // sync
         {
-            u32 a=0x1fff;
+            u32 a=0xffff;
             while(--a) {__asm__("nop; sync");}
         }
         sceGuFinish();
         sceGuSync(GU_SYNC_FINISH, GU_SYNC_WHAT_DONE);
         // restore context
-        sceKernelCpuResumeIntrWithSync(intr);
         sceKernelResumeDispatchThread(state);
         sceGeRestoreContext(gectx);
         free(gectx);
         free(list);
+        sceKernelCpuResumeIntrWithSync(intr);
     }
 
     return prevDisplaySetFrameBuf(frameBuf, bufferwidth, pixelformat, sync);
