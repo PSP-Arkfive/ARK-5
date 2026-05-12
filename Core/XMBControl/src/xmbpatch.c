@@ -877,7 +877,7 @@ int AddVshItemPatched(void *a0, int topitem, SceVshItem *item)
         SceIoStat stat;
         int ebootFound;
 
-        if (psp_model == PSP_11000){
+        if (psp_model == PSP_STREET){
             u32 value = 0;
             vctrlGetRegistryValue("/CONFIG/SYSTEM/XMB/THEME", "custom_theme_mode", &value);
             cur_icon = !value;
@@ -1037,7 +1037,7 @@ int skipSetting(int i){
         i == NO_HIB_DELETE ||
         i == GO_PAUSE_DELETE
     );
-    else if (psp_model == PSP_11000) return (
+    else if (psp_model == PSP_STREET) return (
         i == DISABLE_GO_PAUSE ||
         i == OLD_GO_PLUGINS ||
         i == NO_HIB_DELETE ||
@@ -1083,7 +1083,7 @@ void OnInitMenuPspConfigPatched()
                 item_opts[SYSTEM_OPTIONS+PLUGINS_CONTEXT+2].c = system_opts_vita;
             }
             // remove overclock values from street and vita
-            if (psp_model == PSP_11000 || IS_VITA(&ark_config)){
+            if (psp_model == PSP_STREET || IS_VITA(&ark_config)){
                 item_opts[CPU_CLOCK_GAME+PLUGINS_CONTEXT+2].n = 4;
                 item_opts[CPU_CLOCK_VSH+PLUGINS_CONTEXT+2].n = 4;
             }
