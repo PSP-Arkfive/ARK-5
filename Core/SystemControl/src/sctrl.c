@@ -625,3 +625,7 @@ void* sctrlArkGetConfig(ARKConfig* conf){
     if (conf) memcpy(conf, ark_config, sizeof(ARKConfig));
     return ark_config;
 }
+
+void sctrlArkSetConfig(ARKConfig* conf){
+	if (conf) memcpy(ark_config, conf, sizeof(ARKConfig));
+}
