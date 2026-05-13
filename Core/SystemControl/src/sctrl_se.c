@@ -31,7 +31,6 @@
 #include <systemctrl_se.h>
 #include <systemctrl_ark.h>
 
-#include "version.h"
 #include "rebootex.h"
 #include "nidresolver.h"
 #include "modulemanager.h"
