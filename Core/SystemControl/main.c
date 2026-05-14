@@ -48,7 +48,8 @@ ARKConfig* ark_config = &_ark_conf;
 int module_start(SceSize args, void * argp)
 {
 
-    #if 0
+    #ifdef DEBUG
+    #include <colordebugger.h>
     // set LCD framebuffer in hardware reg so we can do color debbuging
     _sw(0x44000000, 0xBC800100);
     colorDebug(0xFF00);

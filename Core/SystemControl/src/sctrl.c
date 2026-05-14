@@ -621,8 +621,11 @@ int sctrlKernelQuerySystemCall(void *func_addr)
     return ret;
 }
 
-void* sctrlArkGetConfig(ARKConfig* conf){
-    if (conf) memcpy(conf, ark_config, sizeof(ARKConfig));
+ARKConfig* sctrlArkGetConfig(ARKConfig* conf){
+    if (conf){
+        memcpy(conf, ark_config, sizeof(ARKConfig));
+        return conf;
+    }
     return ark_config;
 }
 

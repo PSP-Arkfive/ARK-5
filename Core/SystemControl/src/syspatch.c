@@ -43,6 +43,14 @@ extern SEConfigARK se_config;
 // Previous Module Start Handler
 STMOD_HANDLER previous = NULL;
 
+#ifdef DEBUG
+#include <pspdisplay.h>
+#include <tinyfont.h>
+#include <colordebugger.h>
+// for screen debugging
+int (* DisplaySetFrameBuf)(void*, int, int, int) = NULL;
+#endif
+
 
 static unsigned int fakeFindFunction(char * szMod, char * szLib, unsigned int nid){
     if (nid == 0x221400A6 && strcmp(szMod, "SystemControl") == 0)
@@ -88,6 +96,22 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
             &sctrlHENFakeDevkitVersion
         );
     }
+
+    #ifdef DEBUG
+    if (sceKernelFindModuleByName("vsh_module") == NULL){
+        if (DisplaySetFrameBuf)
+            DisplaySetFrameBuf((void *)0x04000000, 512, PSP_DISPLAY_PIXEL_FORMAT_8888, 1);
+        colorDebug(0);
+        tinyFontPrintTextScreenBuf((void *)0x44000000, msx, 10, 10, mod->modname, 0xFFFFFFFF, NULL);
+    }
+
+    if (strcmp(mod->modname, "sceDisplay_Service") == 0)
+    {
+        // can use screen now
+        DisplaySetFrameBuf = (void*)sctrlHENFindFunction("sceDisplay_Service", "sceDisplay", 0x289D82FE);
+        goto flush;
+    }
+    #endif
 
     if (strcmp(mod->modname, "sceController_Service") == 0){
         // Allow exiting through key combo

@@ -41,8 +41,8 @@ int module_start(SceSize args, void *argp)
     
     previous = sctrlHENSetStartModuleHandler(OnModuleStart);
 
-    vshgu_init();
     vshcube_init();
+    vshgu_init();
 
     return 0;
 }
