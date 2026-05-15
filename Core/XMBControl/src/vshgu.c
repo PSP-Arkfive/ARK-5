@@ -30,7 +30,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #define BUF_WIDTH               512
 
-static FunctionPatchData display_patch;
+static SctrlFunctionPatchData display_patch;
 static int (*prevDisplaySetFrameBuf)(void*, int, int, int) = NULL;
 
 static void* list = NULL;

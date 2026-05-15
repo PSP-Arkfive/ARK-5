@@ -289,7 +289,7 @@ u32 sctrlHENFindImportInMod(SceModule * mod, const char *library, u32 nid) {
     return 0;
 }
 
-void sctrlHENHijackFunction(FunctionPatchData* patch_data, void* func_addr, void* patch_func, void** orig_func) {
+void sctrlHENHijackFunction(SctrlFunctionPatchData* patch_data, void* func_addr, void* patch_func, void** orig_func) {
 
     void* ptr = patch_data;
 
