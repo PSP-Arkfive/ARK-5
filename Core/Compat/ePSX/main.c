@@ -56,10 +56,11 @@ int module_start(SceSize args, void * argp)
     }
 
     #if 0
+    #include <colordebugger.h>
     _sw(0x44000000, 0xBC800100);
     popsDisplayInit();
     colorDebug(0xFF00);
-    copyPSPVram(0x44000000);
+    copyPSPVram((void*)0x44000000);
     #endif
 
     // set rebootex for VitaPOPS
