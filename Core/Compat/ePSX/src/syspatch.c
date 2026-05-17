@@ -13,8 +13,7 @@
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <systemctrl_ark.h>
-
-#include "popsdisplay.h"
+#include <popsdisplay.h>
 
 
 extern ARKConfig* ark_config;
@@ -30,8 +29,22 @@ int (* DisplaySetFrameBuf)(void*, int, int, int) = NULL;
 int (* DisplayGetFrameBuf)(void**, int*, int*, int) = NULL;
 int (* DisplayWaitVblankStart)() = NULL;
 
+// Registered Vram handler
+void (*psxVramHandler)(u32* psp_vram, u16* ps1_vram) = &popsDisplaySoftRelocateVram; // soft render by default
+
 extern SEConfigARK* se_config;
 
+void copyPSPVram(u32* psp_vram){
+    if (psxVramHandler)
+        psxVramHandler(psp_vram, NULL);
+}
+
+
+void* sctrlARKSetPSXVramHandler(void (*handler)(u32* psp_vram, u16* ps1_vram)){
+    void* prev = psxVramHandler;
+    if (handler) psxVramHandler = handler;
+    return prev;
+}
 
 // hooked function to copy framebuffer
 int (* _sceDisplaySetFrameBufferInternal)(int pri, void *topaddr, int width, int format, int sync) = NULL;
@@ -53,7 +66,7 @@ void patchVitaPopsDisplay(SceModule* mod){
         memset((void *)0x49FE0000, 0, 0x1B0);
         memset((void *)0x490C0000, 0, 0x3C0000);
         // initialize screen configuration
-        initVitaPopsVram();
+        popsDisplayInit();
         // patch display function
         HIJACK_FUNCTION(display_func, sceDisplaySetFrameBufferInternalHook,
             _sceDisplaySetFrameBufferInternal);
@@ -70,7 +83,7 @@ int sceDisplayGetFrameBufPatched(void** p, int* w, int* f, int t){
 // background thread to relocate screen
 int pops_draw_thread(int argc, void* argp){
     DisplayWaitVblankStart();
-    initVitaPopsVram();
+    popsDisplayInit();
     DisplayWaitVblankStart();
     while (do_draw){
         void* framebuf = NULL;
@@ -136,7 +149,7 @@ int popsExit(){
 
 static int vram_clear(){
     while (1){
-        initVitaPopsVram();
+        popsDisplayInit();
         sceKernelDelayThread(100);
     }
     return 0;
@@ -149,7 +162,7 @@ int popsLauncher(){
 
     // init pops vram and pause pops, this fixes screen when going back to launcher
     DisplayWaitVblankStart();
-    initVitaPopsVram();
+    popsDisplayInit();
 
     // thread to constantly configure the screen (fixes race condition with pops reconfiguring vram before we pause it)
     int thid = sceKernelCreateThread("psxloader", &vram_clear, 10, 0x10000, PSP_THREAD_ATTR_VFPU, NULL);

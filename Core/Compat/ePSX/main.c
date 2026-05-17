@@ -10,8 +10,8 @@
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <systemctrl_ark.h>
+#include <popsdisplay.h>
 
-#include "popsdisplay.h"
 #include "payload.h"
 
 PSP_MODULE_INFO("ARKCompatLayer", 0x3007, 1, 0);
@@ -21,13 +21,7 @@ SEConfig* se_config = NULL;
 RebootexConfigARK* reboot_config = NULL;
 
 extern void initVitaPopsSysPatch();
-
-void* sctrlARKSetPSXVramHandler(void (*handler)(u32* psp_vram, u16* ps1_vram)){
-    int k1 = pspSdkSetK1(0);
-    void* prev = registerPSXVramHandler(handler);
-    pspSdkSetK1(k1);
-    return prev;
-}
+extern void copyPSPVram(u32* psp_vram);
 
 static void processArkConfig(){
     if (ark_config->exec_mode == DEV_UNK){
@@ -63,9 +57,9 @@ int module_start(SceSize args, void * argp)
 
     #if 0
     _sw(0x44000000, 0xBC800100);
-    setScreenHandler(&copyPSPVram);
-    initVitaPopsVram();
+    popsDisplayInit();
     colorDebug(0xFF00);
+    copyPSPVram(0x44000000);
     #endif
 
     // set rebootex for VitaPOPS
