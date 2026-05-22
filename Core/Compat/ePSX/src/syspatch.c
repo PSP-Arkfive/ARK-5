@@ -205,6 +205,14 @@ int ARKVitaPopsOnModuleStart(SceModule * mod){
 
     static int booted = 0;
 
+    #if 0
+    #include <colordebugger.h>
+    #include <tinyfont.h>
+    colorDebug(0);
+    tinyFontPrintTextScreenBuf((void*)0x44000000, msx, 10, 10, mod->modname, -1, NULL);
+    copyPSPVram((void*)0x44000000);
+    #endif
+
     // Patch sceKernelExitGame Syscalls
     if (strcmp(mod->modname, "sceLoadExec") == 0) {
         // fix vsh exit
@@ -292,11 +300,12 @@ int ARKVitaPopsOnModuleStart(SceModule * mod){
                 sceIoOpen("ms0:/__popsresume__", 0, 0);
             }
 
+            // fix launcher exit
+            u32 exitFunc = sctrlHENFindFunction("SystemControl", "ArkCtrl", 0x8476E2F1);
+            HIJACK_FUNCTION(exitFunc, popsLauncher, arkLauncher);
+
             // notify ps1cfw_enabler that boot is complete
             sceIoOpen("ms0:/__popsbooted__", 0, 0);
-
-            // fix launcher exit
-            HIJACK_FUNCTION(K_EXTRACT_IMPORT(sctrlArkExitLauncher), popsLauncher, arkLauncher);
 
             // Boot Complete Action done
             booted = 1;
