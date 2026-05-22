@@ -157,14 +157,6 @@ static int isHomebrewRunlevel(){
     return cur_runlevel == RUNLEVEL_HOMEBREW;
 }
 
-int isLauncher(){
-    char path[ARK_PATH_SIZE];
-    strcpy(path, ark_config->arkpath);
-    if (ark_config->launcher[0]) strcat(path, ark_config->launcher);
-    else                         strcat(path, VBOOT_PBP);
-    return (strcmp(path, sceKernelInitFileName())==0);
-}
-
 static int isPath(char* runlevel){
     return (
         strcasecmp(runlevel, sceKernelInitFileName())==0 ||
@@ -214,7 +206,7 @@ static int matchingRunlevel(char * runlevel)
     if(isHomebrewRunlevel()) {
         if (strstr(runlevel, "launcher") != NULL){
         	// check if running custom launcher
-        	if (isLauncher()) return 1;
+        	if (sctrlArkIsLauncher()) return 1;
         }
         if (strstr(runlevel, "app") != NULL || strstr(runlevel, "homebrew") != NULL || strstr(runlevel, "game") != NULL) return 1; // homebrews only
     }

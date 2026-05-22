@@ -61,6 +61,14 @@ static int exitVsh(){
     return res;
 }
 
+int sctrlArkIsLauncher(){
+    char path[ARK_PATH_SIZE];
+    strcpy(path, ark_config->arkpath);
+    if (ark_config->launcher[0]) strcat(path, ark_config->launcher);
+    else                         strcat(path, VBOOT_PBP);
+    return (strcmp(path, sceKernelInitFileName())==0);
+}
+
 int sctrlArkExitLauncher()
 {
 

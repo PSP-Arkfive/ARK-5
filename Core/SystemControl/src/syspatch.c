@@ -24,6 +24,7 @@
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
+#include <systemctrl_ark.h>
 
 #include "modulemanager.h"
 #include "cryptography.h"
@@ -36,6 +37,8 @@
 #include "exitgame.h"
 #include "systemctrl_private.h"
 
+
+extern void extendUtilityModules();
 extern u32 sctrlHENFakeDevkitVersion();
 extern int is_plugins_loading;
 extern SEConfigARK se_config;
@@ -200,17 +203,14 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
         // Boot is complete
         if(sctrlHENIsSystemBooted())
         {
-
             // remember last played game
-            extern int isLauncher();
-            if (sceKernelInitKeyConfig() != PSP_INIT_KEYCONFIG_VSH && !isLauncher()){
+            if (sceKernelInitKeyConfig() != PSP_INIT_KEYCONFIG_VSH && !sctrlArkIsLauncher()){
                 rebootex_config.last_played.apitype = sceKernelInitApitype();
                 memcpy(rebootex_config.last_played.game_id, rebootex_config.game_id, 10);
                 strcpy(rebootex_config.last_played.path, sceKernelInitFileName());
             }
 
             // extend utility modules
-            extern void extendUtilityModules();
             extendUtilityModules();
 
             // patch QA flags settings
