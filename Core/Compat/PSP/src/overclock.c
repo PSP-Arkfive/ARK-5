@@ -142,7 +142,9 @@ u32 (*origGetClockFrequency)() = NULL;
 static inline void adjustPLLMultiplier() {
   
   const u32 defaultNum = (u32)(((float)(DEFAULT_FREQUENCY * pll_den)) / ((float)pll_base_freq));
-  hw(0xbc1000fc) = (pll_mul_msb << 16) | (defaultNum << 8) | pll_den;
+  hw(0xbc1000fc) = (hw(0xbc1000fc) & 0xffff0000) | (defaultNum << 8) | pll_den;
+  sync();
+  hw(0xbc1000fc) = (pll_mul_msb << 16) | (hw(0xbc1000fc) & 0xffff);
   settle();
 }
 
