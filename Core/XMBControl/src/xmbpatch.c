@@ -1082,8 +1082,8 @@ void OnInitMenuPspConfigPatched()
                 item_opts[SYSTEM_OPTIONS+PLUGINS_CONTEXT+2].n = NELEMS(system_opts_vita);
                 item_opts[SYSTEM_OPTIONS+PLUGINS_CONTEXT+2].c = system_opts_vita;
             }
-            // remove overclock values from street and vita
-            if (psp_model == PSP_STREET || IS_VITA(&ark_config)){
+            // remove overclock values from vita
+            if (IS_VITA(&ark_config)){
                 item_opts[CPU_CLOCK_GAME+PLUGINS_CONTEXT+2].n = 4;
                 item_opts[CPU_CLOCK_VSH+PLUGINS_CONTEXT+2].n = 4;
             }

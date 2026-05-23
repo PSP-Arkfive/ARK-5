@@ -20,7 +20,7 @@ OBJS = \
 all: $(TARGET).prx
 
 INCDIR = include rebootex
-CFLAGS = -std=c99 -Os -G0 -Wall -fno-pic
+CFLAGS = -std=c99 -Os -G0 -Wall -fno-pic -fsingle-precision-constant
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 

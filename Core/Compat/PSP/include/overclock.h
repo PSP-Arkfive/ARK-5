@@ -2,14 +2,14 @@
 #define OVERCLOCK_H
 
 #define    DEFAULT_FREQUENCY        333
-#define    THEORETICAL_FREQUENCY    443
+#define    MAX_ALLOWED_FREQUENCY    483
 
-extern int current_frequency;
+extern int currFreq, targetFreq;
 extern void (*origSetClockFrequency)(int cpu, int bus);
 
 void initOverclock();
 void overclockHandler(int cpu, int bus);
 void doOverclock();
-int cancelOverclock();
+void cancelOverclock();
 
 #endif

@@ -1,9 +1,8 @@
-
-// m-c/d 2026, MIT License, for more information on this project see:
+// m-c/d 2026, for more information on this project see:
 // https://github.com/mcidclan/psp-undocumented-sorcery/tree/main/experimental-overclock
 
+
 #include <string.h>
-#include <stdio.h>
 #include <pspsdk.h>
 #include <pspkernel.h>
 
@@ -13,36 +12,29 @@
 #include "overclock.h"
 
 
-#define PLL_MUL_MSB                 0x0124
-#define PLL_RATIO_INDEX             5
-#define PLL_BASE_FREQ               37
-#define PLL_DEN                     20
-#define OVERCLOCK_FREQUENCY_STEP    5
-//#define PLL_CUSTOM_FLAG           27
+#define PLL_DEN                       20
+#define PLL_DEN_STREET                2
+#define PLL_BASE_FREQ                 37
+#define PLL_BASE_FREQ_STREET          12
+#define PLL_RATIO_INDEX               5
+#define PLL_RATIO_INDEX_STREET        5
+#define PLL_MUL_MSB                   0x0124
+#define PLL_MUL_MSB_STREET            0x0122
 
-int current_frequency = DEFAULT_FREQUENCY;
+//#define PLL_CUSTOM_FLAG             27
+#define FREQUENCY_STEP                10  /*PLL_BASE_FREQ / 2*/
 
-#define updatePLLMultiplier(num, msb)               \
-{                                                   \
-  const u32 lsb = (num) << 8 | PLL_DEN;             \
-  const u32 multiplier = (msb << 16) | lsb;         \
-  hw(0xbc1000fc) = multiplier;                      \
-  sync();                                           \
-}
+static unsigned int pll_den           = PLL_DEN;
+static unsigned int pll_base_freq     = PLL_BASE_FREQ;
+static unsigned int pll_mul_msb       = PLL_MUL_MSB;
+static unsigned int pll_ratio_index   = PLL_RATIO_INDEX;
+static unsigned int freq_step         = FREQUENCY_STEP;
 
-#define updatePLLControl()                          \
-{                                                   \
-  if (!(hw(0xbc100068) & PLL_RATIO_INDEX)) {        \
-    hw(0xbc100068) = 0x80 | PLL_RATIO_INDEX;        \
-    /*hw(0xbc100068) &= 0xfffffff0;*/               \
-    /*hw(0xbc100068) |= (0x80 | PLL_RATIO_INDEX);*/ \
-    sync();                                         \
-    do {                                            \
-      delayPipeline();                              \
-    } while (hw(0xbc100068) & 0x80);                \
-    sync();                                         \
-  }                                                 \
-}
+
+int currFreq = DEFAULT_FREQUENCY, targetFreq = DEFAULT_FREQUENCY;
+
+void (*origSetClockFrequency)(int cpu, int bus) = NULL;
+u32 (*origGetClockFrequency)() = NULL;
 
 #define hw(addr)                      \
   (*((volatile unsigned int*)(addr)))
@@ -52,13 +44,6 @@ int current_frequency = DEFAULT_FREQUENCY;
     "sync       \n"     \
   )
 
-#define clearTags()       \
-  __asm__ volatile (          \
-    "mtc0 $0, $28   \n"   \
-    "mtc0 $0, $29   \n"   \
-    "sync           \n"   \
-  )
-  
 #define delayPipeline()                    \
   __asm__ volatile(                            \
     "nop; nop; nop; nop; nop; nop; nop \n" \
@@ -86,7 +71,7 @@ int current_frequency = DEFAULT_FREQUENCY;
   )
 
 #define resumeCpuIntr(var) \
-  __asm__ volatile (            \
+  __asm__ volatile(            \
     ".set push      \n"    \
     ".set noreorder \n"    \
     ".set volatile  \n"    \
@@ -102,25 +87,6 @@ int current_frequency = DEFAULT_FREQUENCY;
     : "memory"             \
   )
 
-// Set clock domains to ratio 1:1
-#define resetDomainRatios()          \
-  sync();                            \
-  hw(0xbc200000) = 511 << 16 | 511;  \
-  hw(0xBC200004) = 511 << 16 | 511;  \
-  hw(0xBC200008) = 511 << 16 | 511;  \
-  sync();
-
-// Wait for clock stability, signal propagation and pipeline drain
-/*
- #define settle()            \
-{                           \
-  sync();                   \
-  u32 i = 0x1fffff;         \
-  while (--i) {             \
-    delayPipeline();        \
-  }                         \
-}
-*/
 #define settle()                \
   __asm__ volatile(                 \
     ".set push              \n" \
@@ -151,24 +117,32 @@ int current_frequency = DEFAULT_FREQUENCY;
     : "$t0", "memory"           \
   )
 
-
-void (*origSetClockFrequency)(int cpu, int bus) = NULL;
-u32 (*origGetClockFrequency)() = NULL;
-
-static inline void unlockMemory() {
-  const u32 start = 0xbc000000;
-  const u32 end   = 0xbc00002c;
-  for (u32 reg = start; reg <= end; reg += 4) {
-    hw(reg) = -1;
-  }
-  sync();
+#define updatePLLMultiplier(num, msb)               \
+{                                                   \
+  const u32 lsb = (num) << 8 | pll_den;             \
+  const u32 multiplier = (msb << 16) | lsb;         \
+  hw(0xbc1000fc) = multiplier;                      \
+  sync();                                           \
 }
 
+#define updatePLLControl()                          \
+{                                                   \
+  if (!(hw(0xbc100068) & pll_ratio_index)) {        \
+    hw(0xbc100068) = 0x80 | pll_ratio_index;        \
+    /*hw(0xbc100068) &= 0xfffffff0;*/               \
+    /*hw(0xbc100068) |= (0x80 | pll_ratio_index);*/ \
+    sync();                                         \
+    do {                                            \
+      delayPipeline();                              \
+    } while (hw(0xbc100068) & 0x80);                \
+    sync();                                         \
+  }                                                 \
+}
 
 static inline void adjustPLLMultiplier() {
   
-  const u32 defaultNum = (u32)(((float)(DEFAULT_FREQUENCY * PLL_DEN)) / ((float)PLL_BASE_FREQ));
-  hw(0xbc1000fc) = (PLL_MUL_MSB << 16) | (defaultNum << 8) | PLL_DEN;
+  const u32 defaultNum = (u32)(((float)(DEFAULT_FREQUENCY * pll_den)) / ((float)pll_base_freq));
+  hw(0xbc1000fc) = (pll_mul_msb << 16) | (defaultNum << 8) | pll_den;
   settle();
 }
 
@@ -177,10 +151,10 @@ static inline void adjustPLLRatio() {
   u32 index = hw(0xbc100068) & 0x0f;
   sync();
 
-  if (index != PLL_RATIO_INDEX) {
+  if (index != pll_ratio_index) {
     
-    const int step = (index > 5) ? -1 : 1;
-    while (((step < 0) == (index > 5)) || index == 5) {
+    const int step = (index > pll_ratio_index) ? -1 : 1;
+    while (((step < 0) == (index > pll_ratio_index)) || index == pll_ratio_index) {
         
       hw(0xbc100068) = 0x80 | index;
       sync();
@@ -246,16 +220,26 @@ static void adjustInitialFrequencies() {
   sceKernelResumeDispatchThread(state);
 }
 
+static void adjustValues(){
+  extern int psp_model;
+  if (psp_model == PSP_STREET){
+    pll_den           = PLL_DEN_STREET;
+    pll_base_freq     = PLL_BASE_FREQ_STREET;
+    pll_mul_msb       = PLL_MUL_MSB_STREET;
+    pll_ratio_index   = PLL_RATIO_INDEX_STREET;
+  }
+}
+
 void doOverclock() {
 
   origSetClockFrequency(DEFAULT_FREQUENCY, DEFAULT_FREQUENCY/2);
   adjustInitialFrequencies();
   
   int defaultFreq = DEFAULT_FREQUENCY;
-  const int freqStep = OVERCLOCK_FREQUENCY_STEP;
+  const int freqStep = freq_step;
   int theoreticalFreq = defaultFreq + freqStep;
   
-  while (theoreticalFreq <= current_frequency) {
+  while (theoreticalFreq <= targetFreq) {
     
     int intr, state;
     state = sceKernelSuspendDispatchThread();
@@ -263,17 +247,16 @@ void doOverclock() {
     
     // clearTags();
     
-    u32 _num = (u32)(((float)(defaultFreq * PLL_DEN)) / ((float)PLL_BASE_FREQ));
-    const u32 num = (u32)(((float)(theoreticalFreq * PLL_DEN)) / ((float)PLL_BASE_FREQ));
-
+    u32 _num = (u32)(((float)(defaultFreq * pll_den)) / ((float)pll_base_freq));
+    const u32 num = (u32)(((float)(theoreticalFreq * pll_den)) / ((float)pll_base_freq));
+    
     updatePLLControl();
     
-    //const u32 msb = PLL_MUL_MSB | (1 << (PLL_CUSTOM_FLAG - 16));
+    //const u32 msb = pll_mul_msb | (1 << (PLL_CUSTOM_FLAG - 16));
     while (_num <= num) {
-      updatePLLMultiplier(_num, PLL_MUL_MSB);
+      updatePLLMultiplier(_num, pll_mul_msb);
       _num++;
     }
-
     settle();
     
     defaultFreq += freqStep;
@@ -281,16 +264,14 @@ void doOverclock() {
     
     resumeCpuIntr(intr);
     sceKernelResumeDispatchThread(state);
-  
-    // scePowerTick(PSP_POWER_TICK_ALL);
     sceKernelDelayThread(100);
   }
+  currFreq = theoreticalFreq;
 }
 
-int cancelOverclock() {
-  
-  u32 _num = (u32)(((float)(current_frequency * PLL_DEN)) / ((float)PLL_BASE_FREQ));
-  const u32 num = (u32)(((float)(current_frequency * PLL_DEN)) / ((float)PLL_BASE_FREQ));
+void cancelOverclock() {
+  u32 _num = (u32)(((float)(currFreq * pll_den)) / ((float)pll_base_freq));
+  const u32 num = (u32)(((float)(DEFAULT_FREQUENCY * pll_den)) / ((float)pll_base_freq));
   
   int intr, state;
   state = sceKernelSuspendDispatchThread();
@@ -306,7 +287,7 @@ int cancelOverclock() {
   const float n = (float)((pllMul & 0xff00) >> 8);
   const float d = (float)((pllMul & 0x00ff));
   const float m = (d > 0.0f) ? (n / d) : 9.0f;
-  const int overclocked = ((pllCtl & PLL_RATIO_INDEX) && (m > 9.0f)) ? 1 : 0;
+  const int overclocked = ((pllCtl & pll_ratio_index) && (m > 9.0f)) ? 1 : 0;
   sceKernelDelayThread(1000);
 
   //const u32 pllMul = hw(0xbc1000fc); sync();
@@ -319,7 +300,7 @@ int cancelOverclock() {
     updatePLLControl();
 
     while (_num >= num) {
-      updatePLLMultiplier(_num, PLL_MUL_MSB);
+      updatePLLMultiplier(_num, pll_mul_msb);
       _num--;
     }
     settle();
@@ -327,25 +308,22 @@ int cancelOverclock() {
     resumeCpuIntr(intr);
     sceKernelResumeDispatchThread(state);
   }
-  
-  return overclocked;
 }
 
-void overclockHandler(int cpu, int bus){
-    current_frequency = cpu;
-    if (cpu > DEFAULT_FREQUENCY && cpu <= THEORETICAL_FREQUENCY) {
+void overclockHandler(int cpu, int bus){    
+    if (cpu > DEFAULT_FREQUENCY && cpu <= MAX_ALLOWED_FREQUENCY && cpu > currFreq) {
+        targetFreq = cpu;
         doOverclock();
     }
     else {
-        cancelOverclock();
-        // disallow changing CPU clock on devkits
-        if (sctrlHENIsToolKit() == PSP_TOOLKIT_TYPE_DEV) return;
+        if (currFreq > DEFAULT_FREQUENCY && cpu < currFreq) return;
         origSetClockFrequency(cpu, bus);
+        currFreq = cpu;
     }
 }
 
 u32 getOverclockSpeed(){
-    if (current_frequency > DEFAULT_FREQUENCY) return current_frequency;
+    if (currFreq > DEFAULT_FREQUENCY) return currFreq;
     return origGetClockFrequency();
 }
 
@@ -353,7 +331,6 @@ void initOverclock() {
   // override clock set/get functions
   HIJACK_FUNCTION(K_EXTRACT_IMPORT(sctrlHENSetSpeed), overclockHandler, origSetClockFrequency);
   HIJACK_FUNCTION(K_EXTRACT_IMPORT(sctrlHENGetSpeed), getOverclockSpeed, origGetClockFrequency);
-  // set up
-  unlockMemory();
+  adjustValues();
   sctrlFlushCache();
 }
