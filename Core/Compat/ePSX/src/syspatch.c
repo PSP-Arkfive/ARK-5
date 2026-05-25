@@ -18,6 +18,7 @@
 
 extern ARKConfig* ark_config;
 extern RebootexConfigARK* reboot_config;
+extern SEConfigARK* se_config;
 
 // Previous Module Start Handler
 STMOD_HANDLER previous = NULL;
@@ -29,10 +30,11 @@ int (* DisplaySetFrameBuf)(void*, int, int, int) = NULL;
 int (* DisplayGetFrameBuf)(void**, int*, int*, int) = NULL;
 int (* DisplayWaitVblankStart)() = NULL;
 
+extern void patchKermitPeripheral();
+
 // Registered Vram handler
 void (*psxVramHandler)(u32* psp_vram, u16* ps1_vram) = &popsDisplaySoftRelocateVram; // soft render by default
 
-extern SEConfigARK* se_config;
 
 void copyPSPVram(u32* psp_vram){
     if (psxVramHandler)
@@ -194,10 +196,6 @@ int sctrlKernelLoadExecVSHWithApitypeFixed(int apitype, const char * file, struc
     reboot_config->fake_apitype = apitype; // reuse space of this variable
     if (apitype == 0x155) apitype = 0x144;
 
-    if (apitype == 0x141 && sctrlSEGetBootConfFileIndex() != MODE_INFERNO){ // homebrew API not using Inferno
-        sctrlSESetBootConfFileIndex(MODE_INFERNO); // force inferno to simulate UMD drive
-        sctrlSESetUmdFile(""); // empty UMD drive (makes sceUmdCheckMedium return false)
-    }
     return _sctrlKernelLoadExecVSHWithApitype(apitype, file, param);
 }
 
@@ -243,7 +241,6 @@ int ARKVitaPopsOnModuleStart(SceModule * mod){
     // Patch Kermit Peripheral Module to load flash0
     if(strcmp(mod->modname, "sceKermitPeripheral_Driver") == 0)
     {
-        extern void patchKermitPeripheral();
         patchKermitPeripheral();
         goto flush;
     }
