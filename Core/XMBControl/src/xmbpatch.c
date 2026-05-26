@@ -768,15 +768,26 @@ int LoadTextLanguage(int new_id)
     if (id < NELEMS(languages)){
         char file[64];
         char pkgpath[ARK_PATH_SIZE];
-    
-        sce_paf_private_strcpy(pkgpath, ark_config.arkpath);
-        strcat(pkgpath, "LANG.ARK");
+   
         sce_paf_private_sprintf(file, "lang_%s.json", languages[id]);
-        offset = findPkgOffset(file, &size, pkgpath);
-        if (!offset && !size)
-            pkgpath[0] = 0;
-        
+
+        sce_paf_private_strcpy(pkgpath, ark_config.arkpath);
+        sce_paf_private_strcat(pkgpath, file);
+
         fd = sceIoOpen(pkgpath, PSP_O_RDONLY, 0);
+        
+        if (fd >= 0){
+            size = sceIoLseek32(fd, 0, PSP_SEEK_END);
+        }
+        else {
+            sce_paf_private_strcpy(pkgpath, ark_config.arkpath);
+            sce_paf_private_strcat(pkgpath, "LANG.ARK");
+            offset = findPkgOffset(file, &size, pkgpath);
+            if (!offset && !size)
+                pkgpath[0] = 0;
+            
+            fd = sceIoOpen(pkgpath, PSP_O_RDONLY, 0);
+        }
     }
 
     if(fd < 0) return 0;
