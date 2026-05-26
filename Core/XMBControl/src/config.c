@@ -153,6 +153,10 @@ static int processConfigLine(char* runlevel, char* path, char* enabled){
         config.noanalog = opt;
         return 1;
     }
+    else if (strcasecmp(path, "vitamute") == 0){
+        config.vitamute = opt;
+        return 1;
+    }
     else if (strcasecmp(path, "qaflags") == 0){
         config.qaflags = opt;
         return 1;
@@ -223,6 +227,7 @@ void loadSettings(){
     FIX_BOOLEAN(config.noumd);
     FIX_BOOLEAN(config.noanalog);
     FIX_BOOLEAN(config.noled);
+    FIX_BOOLEAN(config.vitamute);
     FIX_BOOLEAN(config.qaflags);
     FIX_BOOLEAN(config.wpa2);
 }
@@ -317,6 +322,7 @@ void saveSettings(){
     processSetting(fd, line, "noled", config.noled);
     processSetting(fd, line, "noumd", config.noumd);
     processSetting(fd, line, "noanalog", config.noanalog);
+    processSetting(fd, line, "vitamute", config.vitamute);
     processSetting(fd, line, "qaflags", config.qaflags);
     switch (config.umdregion){
         case 1: processSetting(fd, line, "region_us", VSH_ONLY); break;

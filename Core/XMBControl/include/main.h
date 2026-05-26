@@ -66,6 +66,7 @@ typedef struct
     u8 noled;
     u8 noumd;
     u8 noanalog;
+    u8 vitamute;
     u8 umdregion;
     u8 vshregion;
     u8 confirmbtn;

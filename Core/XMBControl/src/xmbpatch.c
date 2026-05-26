@@ -96,6 +96,7 @@ enum{
     DISABLE_LED,
     DISABLE_UMD,
     DISABLE_ANALOG,
+    VITA_MUTE,
     UMD_REGION,
     VSH_REGION,
     CONFIRM_BUTTON,
@@ -145,6 +146,7 @@ GetItem GetItemes[] =
     { DISABLE_LED         +PLUGINS_CONTEXT+2, 0, "Turn off LEDs" },
     { DISABLE_UMD         +PLUGINS_CONTEXT+2, 0, "Disable UMD Drive" },
     { DISABLE_ANALOG      +PLUGINS_CONTEXT+2, 0, "Disable Analog Stick" },
+    { VITA_MUTE           +PLUGINS_CONTEXT+2, 0, "Vita-style mute" },
     { UMD_REGION          +PLUGINS_CONTEXT+2, 0, "UMD Region" },
     { VSH_REGION          +PLUGINS_CONTEXT+2, 0, "VSH Region" },
     { CONFIRM_BUTTON      +PLUGINS_CONTEXT+2, 0, "Confirm Button" },
@@ -306,6 +308,7 @@ struct {
     ITEM_OPT(boolean_settings), // Turn off LEDs
     ITEM_OPT(boolean_settings), // Disable UMD Drive
     ITEM_OPT(boolean_settings), // Disable Analog Stick 
+    ITEM_OPT(boolean_settings), // Vita Mute
     ITEM_OPT(umdregion_settings), // UMD Region
     ITEM_OPT(vshregion_settings), // VSH Region
     ITEM_OPT(confirmbutton_settings), // Confirmation Button
@@ -503,7 +506,7 @@ int activate_codecs() {
 void reset_ark_settings(){
     const char settings[] =
         "always, usbcharge, on\n"
-        "always, overclock, on\n"
+        "always, cpuclock:333, on\n"
         "always, wpa2, on\n"
         "always, launcher, off\n"
         "always, highmem, off\n"
@@ -519,6 +522,7 @@ void reset_ark_settings(){
         "always, noled, off\n"
         "always, noumd, off\n"
         "always, noanalog, off\n"
+        "always, vitamute, on\n"
         "always, qaflags, on\n"
         "\n"
         "# The following games don't like Inferno Cache\n"
@@ -850,7 +854,6 @@ void* addCustomVshItem(int id, char* text, int action_arg, SceVshItem* orig){
 
 int AddVshItemPatched(void *a0, int topitem, SceVshItem *item)
 {
-
     static int items_added = 0;
 
     if (sce_paf_private_strcmp(item->text, "msgtop_sysconf_console")==0){
@@ -927,7 +930,6 @@ int AddVshItemPatched(void *a0, int topitem, SceVshItem *item)
     }
     
     return AddVshItem(a0, topitem, item);
-
 }
 
 int OnXmbPushPatched(void *arg0, void *arg1)
@@ -1298,6 +1300,7 @@ int vshGetRegistryValuePatched(u32 *option, char *name, void *arg2, int size, in
                 config.noled,        	
                 config.noumd,        	
                 config.noanalog,
+                config.vitamute,
                 config.umdregion,
                 config.vshregion,
                 config.confirmbtn,
@@ -1379,6 +1382,7 @@ int vshSetRegistryValuePatched(u32 *option, char *name, int size, int *value)
                 &config.noled,
                 &config.noumd,
                 &config.noanalog,
+                &config.vitamute,
                 &config.umdregion,
                 &config.vshregion,
                 &config.confirmbtn,

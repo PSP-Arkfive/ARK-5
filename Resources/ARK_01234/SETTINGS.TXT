@@ -15,6 +15,7 @@ always, hidedlc, on
 always, noled, off
 always, noumd, off
 always, noanalog, off
+always, vitamute, on
 always, qaflags, on
 
 # The following games don't like Inferno Cache
