@@ -511,6 +511,18 @@ static void settingsHandler(const char* path, u8 enabled){
     else if (strcasecmp(path, "noanalog") == 0){
         se_config.noanalog = enabled;
     }
+    else if (strcasecmp(path, "vitamute") == 0){ // vita-style mute
+        se_config.vitamute = enabled;
+    }
+    else if (strcasecmp(path, "hidemac") == 0){ // hide mac address
+        se_config.hidemac = enabled;
+    }
+    else if (strcasecmp(path, "hidedlc") == 0){ // hide mac address
+        se_config.hidedlc = enabled;
+    }
+    else if (strcasecmp(path, "qaflags") == 0){ // QA Flags
+        se_config.qaflags = enabled;
+    }
     else if (strncasecmp(path, "region_", 7) == 0){
         char* c = strchr(path, '_')+1;
         if (strcasecmp(c, "jp") == 0){
@@ -553,18 +565,6 @@ static void settingsHandler(const char* path, u8 enabled){
             if (strcasecmp(c+1, "pic0") == 0) se_config.hidepics = 2;
             else if (strcasecmp(c+1, "pic1") == 0) se_config.hidepics = 3;
         }
-    }
-    else if (strcasecmp(path, "hidemac") == 0){ // hide mac address
-        se_config.hidemac = enabled;
-    }
-    else if (strcasecmp(path, "hidedlc") == 0){ // hide mac address
-        se_config.hidedlc = enabled;
-    }
-    else if (strcasecmp(path, "qaflags") == 0){ // QA Flags
-        se_config.qaflags = enabled;
-    }
-    else if (strcasecmp(path, "vitamute") == 0){ // QA Flags
-        se_config.vitamute = enabled;
     }
 }
 

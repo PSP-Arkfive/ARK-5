@@ -20,8 +20,7 @@ extern ARKConfig* ark_config;
 extern int disable_plugins;
 extern int disable_settings;
 
-//static int (*_sceImposeGetParam)(u32); // int (*)(int)
-static int (*_sceImposeSetParam)(u32, int); // int (*)(int, int)
+static int (*_sceImposeSetParam)(u32, int);
 
 
 static int exitVsh(){
@@ -65,42 +64,19 @@ static void startExitThread(void* exitFunc){
 }
 
 static void remove_analog_input(SceCtrlData *data, int count)
-{   
+{
     for (int i=0; i<count; i++){
         data[i].Lx = 0xFF/2;
         data[i].Ly = 0xFF/2;
     }
 }
 
-/*
-static void positive_note_button(SceCtrlData *data, int count)
-{   
-    for (int i=0; i<count; i++){
-        if ((data[i].Buttons & MUTE_MASK) == MUTE_MASK){
-            data[i].Buttons |= PSP_CTRL_NOTE;
-            data[i].Buttons &= ~MUTE_MASK;
-        }
-    }
-}
-
-static void negative_note_button(SceCtrlData *data, int count)
-{   
-    for (int i=0; i<count; i++){
-        if ((data[i].Buttons & MUTE_MASK) == 0){
-            data[i].Buttons &= ~PSP_CTRL_NOTE;
-            data[i].Buttons |= MUTE_MASK;
-        }
-    }
-}*/
-
 // Gamepad Hook #1
 int (*CtrlPeekBufferPositive)(SceCtrlData *, int) = NULL;
 int peek_positive(SceCtrlData * pad_data, int count)
 {
     // Capture Gamepad Input
-    int k1 = pspSdkSetK1(0);
     count = CtrlPeekBufferPositive(pad_data, count);
-    pspSdkSetK1(k1);
     
     // Check for Exit Mask
     if ((pad_data[0].Buttons & EXIT_MASK_CL) == EXIT_MASK_CL)
@@ -134,9 +110,7 @@ int (*CtrlPeekBufferNegative)(SceCtrlData *, int) = NULL;
 int peek_negative(SceCtrlData * pad_data, int count)
 {
     // Capture Gamepad Input
-    int k1 = pspSdkSetK1(0);
     count = CtrlPeekBufferNegative(pad_data, count);
-    pspSdkSetK1(k1);
     
     // Check for Exit Mask
     if((pad_data[0].Buttons & EXIT_MASK_CL) == 0)
@@ -170,9 +144,7 @@ int (*CtrlReadBufferPositive)(SceCtrlData *, int) = NULL;
 int read_positive(SceCtrlData * pad_data, int count)
 {
     // Capture Gamepad Input
-    int k1 = pspSdkSetK1(0);
     count = CtrlReadBufferPositive(pad_data, count);
-    pspSdkSetK1(k1);
     
     // Check for Exit Mask
     if((pad_data[0].Buttons & EXIT_MASK_CL) == EXIT_MASK_CL)
@@ -206,9 +178,7 @@ int (*CtrlReadBufferNegative)(SceCtrlData *, int) = NULL;
 int read_negative(SceCtrlData * pad_data, int count)
 {
     // Capture Gamepad Input
-    int k1 = pspSdkSetK1(0);
     count = CtrlReadBufferNegative(pad_data, count);
-    pspSdkSetK1(k1);
     
     // Check for Exit Mask
     if((pad_data[0].Buttons & EXIT_MASK_CL) == 0)
