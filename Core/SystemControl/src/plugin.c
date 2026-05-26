@@ -563,6 +563,9 @@ static void settingsHandler(const char* path, u8 enabled){
     else if (strcasecmp(path, "qaflags") == 0){ // QA Flags
         se_config.qaflags = enabled;
     }
+    else if (strcasecmp(path, "vitamute") == 0){ // QA Flags
+        se_config.vitamute = enabled;
+    }
 }
 
 static void settingsEnabler(const char* path){

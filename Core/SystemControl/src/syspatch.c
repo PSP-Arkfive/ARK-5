@@ -34,7 +34,7 @@
 #include "psnfix.h"
 #include "loadexec.h"
 #include "gameinfo.h"
-#include "exitgame.h"
+#include "controller.h"
 #include "systemctrl_private.h"
 
 

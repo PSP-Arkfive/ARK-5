@@ -24,6 +24,7 @@ OBJS = \
 	src/sysmem.o \
 	src/loadexec.o \
 	src/exitgame.o \
+	src/controller.o \
 	src/gameinfo.o \
 	src/plugin.o \
 	src/leda.o \

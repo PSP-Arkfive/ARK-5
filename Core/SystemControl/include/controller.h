@@ -1,5 +1,5 @@
-#ifndef EXITGAME_H
-#define EXITGAME_H
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
 
 void checkControllerInput();
 void patchController(SceModule* mod);

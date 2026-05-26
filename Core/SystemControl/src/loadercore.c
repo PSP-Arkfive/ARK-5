@@ -34,7 +34,7 @@
 #include "cryptography.h"
 #include "rebootex.h"
 #include "gameinfo.h"
-#include "exitgame.h"
+#include "controller.h"
 #include "systemctrl_private.h"
 
 extern SEConfigARK se_config;
