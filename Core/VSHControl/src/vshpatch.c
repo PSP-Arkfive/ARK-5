@@ -38,15 +38,17 @@
 #include "virtual_pbp.h"
 #include "custom_update.h"
 
-extern int _sceCtrlReadBufferPositive(SceCtrlData *ctrl, int count);
-extern void patch_sceUSB_Driver(void);
-
-extern int (*g_sceCtrlReadBufferPositive) (SceCtrlData *, int);
 
 typedef struct _HookUserFunctions {
     u32 nid;
     void *func;
 } HookUserFunctions;
+
+extern SEConfigARK* se_config;
+extern int has_umd_iso;
+
+extern int _sceCtrlReadBufferPositive(SceCtrlData *ctrl, int count);
+extern int (*g_sceCtrlReadBufferPositive)(SceCtrlData *, int);
 
 static STMOD_HANDLER previous;
 
@@ -58,10 +60,8 @@ static void patch_sceCtrlReadBufferPositive(void);
 static void patch_Gameboot(SceModule *mod); 
 static void patch_hibblock(SceModule *mod); 
 static void patch_msvideo_main_plugin_module(SceModule* mod);
+extern void patch_sceUSB_Driver(void);
 
-extern SEConfigARK* se_config;
-
-extern int has_umd_iso;
 
 static int vshpatch_module_chain(SceModule *mod)
 {

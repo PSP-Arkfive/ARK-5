@@ -134,7 +134,7 @@ static int _sceUsbStop(const char *driverName, int size, void *args)
     return ret;
 }
 
-void patch_sceUSB_Driver(u32 text_addr)
+void patch_sceUSB_Driver()
 {
     sceUsbStartOrig = (void*)sctrlHENFindFunction("sceUSB_Driver", "sceUsb", 0xAE5DE6AF);
     sctrlHENPatchSyscall(sceUsbStartOrig, &_sceUsbStart);
