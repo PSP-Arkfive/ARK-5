@@ -26,14 +26,15 @@
 #include <pspusb.h>
 #include <pspctrl.h>
 
-#include <systemctrl_ark.h>
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
+#include <systemctrl_ark.h>
+#include <pspusbdevice.h>
 
 #include "main.h"
 #include "virtual_pbp.h"
-#include "pspusbdevice.h"
+
 
 static SceUID g_usbdevice_modid = -1;
 extern ARKConfig* ark_config;
