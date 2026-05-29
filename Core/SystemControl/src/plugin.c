@@ -59,6 +59,8 @@ enum {
 };
 static int cur_runlevel = RUNLEVEL_UNKNOWN;
 
+int pluginsLoaded = 0;
+int settingsLoaded = 0;
 int disable_plugins = 0;
 int disable_settings = 0;
 int is_plugins_loading = 0;
@@ -576,30 +578,40 @@ static void settingsDisabler(const char* path){
     settingsHandler(path, 0);
 }
 
-void LoadPlugins(){
+void loadPlugins(){
     if (disable_plugins || sceKernelFindModuleByName("DesCemManager")!=NULL)
         return; // don't load plugins in recovery mode
     is_plugins_loading = 1;
+
     // allocate resources
     plugins = oe_malloc(sizeof(Plugins));
     plugins->count = 0; // initialize plugins table
+    
     // Open Plugin Config from ARK's installation folder
     char path[ARK_PATH_SIZE];
     strcpy(path, ark_config->arkpath);
     strcat(path, PLUGINS_FILE);
     ProcessConfigFile(ark_config->arkpath, path, addPlugin, removePlugin);
+    
     // Open Plugin Config from SEPLUGINS
     ProcessConfigFile(SEPLUGINS_MS0, PLUGINS_PATH, addPlugin, removePlugin);
+    
     // On PSP Go (only if ms0 isn't already redirected to ef0)
     ProcessConfigFile(SEPLUGINS_EF0, PLUGINS_PATH_GO, addPlugin, removePlugin);
+    
     // Flash0 plugins
     ProcessConfigFile(FLASH0_PATH, PLUGINS_PATH_FLASH, addPlugin, removePlugin);
+    
     // start all loaded plugins
     startPlugins();
+    
     // free resources
     oe_free(plugins);
     plugins = NULL;
     is_plugins_loading = 0;
+    
+    // Remember it
+    pluginsLoaded = 1;
 }
 
 void loadSettings(){
@@ -611,7 +623,6 @@ void loadSettings(){
     strcat(path, ARK_SETTINGS);
     if (ProcessConfigFile(NULL, path, settingsEnabler, settingsDisabler) < 0) // try external settings
         ProcessConfigFile(NULL, ARK_SETTINGS_FLASH, settingsEnabler, settingsDisabler); // retry flash1 settings
-    se_config.magic = ARK_CONFIG_MAGIC;
 
     int apitype = sceKernelInitApitype();
     if (apitype == 0x141 || apitype == 0x152){
@@ -625,6 +636,9 @@ void loadSettings(){
     if (se_config.force_high_memory){
         se_config.disable_pause = 1; // unless we figure out how to fix this
     }
+
+    // Remember it
+    settingsLoaded = 1;
 }
 
 static int needs_devicename_patch(SceModule* mod){

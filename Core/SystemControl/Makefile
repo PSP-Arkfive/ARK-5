@@ -4,12 +4,13 @@ TARGET = systemctrl
 
 OBJS = \
 	main.o \
-	src/modulemanager.o \
 	src/elf.o \
+	src/init.o \
 	src/flushcache.o \
 	src/loadercore.o \
 	src/cryptography.o \
 	src/interruptman.o \
+	src/modulemanager.o \
 	src/kubridge.o \
 	src/sctrl.o \
 	src/sctrl_se.o \

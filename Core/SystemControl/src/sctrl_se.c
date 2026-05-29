@@ -38,32 +38,18 @@
 
 SEConfigARK se_config = {
     .magic = ARK_CONFIG_MAGIC,
-    .umdseek = 0,
-    .cpubus_clock = 0,
-    .disable_pause = 0,
-    .hidedlc = 0,
-    .umdregion = 0,
-    .vshregion = 0,
-    .usbdevice = 0,
-    .usbcharge = 0,
-    .hidemac = 0,
-    .launcher_mode = 0,
-    .hidepics = 0,
-    .qaflags = 0,
+    .usbcharge = 1,
+    .qaflags = 1,
     .usbdevice_rdonly = 2,
-    .skiplogos = 0,
-    .noumd = 0,
-    .hibblock = 0,
-    .noanalog = 0,
-    .oldplugin = 0,
-    .msspeed = 0,
+    .hibblock = 1,
+    .oldplugin = 1,
+    .msspeed = 1,
     .iso_cache_type = 0,
     .iso_cache_size_kb = 4,
     .iso_cache_num = 8,
     .iso_cache_partition = PSP_MEMORY_PARTITION_KERNEL,
-    .noled = 0, // always false
-    .wpa2 = 0, /* not used by default */
-    .force_high_memory = 0,
+    .wpa2 = 1,
+    .vitamute = 1,
 };
 
 char *GetUmdFile(void) __attribute__((alias("sctrlSEGetUmdFile")));

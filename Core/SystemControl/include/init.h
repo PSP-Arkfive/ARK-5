@@ -15,17 +15,20 @@
  * along with PRO CFW. If not, see <http://www.gnu.org/licenses/ .
  */
 
-#ifndef _SEPLUGINS_H_
-#define _SEPLUGINS_H_
+#ifndef _INIT_H_
+#define _INIT_H_
 
-extern int pluginsLoaded;
-extern int settingsLoaded;
-extern int disable_plugins;
-extern int disable_settings;
-extern int is_plugins_loading;
+#include <stdio.h>
+#include <string.h>
+#include <pspsdk.h>
+#include <pspkernel.h>
+#include <psputilsforkernel.h>
 
-void loadPlugins();
-void loadSettings();
+extern u32 sceInitTextAddr;
+
+extern int (* customStartModule)(int modid, SceSize argsize, void * argp, int * modstatus, SceKernelSMOption * opt);
+
+int patch_sceKernelStartModule_in_bootstart(int (* bootstart)(SceSize, void *), void * argp);
 
 #endif
 
