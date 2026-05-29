@@ -579,10 +579,10 @@ static void settingsDisabler(const char* path){
 }
 
 void loadPlugins(){
-    if (disable_plugins || sceKernelFindModuleByName("DesCemManager")!=NULL)
+    if (disable_plugins || pluginsLoaded || sceKernelFindModuleByName("DesCemManager")!=NULL)
         return; // don't load plugins in recovery mode
-    is_plugins_loading = 1;
 
+    is_plugins_loading = 1;
     // allocate resources
     plugins = oe_malloc(sizeof(Plugins));
     plugins->count = 0; // initialize plugins table
@@ -615,9 +615,10 @@ void loadPlugins(){
 }
 
 void loadSettings(){
-    if (disable_settings)
+    if (disable_settings || settingsLoaded)
         return; // don't load settings in recovery mode
-    // process settings file
+
+        // process settings file
     char path[ARK_PATH_SIZE];
     strcpy(path, ark_config->arkpath);
     strcat(path, ARK_SETTINGS);

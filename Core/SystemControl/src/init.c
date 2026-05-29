@@ -111,7 +111,7 @@ static int InitKernelStartModule(int modid, SceSize argsize, void * argp, int * 
     }
 
     // load settings before impose module
-    if (!settingsLoaded && strcmp(modname, "sceImpose_Driver") == 0){
+    if (strcmp(modname, "sceImpose_Driver") == 0){
         // Read Game ID
         findGameId();
         // Check ARK install path
@@ -123,7 +123,7 @@ static int InitKernelStartModule(int modid, SceSize argsize, void * argp, int * 
     }
 
     // load plugins before starting mediasync
-    if (!pluginsLoaded && strcmp(modname, "sceMediaSync") == 0)
+    if (strcmp(modname, "sceMediaSync") == 0)
     {
         // Load Plugins
         loadPlugins();
