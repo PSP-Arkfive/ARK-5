@@ -158,15 +158,15 @@ GetItem GetItemes[] =
 
 char* system_opts[] = {
     "Cancel",
-    "Soft Reset",
-    "Hard Reset",
+    "Reset VSH",
+    "Restart",
     "Suspend",
     "Shutdown",
 };
 
 char* system_opts_vita[] = {
     "Cancel",
-    "Soft Reset",
+    "Reset VSH",
     "Suspend",
 };
 
