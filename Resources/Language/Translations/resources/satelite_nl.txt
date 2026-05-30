@@ -1,0 +1,32 @@
+VSH-GU Menu
+Apparaat uitschakelen
+Apparaat in slaapstand zetten
+Apparaat resetten
+VSH resetten
+Opties
+Afsluiten
+Achtergrondkleur:
+Achtergrondtransparantie:
+Tekstkleur:
+Tekstlettertype:
+Accepteren
+Annuleren
+Geen
+Klein
+Normaal
+Hoog
+Standaard
+Rood
+Oranje
+Geel
+Groen
+Blauw
+Indigo
+Violet
+Roze
+Paars
+Turquoise
+Aqua
+Grijs
+Zwart
+Wit

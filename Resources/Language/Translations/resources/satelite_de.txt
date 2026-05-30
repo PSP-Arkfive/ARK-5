@@ -1,0 +1,32 @@
+VSH-GU-Men
+Ger„t herunterfahren
+Ger„t in den Ruhezustand versetzen
+Ger„t zurcksetzen
+VSH zurcksetzen
+Optionen
+Beenden
+Hintergrundfarbe:
+Hintergrundtransparenz:
+Textfarbe:
+Schriftart:
+Akzeptieren
+Abbrechen
+Keine
+Niedrig
+Normal
+Hoch
+Standard
+Rot
+Orange
+Gelb
+Grn
+Blau
+Indigo
+Violett
+Rosa
+Lila
+Trkis
+Aquamarin
+Grau
+Schwarz
+Weiá

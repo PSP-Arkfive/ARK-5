@@ -1,0 +1,32 @@
+Menu VSH-GU
+Desligar dispositivo
+Suspender dispositivo
+Reiniciar dispositivo
+Reiniciar VSH
+Opá‰es
+Sair
+Cor de fundo:
+Transparància de fundo:
+Cor do texto:
+Fonte do texto:
+Aceitar
+Cancelar
+Nenhum
+Baixo
+Normal
+Alto
+Padr∆o
+Vermelho
+Laranja
+Amarelo
+Verde
+Azul
+÷ndigo
+Violeta
+Rosa
+Roxo
+Turquesa
+µgua-marinha
+Cinza
+Preto
+Branco

@@ -1,0 +1,32 @@
+Menu VSH-GU
+Spegni dispositivo
+Sospendi dispositivo
+Ripristina dispositivo
+Ripristina VSH
+Opzioni
+Esci
+Colore di sfondo:
+Trasparenza di sfondo:
+Colore del testo:
+Carattere del testo:
+Accetta
+Annulla
+Nessuno
+Basso
+Normale
+Alto
+Predefinito
+Rosso
+Arancione
+Giallo
+Verde
+Blu
+Indaco
+Viola
+Rosa
+Viola
+Verde acqua
+Acqua
+Grigio
+Nero
+Bianco

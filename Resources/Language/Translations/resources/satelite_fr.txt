@@ -1,0 +1,32 @@
+Menu VSH-GU
+Arrˆter l'appareil
+Suspendre l'appareil
+R‚initialiser l'appareil
+R‚initialiser le VSH
+Options
+Quitter
+Couleur de fondÿ:
+Transparence du fondÿ:
+Couleur du texteÿ:
+Policeÿ:
+Accepter
+Annuler
+Aucun
+Faible
+Normal
+lev‚
+Par d‚faut
+Rouge
+Orange
+Jaune
+Vert
+Bleu
+Indigo
+Violet
+Rose
+Violet
+Turquoise
+Aigue-marine
+Gris
+Noir
+Blanc

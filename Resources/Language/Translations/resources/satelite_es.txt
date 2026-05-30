@@ -1,0 +1,32 @@
+Menu VSH-GU
+Apagar Consola
+Suspender
+Reiniciar
+Recargar VSH
+Opciones
+Salir
+Color de fondo
+Transparencia
+Color del texto
+Fuente del texto
+Aceptar
+Cancelar
+Nada
+Poco
+Normal
+Mucho
+Por defecto
+Rojo
+Naranja
+Amarillo
+Verde
+Azul
+Indigo
+Violeta
+Rosa
+PUrpura
+Verde Azulado
+Agua
+Gris
+Negro
+Blanco
