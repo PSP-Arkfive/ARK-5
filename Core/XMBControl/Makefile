@@ -13,7 +13,7 @@ OBJS = main.o stub.o \
 	src/vshmenu.o \
 	src/vshcube.o \
 
-CFLAGS = -std=c99 -O2 -Os -G0 -Wall -fshort-wchar -fno-pic -mno-check-zero-division
+CFLAGS = -std=c99 -Oz -G0 -Wall -fshort-wchar -fno-pic -mno-check-zero-division
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 

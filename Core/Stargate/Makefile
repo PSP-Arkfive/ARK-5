@@ -18,7 +18,7 @@ OBJS = $(C_OBJS)
 all: $(TARGET).prx
 
 INCDIR = include
-CFLAGS = -std=c99 -Os -G0 -Wall -fno-pic
+CFLAGS = -std=c99 -Oz -G0 -Wall -fno-pic
 
 PSP_FW_VERSION = 660
 

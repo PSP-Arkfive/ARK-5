@@ -12,7 +12,7 @@ C_OBJS = \
 OBJS = $(C_OBJS) imports.o
 
 INCDIR = include
-CFLAGS = -std=c99 -Os -G0 -Wall
+CFLAGS = -std=c99 -Oz -G0 -Wall
 LDFLAGS =  -nostartfiles
 LIBDIR = 
 LIBS = -lcisoread -lpspsystemctrl_kernel

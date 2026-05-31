@@ -19,7 +19,7 @@ OBJS = main.o \
 IMPORTS = imports.o
 
 INCDIR = include
-CFLAGS = -Os -G0 -Wall -fno-pic
+CFLAGS = -Oz -G0 -Wall -fno-pic
 
 PSP_FW_VERSION = 660
 
