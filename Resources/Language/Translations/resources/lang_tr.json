@@ -166,6 +166,10 @@
 	"Custom App": "Özel Uygulama",
 	"QA Flags": "QA Flagleri",
 
+    "Triangle -> Open Options Menu": "Üçgen -> Seçenekler Menüsünü Aç",
+    "Triangle -> Close Options Menu": "Üçgen -> Seçenekler Menüsünü Kapat",
+    "Settings Saved": "Ayarlar Kaydedildi",
+
     "Japan": "Japonya",
     "America": "Amerika",
     "Korea": "Kore",

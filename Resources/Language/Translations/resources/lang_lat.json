@@ -163,7 +163,10 @@
     "Disable UMD Drive": "Extinguere UMD",
     "Disable Analog Stick": "Extinguere Analogi",
     "Vita-style mute": "Silentiam novi modi",
-    "QA Flags": "QA Flags"
+    "QA Flags": "QA Flags",
 
+    "Triangle -> Open Options Menu": "Triangulum -> Aperi Indicem Optionum",
+    "Triangle -> Close Options Menu": "Triangulum -> Claude Indicem Optionum",
+    "Settings Saved": "Optiones Servatae"
 
 }

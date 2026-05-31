@@ -164,6 +164,10 @@
     "Disable Analog Stick": "Dezactiveaza stick-ul analogic",
     "Vita-style mute": "Silențios în stil Vita",
 	"Custom App": "Aplicație personalizată",
-    "QA Flags": "Steaguri QA"
+    "QA Flags": "Steaguri QA",
+
+    "Triangle -> Open Options Menu": "Triunghi -> Deschide meniul de opțiuni",
+    "Triangle -> Close Options Menu": "Triunghi -> Închide meniul de opțiuni",
+    "Settings Saved": "Setări salvate"
 
 }

@@ -163,6 +163,10 @@
     "Disable Analog Stick": "Απενεργοποιήστε το Analog Stick",
 	"Custom App": "Προσαρμοσμένη εφαρμογή",
     "QA Flags": "Σημαίες δοκιμαστής",
-    "Vita-style mute": "Σίγαση νέου τύπου"
+    "Vita-style mute": "Σίγαση νέου τύπου",
+
+    "Triangle -> Open Options Menu": "Τρίγωνο -> Άνοιγμα μενού επιλογών",
+    "Triangle -> Close Options Menu": "ρίγωνο -> Κλείσιμο μενού επιλογών",
+    "Settings Saved": "Ρυθμίσεις που έχουν αποθηκευτεί"
 
 }

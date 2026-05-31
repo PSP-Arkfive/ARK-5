@@ -158,6 +158,10 @@
     "Disable Analog Stick": "Wylacz drazek analogowy",
     "Vita-style mute": "Wyciszenie w stylu Vita",
 	"Custom App": "Aplikacja niestandardowa",
-    "QA Flags": "Flagi QA"
+    "QA Flags": "Flagi QA",
+
+    "Triangle -> Open Options Menu": "Trójkąt -> Otwórz menu opcji",
+    "Triangle -> Close Options Menu": "Trójkąt -> Zamknij menu opcji",
+    "Settings Saved": "Ustawienia zapisane"
 
 }

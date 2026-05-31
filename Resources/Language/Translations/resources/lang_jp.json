@@ -178,6 +178,10 @@
     "No Cleanup": "クリーンアップなし",
     "With Cleanup": "クリーンアップあり",
 
+    "Triangle -> Open Options Menu": "△ボタン→オプションメニューを開く",
+    "Triangle -> Close Options Menu": "△ボタン→オプションメニューを閉じる",
+    "Settings Saved": "設定が保存されました",
+
     "Japan": "日本",
     "America": "アメリカ",
     "Europe": "ヨーロッパ",
