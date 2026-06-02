@@ -56,11 +56,12 @@ PspSysEventHandler g_power_event = {
 };
 
 
+
 static void (*origSetUmdFile)(const char*) = NULL;
 static void infernoSetUmdFile(const char* path){
     if (path && path[0]){
         memset(g_iso_fn, 0, sizeof(g_iso_fn));
-        strncpy(g_iso_fn, GetUmdFile(), sizeof(g_iso_fn));
+        strncpy(g_iso_fn, path, sizeof(g_iso_fn));
     }
     origSetUmdFile(path);
 }
@@ -73,6 +74,7 @@ int setup_umd_device(void)
     memset(g_iso_fn, 0, sizeof(g_iso_fn));
     strncpy(g_iso_fn, GetUmdFile(), sizeof(g_iso_fn));
     HIJACK_FUNCTION(K_EXTRACT_CALL(sctrlSESetUmdFile), infernoSetUmdFile, origSetUmdFile);
+
 
     infernoSetDiscType(sctrlSEGetDiscType());
 
