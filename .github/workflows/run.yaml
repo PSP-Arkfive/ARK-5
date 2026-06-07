@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Dependencies
         run: |
-          apk add clang automake autoconf zlib-dev python3 zip curl unzip
+          apk add clang automake autoconf zlib-dev python3 zip curl unzip sudo
 
       - name: Cloning and Building lastest pspsdk
         run: | 
