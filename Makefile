@@ -1,7 +1,6 @@
 PY = $(shell which python3)
 PSPDEV = $(shell psp-config --pspdev-path)
 BUILDTOOLS = $(PSPDEV)/share/psp-cfw-sdk/build-tools
-LANGFOLDER = Resources/Language/Translations/resources
 
 .PHONY : mkdist Core Resources FlashPackage
 
@@ -48,12 +47,7 @@ Core:
 
 Resources:
 	$(Q)cp -r Resources/ARK_01234 dist/
-		$(Q)$(PY) $(BUILDTOOLS)/pftools/bdf_to_pf.py $(LANGFOLDER)/satelite_chs_utf8.txt Resources/Language/quan.bdf $(LANGFOLDER)/satelite_chs.txt $(LANGFOLDER)/CHS.pf
-	$(Q)$(PY) $(BUILDTOOLS)/pftools/bdf_to_pf.py $(LANGFOLDER)/satelite_cht_utf8.txt Resources/Language/quan.bdf $(LANGFOLDER)/satelite_cht.txt $(LANGFOLDER)/CHT.pf
-	$(Q)$(PY) $(BUILDTOOLS)/pftools/bdf_to_pf.py $(LANGFOLDER)/satelite_jp_utf8.txt Resources/Language/quan.bdf $(LANGFOLDER)/satelite_jp.txt $(LANGFOLDER)/JP.pf
-	$(Q)$(PY) $(BUILDTOOLS)/pftools/bdf_to_pf.py $(LANGFOLDER)/satelite_kr_utf8.txt Resources/Language/quan.bdf $(LANGFOLDER)/satelite_kr.txt $(LANGFOLDER)/KR.pf
-	$(Q)$(PY) $(BUILDTOOLS)/pack/pkg-res.py Resources/Language LANG.ARK
-	$(Q)mv Resources/Language/Translations/LANG.ARK dist/ARK_01234/
+
 
 FlashPackage: mkdist Core Resources
 	$(Q)mv Core/Compat/ePSP/btcnf/*.bin dist/flash0/
