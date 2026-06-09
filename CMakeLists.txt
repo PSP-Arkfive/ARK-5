@@ -32,7 +32,13 @@ set(COMPILE_OPS -std=c99 -Os -G0 -Wall -fno-pic)
 remove_definitions("-D_PSP_FW_VERSION=600")
 add_definitions("-D_PSP_FW_VERSION=660")
 
-add_subdirectory(Core)
+add_subdirectory(Compat)
+add_subdirectory(Inferno)
+add_subdirectory(PopCorn)
+add_subdirectory(Stargate)
+add_subdirectory(SystemControl)
+add_subdirectory(VSHControl)
+add_subdirectory(XMBControl)
 
 add_custom_target(dist ALL
    DEPENDS 
