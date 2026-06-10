@@ -6,7 +6,7 @@ BUILDTOOLS = $(PSPDEV)/share/psp-cfw-sdk/build-tools
 
 
 all: dist
-	$(Q)echo "Build Done"
+	echo "Build Done"
 
 
 Core: 
@@ -42,11 +42,11 @@ Core:
 
 
 dist: Core
-	$(Q)mkdir -p dist
-	$(Q)mkdir -p dist/flash0
-	$(Q)mv Compat/ePSP/btcnf/*.bin dist/flash0/
-	$(Q)mv Compat/ePSX/btcnf/*.bin dist/flash0/
-	$(Q)mv Compat/vPSP/btcnf/*.bin dist/flash0/
+	mkdir -p dist
+	mkdir -p dist/flash0
+	mv Compat/ePSP/btcnf/*.bin dist/flash0/
+	mv Compat/ePSX/btcnf/*.bin dist/flash0/
+	mv Compat/vPSP/btcnf/*.bin dist/flash0/
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_systemctrl.prx $(BUILDTOOLS)/gz/SystemControl.hdr SystemControl/systemctrl.prx SystemControl 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_vshctrl.prx $(BUILDTOOLS)/gz/SystemControl.hdr VSHControl/vshctrl.prx VshControl 0x3007
 	$(PY) $(BUILDTOOLS)/gz/pspgz.py dist/flash0/ark_xmbctrl.prx $(BUILDTOOLS)/gz/UserModule.hdr XMBControl/xmbctrl.prx XmbControl 0x0000
@@ -86,4 +86,4 @@ clean:
 	$(MAKE) -C Compat/vPSP clean
 	$(MAKE) -C Compat/vPSP/rebootex clean
 	# Rest
-	$(Q)rm -rf dist
+	rm -rf dist

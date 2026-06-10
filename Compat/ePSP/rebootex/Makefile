@@ -21,13 +21,13 @@ LIBS = -L $(PSPSDK)/lib -lbootloadex -lansic
 main.elf: $(C_OBJS)
 
 $(TARGET): main.elf
-	$(Q)$(STRIP) -s $<
-	$(Q)$(OBJCOPY) -O binary $< $(patsubst %.gz,%,$(TARGET))
-	$(Q)$(PYTHON) $(CFWSDK)/build-tools/gz/gz.py $(patsubst %.gz,%,$(TARGET)) $@
-	$(Q)bin2c $@ payload.h rebootbuffer_vita
+	$(STRIP) -s $<
+	$(OBJCOPY) -O binary $< $(patsubst %.gz,%,$(TARGET))
+	$(PYTHON) $(CFWSDK)/build-tools/gz/gz.py $(patsubst %.gz,%,$(TARGET)) $@
+	bin2c $@ payload.h rebootbuffer_vita
 	@echo GET $@
 
 clean:
-	$(Q)rm -rf *~ *.s *.o *.elf reboot.bin reboot.bin.gz payload.h $(EXTRA_CLEAN)
+	rm -rf *~ *.s *.o *.elf reboot.bin reboot.bin.gz payload.h $(EXTRA_CLEAN)
 
 include $(CFWSDK)/build-tools/beauty_bin.mak
