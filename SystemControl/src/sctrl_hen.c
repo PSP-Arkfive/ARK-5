@@ -16,6 +16,7 @@
 #include <systemctrl_ark.h>
 #include <vshctrl.h>
 
+#include "version.h"
 #include "rebootex.h"
 #include "nidresolver.h"
 #include "modulemanager.h"
