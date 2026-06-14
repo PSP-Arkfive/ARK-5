@@ -67,7 +67,7 @@ void patchVshClock(u32 addr){
         }
     }
 
-    sce_paf_private_sprintf(info_string, "\n\n\n\n"
+    sprintf(info_string, "\n\n\n\n"
         "CFW: ARK %d.%d.%d\n"
         "Built: %s %s\n"
         "Console: %s (%02dg) FW%d%d%d\n"

@@ -44,8 +44,8 @@
 #include "battery.h"
 
 // TODO: send to pspsdk
-#define PSP_INIT_APITYPE_EF2 0x152
-extern int scePowerRequestColdReset(int unk);
+//#define PSP_INIT_APITYPE_EF2 0x152
+//extern int scePowerRequestColdReset(int unk);
 
 ARKConfig ark_config;
 RebootexConfigARK rebootex_config;
@@ -60,7 +60,6 @@ int codecs_active = 0;
 int battery_type = -1;
 int has_hibernation = 0;
 
-char * strtrim(char * text);
 
 char* custom_app_path = "ms0:/PSP/APP/CUSTOM/EBOOT.PBP";
 const char* PLUGIN_PATH_GO = "ef0:/SEPLUGINS/PLUGINS.TXT";
@@ -412,7 +411,7 @@ char* getLastGameForPlugin(){
 char* getLastGameForPluginFormatted(){
     char* opt = getLastGameForPlugin();
     if (opt){
-        char* hbn = sce_paf_private_strrchr(opt, '/');
+        char* hbn = strrchr(opt, '/');
         if (hbn) opt = hbn;
     }
     return opt;
@@ -420,15 +419,15 @@ char* getLastGameForPluginFormatted(){
 
 void exec_custom_launcher() {
     char menupath[ARK_PATH_SIZE];
-    sce_paf_private_strcpy(menupath, ark_config.arkpath);
+    strcpy(menupath, ark_config.arkpath);
     strcat(menupath, VBOOT_PBP);
 
     SceIoStat stat; int res = sceIoGetstat(menupath, &stat);
     if (res >= 0){
         struct SceKernelLoadExecVSHParam param;
-        sce_paf_private_memset(&param, 0, sizeof(param));
+        memset(&param, 0, sizeof(param));
         param.size = sizeof(param);
-        param.args = sce_paf_private_strlen(menupath) + 1;
+        param.args = strlen(menupath) + 1;
         param.argp = menupath;
         param.key = "game";
         sctrlKernelLoadExecVSHWithApitype(0x141, menupath, &param);
@@ -450,9 +449,9 @@ void exec_150_reboot(void) {
 
 void exec_custom_app(char *path) {
     struct SceKernelLoadExecVSHParam param;
-    sce_paf_private_memset(&param, 0, sizeof(param));
+    memset(&param, 0, sizeof(param));
     param.size = sizeof(param);
-    param.args = sce_paf_private_strlen(path) + 1;
+    param.args = strlen(path) + 1;
     param.argp = path;
     param.key = "game";
     sctrlKernelLoadExecVSHWithApitype(0x141, path, &param);
@@ -460,7 +459,7 @@ void exec_custom_app(char *path) {
 
 void recreate_umd_keys(void) {
     struct KernelCallArg args;
-    sce_paf_private_memset(&args, 0, sizeof(args));
+    memset(&args, 0, sizeof(args));
 
     sctrlSEGetConfig((SEConfig*)&se_config);
     se_config.umdregion = config.umdregion;
@@ -534,10 +533,10 @@ void reset_ark_settings(){
 
     char arkMenuPath[ARK_PATH_SIZE];
     char arkSettingsPath[ARK_PATH_SIZE];
-    sce_paf_private_strcpy(arkMenuPath, ark_config.arkpath);
-    sce_paf_private_strcpy(arkSettingsPath, ark_config.arkpath);
-    sce_paf_private_strcat(arkMenuPath, MENU_SETTINGS);
-    sce_paf_private_strcat(arkSettingsPath, ARK_SETTINGS);
+    strcpy(arkMenuPath, ark_config.arkpath);
+    strcpy(arkSettingsPath, ark_config.arkpath);
+    strcat(arkMenuPath, MENU_SETTINGS);
+    strcat(arkSettingsPath, ARK_SETTINGS);
     
     int fd = sceIoOpen(arkMenuPath, PSP_O_RDONLY, 0);
     if(fd) {
@@ -570,13 +569,13 @@ void import_classic_plugins(int devpath, int cleanup) {
     int i = 0;
     int chunksize = 512;
     int bytesRead;
-    char *buf = sce_paf_private_malloc(chunksize);
+    char *buf = malloc(chunksize);
     char *gameChar = "game, ";
-    int gameCharLength = sce_paf_private_strlen(gameChar);
+    int gameCharLength = strlen(gameChar);
     char *vshChar = "vsh, ";
-    int vshCharLength = sce_paf_private_strlen(vshChar);
+    int vshCharLength = strlen(vshChar);
     char *popsChar = "pops, ";
-    int popsCharLength = sce_paf_private_strlen(popsChar);
+    int popsCharLength = strlen(popsChar);
     
     const char* filename = (devpath)? PLUGIN_PATH_GO : PLUGIN_PATH;
     const char* gamepath = (devpath)? GAME_PLUGIN_PATH_GO : GAME_PLUGIN_PATH;
@@ -589,7 +588,7 @@ void import_classic_plugins(int devpath, int cleanup) {
     plugins = sceIoOpen(filename, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_APPEND, 0777);
 
     // GAME.txt
-    sce_paf_private_memset(buf, 0, chunksize);
+    memset(buf, 0, chunksize);
     while ((bytesRead = sceIoRead(game, buf, chunksize)) > 0) {
         for(i = 0; i < bytesRead; i++) {
         	if (i == 0 || buf[i-1] == '\n' || buf[i-1] == '\0'){
@@ -603,7 +602,7 @@ void import_classic_plugins(int devpath, int cleanup) {
     sceIoClose(game);
 
 
-    sce_paf_private_memset(buf, 0, chunksize);
+    memset(buf, 0, chunksize);
 
     // VSH.txt
     while ((bytesRead = sceIoRead(vsh, buf, chunksize)) > 0) {
@@ -618,7 +617,7 @@ void import_classic_plugins(int devpath, int cleanup) {
     }
     sceIoClose(vsh);
 
-    sce_paf_private_memset(buf, 0, chunksize);
+    memset(buf, 0, chunksize);
 
     // POP.txt
     while ((bytesRead = sceIoRead(pops, buf, chunksize)) > 0) {
@@ -634,7 +633,7 @@ void import_classic_plugins(int devpath, int cleanup) {
     sceIoClose(pops);
 
     sceIoClose(plugins);
-    sce_paf_private_free(buf);
+    free(buf);
 
     if (cleanup){
         sceIoRemove(gamepath);
@@ -688,7 +687,7 @@ SceOff findPkgOffset(const char* filename, unsigned* size, const char* pkgpath){
 }
 
 void findAllTranslatableStrings(){
-    sce_paf_private_memset(language_strings, 0, sizeof(language_strings));
+    memset(language_strings, 0, sizeof(language_strings));
     n_translated = 0;
 
     language_strings[n_translated++].orig = "xmbmsg_system_update";
@@ -710,15 +709,15 @@ void findAllTranslatableStrings(){
 }
 
 static int findTranslatableStringIndex(char* line){
-    char* txt_start = sce_paf_private_strchr(line, '"');
+    char* txt_start = strchr(line, '"');
     if (!txt_start) return -1;
     for (int i=0; i<n_translated; i++){
         char* item = language_strings[i].orig;
         if (item == NULL) continue;
-        if (sce_paf_private_strcmp(line, item) == 0) return i;
+        if (strcmp(line, item) == 0) return i;
         char* sub = strstr(line, item);
         if (sub == NULL) continue;
-        int l = sce_paf_private_strlen(item);
+        int l = strlen(item);
         if (sub == txt_start+1 && sub[l] == '"')
             return i;
     }
@@ -728,7 +727,7 @@ static int findTranslatableStringIndex(char* line){
 static char* findTranslation(char* text){
     for (int i=0; i<n_translated; i++)
     {
-        if (sce_paf_private_strcmp(text, language_strings[i].orig) == 0){
+        if (strcmp(text, language_strings[i].orig) == 0){
             return language_strings[i].translated;
         }
     }
@@ -738,7 +737,7 @@ static char* findTranslation(char* text){
 static int isTranslatableString(char* text){
     for (int i=0; i<n_translated; i++)
     {
-        if (sce_paf_private_strcmp(text, language_strings[i].orig) == 0){
+        if (strcmp(text, language_strings[i].orig) == 0){
             return 1;
         }
     }
@@ -758,7 +757,7 @@ int LoadTextLanguage(int new_id)
     }
 
     for (int i=0; i<n_translated; i++){
-        sce_paf_private_free(language_strings[i].translated);
+        free(language_strings[i].translated);
         language_strings[i].translated = NULL;
     }
 
@@ -769,10 +768,10 @@ int LoadTextLanguage(int new_id)
         char file[64];
         char pkgpath[ARK_PATH_SIZE];
    
-        sce_paf_private_sprintf(file, "lang_%s.json", languages[id]);
+        sprintf(file, "lang_%s.json", languages[id]);
 
-        sce_paf_private_strcpy(pkgpath, ark_config.arkpath);
-        sce_paf_private_strcat(pkgpath, file);
+        strcpy(pkgpath, ark_config.arkpath);
+        strcat(pkgpath, file);
 
         fd = sceIoOpen(pkgpath, PSP_O_RDONLY, 0);
         
@@ -780,8 +779,8 @@ int LoadTextLanguage(int new_id)
             size = sceIoLseek32(fd, 0, PSP_SEEK_END);
         }
         else {
-            sce_paf_private_strcpy(pkgpath, ark_config.arkpath);
-            sce_paf_private_strcat(pkgpath, "LANG.ARK");
+            strcpy(pkgpath, ark_config.arkpath);
+            strcat(pkgpath, "LANG.ARK");
             offset = findPkgOffset(file, &size, pkgpath);
             if (!offset && !size)
                 pkgpath[0] = 0;
@@ -792,7 +791,7 @@ int LoadTextLanguage(int new_id)
 
     if(fd < 0) return 0;
 
-    u8* buf = sce_paf_private_malloc(size+1);
+    u8* buf = malloc(size+1);
     sceIoLseek(fd, offset, PSP_SEEK_SET);
     sceIoRead(fd, buf, size);
     sceIoClose(fd);
@@ -817,25 +816,25 @@ int LoadTextLanguage(int new_id)
         buf_pos += n_read;
 
         if (n_read == 0) break;
-        if (sce_paf_private_strchr(line, '"') == NULL) continue;
+        if (strchr(line, '"') == NULL) continue;
 
         char* sep = NULL;
         int text_idx = findTranslatableStringIndex(line);
 
         if (text_idx>=0){
             char* aux = language_strings[text_idx].orig;
-            sep = sce_paf_private_strchr(sce_paf_private_strchr(line, '"')+sce_paf_private_strlen(aux)+1, ':');
+            sep = strchr(strchr(line, '"')+strlen(aux)+1, ':');
             if (!sep) continue;
         }
         else continue;
 
-        char* start = sce_paf_private_strchr(sep, '"');
+        char* start = strchr(sep, '"');
         if (!start) continue;
 
-        char* translated = sce_paf_private_malloc(strlen(start+1)+1);
-        sce_paf_private_strcpy(translated, start+1);
+        char* translated = malloc(strlen(start+1)+1);
+        strcpy(translated, start+1);
 
-        char* ending = sce_paf_private_strrchr(translated, '"');
+        char* ending = strrchr(translated, '"');
         if (ending) *ending = 0;
 
         language_strings[text_idx].translated = translated;
@@ -843,22 +842,22 @@ int LoadTextLanguage(int new_id)
 
     }
 
-    sce_paf_private_free(buf);
+    free(buf);
 
     return 1;
 }
 
 void* addCustomVshItem(int id, char* text, int action_arg, SceVshItem* orig){
-    SceVshItem* item = (SceVshItem *)sce_paf_private_malloc(sizeof(SceVshItem));
-    sce_paf_private_memset(item, 0, sizeof(SceVshItem));
-    sce_paf_private_memcpy(item, orig, sizeof(SceVshItem));
+    SceVshItem* item = (SceVshItem *)malloc(sizeof(SceVshItem));
+    memset(item, 0, sizeof(SceVshItem));
+    memcpy(item, orig, sizeof(SceVshItem));
 
     item->id = id; // custom id
     item->action = sysconf_action;
     item->action_arg = action_arg;
     item->play_sound = 1;
     item->context = NULL;
-    sce_paf_private_strcpy(item->text, text);
+    strcpy(item->text, text);
 
     return item;
 }
@@ -867,21 +866,21 @@ int AddVshItemPatched(void *a0, int topitem, SceVshItem *item)
 {
     static int items_added = 0;
 
-    if (sce_paf_private_strcmp(item->text, "msgtop_sysconf_console")==0){
+    if (strcmp(item->text, "msgtop_sysconf_console")==0){
         sysconf_action = item->action;
         LoadTextLanguage(-1);
     }
 
     if ( !items_added && // prevent adding more than once
         // Game Items
-        (sce_paf_private_strcmp(item->text, "msgtop_game_gamedl")==0 ||
-        sce_paf_private_strcmp(item->text, "msgtop_game_savedata")==0 ||
+        (strcmp(item->text, "msgtop_game_gamedl")==0 ||
+        strcmp(item->text, "msgtop_game_savedata")==0 ||
         // Extras Items
-        sce_paf_private_strcmp(item->text, "msg_digitalcomics")==0 ||
-        sce_paf_private_strcmp(item->text, "msg_bookreader")==0 ||
-        sce_paf_private_strcmp(item->text, "msg_1seg")==0 ||
-        sce_paf_private_strcmp(item->text, "msg_xradar_portable")==0 ||
-        sce_paf_private_strcmp(item->text, "msg_tdmb")==0)
+        strcmp(item->text, "msg_digitalcomics")==0 ||
+        strcmp(item->text, "msg_bookreader")==0 ||
+        strcmp(item->text, "msg_1seg")==0 ||
+        strcmp(item->text, "msg_xradar_portable")==0 ||
+        strcmp(item->text, "msg_tdmb")==0)
         )
     {
         items_added = 1;
@@ -907,7 +906,7 @@ int AddVshItemPatched(void *a0, int topitem, SceVshItem *item)
 
         // Add Custom Launcher (if found)
         char launcher_path[ARK_PATH_SIZE];
-        sce_paf_private_strcpy(launcher_path, ark_config.arkpath);
+        strcpy(launcher_path, ark_config.arkpath);
         strcat(launcher_path, VBOOT_PBP);
         ebootFound = sceIoGetstat(launcher_path, &stat);
         if (ebootFound >= 0){
@@ -988,7 +987,7 @@ int ExecuteActionPatched(int action, int action_arg)
     }
     if(old_is_cfw_config != is_cfw_config)
     {
-        sce_paf_private_memset(backup, 0, sizeof(backup));
+        memset(backup, 0, sizeof(backup));
         context_mode = 0;
 
         unload = 1;
@@ -1012,7 +1011,7 @@ int UnloadModulePatched(int skip)
 
 void AddSysconfContextItem(char *text, char *subtitle, char *regkey)
 {
-    SceSysconfItem *item = (SceSysconfItem *)sce_paf_private_malloc(sizeof(SceSysconfItem));
+    SceSysconfItem *item = (SceSysconfItem *)malloc(sizeof(SceSysconfItem));
 
     item->id = 5;
     item->unk = (u32 *)sysconf_unk;
@@ -1158,17 +1157,17 @@ SceSysconfItem *GetSysconfItemPatched(void *a0, void *a1)
         int i;
         for(i = 0; i < NELEMS(GetItemes); i++)
         {
-            if(sce_paf_private_strcmp(item->text, GetItemes[i].item) == 0)
+            if(strcmp(item->text, GetItemes[i].item) == 0)
             {
                 context_mode = GetItemes[i].mode;
             }
         }
     }
     else if (is_cfw_config == 2){
-        if (sce_paf_private_strcmp(item->text, "Import Classic Plugins") == 0){
+        if (strcmp(item->text, "Import Classic Plugins") == 0){
             context_mode = PLUGINS_CONTEXT-1;
         }
-        else if (sce_paf_private_strncmp(item->text, "iplugin_", 8) == 0){
+        else if (strncmp(item->text, "iplugin_", 8) == 0){
             context_mode = PLUGINS_CONTEXT+1;
         }
         else {
@@ -1182,28 +1181,28 @@ wchar_t *scePafGetTextPatched(void *a0, char *name)
 {
     if(name)
     {
-        if(is_cfw_config == 1 || sce_paf_private_strncmp(name, "xmbmsg", 6)==0)
+        if(is_cfw_config == 1 || strncmp(name, "xmbmsg", 6)==0)
         {
             char* translated = findTranslation(name);
             char* star = NULL;
             if (!translated){
-                if(sce_paf_private_strcmp(name, "xmbmsgtop_sysconf_configuration") == 0){
+                if(strcmp(name, "xmbmsgtop_sysconf_configuration") == 0){
                     translated = "Custom Firmware Settings";
                     star = STAR;
                 }
-                else if(sce_paf_private_strcmp(name, "xmbmsgtop_sysconf_plugins") == 0){
+                else if(strcmp(name, "xmbmsgtop_sysconf_plugins") == 0){
                     translated = "Plugins Manager";
                     star = STAR;
                 }
-                else if(sce_paf_private_strcmp(name, "xmbmsgtop_custom_launcher") == 0){
+                else if(strcmp(name, "xmbmsgtop_custom_launcher") == 0){
                     translated = "Custom Launcher";
                     star = STAR;
                 }
-                else if(sce_paf_private_strcmp(name, "xmbmsgtop_custom_app") == 0){
+                else if(strcmp(name, "xmbmsgtop_custom_app") == 0){
                     translated = "Custom App";
                     star = STAR;
                 }
-                else if(sce_paf_private_strcmp(name, "xmbmsgtop_150_reboot") == 0){
+                else if(strcmp(name, "xmbmsgtop_150_reboot") == 0){
                     translated = "Reboot to 1.50 ARK";
                     star = STAR;
                 }
@@ -1218,40 +1217,40 @@ wchar_t *scePafGetTextPatched(void *a0, char *name)
             }
         }
         else if (is_cfw_config == 2){
-            if (sce_paf_private_strncmp(name, "plugin_", 7) == 0){
-                u32 i = sce_paf_private_strtoul(name + 7, NULL, 10);
+            if (strncmp(name, "plugin_", 7) == 0){
+                u32 i = strtoul(name + 7, NULL, 10);
                 Plugin* plugin = (Plugin*)(plugins.table[i]);
                 char file[128];
 
         		utf8_to_unicode((wchar_t *)user_buffer, getPluginName(plugin->path, file));
         		return (wchar_t *)user_buffer;
             }
-            else if (sce_paf_private_strncmp(name, "plugins", 7) == 0){
-                u32 i = sce_paf_private_strtoul(name + 7, NULL, 10);
+            else if (strncmp(name, "plugins", 7) == 0){
+                u32 i = strtoul(name + 7, NULL, 10);
                 Plugin* plugin = (Plugin*)(plugins.table[i]);
                 char plugin_path[128];
-                if (sce_paf_private_strchr(plugin->path, ':') == NULL){
-                    sce_paf_private_sprintf(plugin_path, "<%s> %s, %s", plugins_paths[plugin->place], plugin->runlevel, plugin->path);
+                if (strchr(plugin->path, ':') == NULL){
+                    sprintf(plugin_path, "<%s> %s, %s", plugins_paths[plugin->place], plugin->runlevel, plugin->path);
                 }
                 else{
-                    sce_paf_private_sprintf(plugin_path, "%s, %s", plugin->runlevel, plugin->path);
+                    sprintf(plugin_path, "%s, %s", plugin->runlevel, plugin->path);
                 }
                 utf8_to_unicode((wchar_t *)user_buffer, plugin_path);
         		return (wchar_t *)user_buffer;
             }
-            else if (sce_paf_private_strncmp(name, "iplugin_", 8) == 0){
-                u32 i = sce_paf_private_strtoul(name + 8, NULL, 10);
+            else if (strncmp(name, "iplugin_", 8) == 0){
+                u32 i = strtoul(name + 8, NULL, 10);
                 Plugin* plugin = (Plugin*)(iplugins.table[i]);
                 utf8_to_unicode((wchar_t *)user_buffer, plugin->path);
         		return (wchar_t *)user_buffer;
             }
-            else if (sce_paf_private_strncmp(name, "iplugins", 8) == 0){
-                u32 i = sce_paf_private_strtoul(name + 8, NULL, 10);
+            else if (strncmp(name, "iplugins", 8) == 0){
+                u32 i = strtoul(name + 8, NULL, 10);
                 Plugin* plugin = (Plugin*)(iplugins.table[i]);
                 utf8_to_unicode((wchar_t *)user_buffer, plugins_paths[plugin->place]);
         		return (wchar_t *)user_buffer;
             }
-            else if (sce_paf_private_strcmp(name, "Import Classic Plugins") == 0){
+            else if (strcmp(name, "Import Classic Plugins") == 0){
                 char* translated = findTranslation(name);
                 utf8_to_unicode((wchar_t *)user_buffer, (translated)? translated:name);
                 return (wchar_t *)user_buffer;
@@ -1264,7 +1263,7 @@ wchar_t *scePafGetTextPatched(void *a0, char *name)
                 }
             }
         }
-        else if (sce_paf_private_strcmp(name, "msg_system_update") == 0 && se_config.custom_update)
+        else if (strcmp(name, "msg_system_update") == 0 && se_config.custom_update)
         {
             char* translated = findTranslation("xmbmsg_system_update");
             if (!translated) translated = "ARK Updater";
@@ -1324,7 +1323,7 @@ int vshGetRegistryValuePatched(u32 *option, char *name, void *arg2, int size, in
             int i;
             for(i = 0; i < NELEMS(GetItemes); i++)
             {
-                if (sce_paf_private_strcmp(name, GetItemes[i].item) == 0)
+                if (strcmp(name, GetItemes[i].item) == 0)
                 {
                     context_mode = GetItemes[i].mode;
                     *value = configs[i];
@@ -1334,22 +1333,22 @@ int vshGetRegistryValuePatched(u32 *option, char *name, void *arg2, int size, in
 
         }
         else if (is_cfw_config == 2){
-            if (sce_paf_private_strcmp(name, "Import Classic Plugins") == 0){
+            if (strcmp(name, "Import Classic Plugins") == 0){
                 *value = config.import_plugins;
                 context_mode = PLUGINS_CONTEXT-1;
                 return 0;
             }
-            if (sce_paf_private_strncmp(name, "plugin_", 7) == 0)
+            if (strncmp(name, "plugin_", 7) == 0)
         	{
-        		u32 i = sce_paf_private_strtoul(name + 7, NULL, 10);
+        		u32 i = strtoul(name + 7, NULL, 10);
                 Plugin* plugin = (Plugin*)(plugins.table[i]);
         		context_mode = PLUGINS_CONTEXT;
         		*value = plugin->active;
         		return 0;
         	}
-            if (sce_paf_private_strncmp(name, "iplugin_", 8) == 0)
+            if (strncmp(name, "iplugin_", 8) == 0)
         	{
-        		u32 i = sce_paf_private_strtoul(name + 8, NULL, 10);
+        		u32 i = strtoul(name + 8, NULL, 10);
                 Plugin* plugin = (Plugin*)(iplugins.table[i]);
         		context_mode = PLUGINS_CONTEXT+1;
         		*value = plugin->active;
@@ -1405,7 +1404,7 @@ int vshSetRegistryValuePatched(u32 *option, char *name, int size, int *value)
         
             for (int i = 0; i < NELEMS(GetItemes); i++)
             {
-                if (sce_paf_private_strcmp(name, GetItemes[i].item) == 0)
+                if (strcmp(name, GetItemes[i].item) == 0)
                 {
                     *configs[i] = GetItemes[i].negative ? !(*value) : *value;
                     saveSettings();
@@ -1462,7 +1461,7 @@ int vshSetRegistryValuePatched(u32 *option, char *name, int size, int *value)
             }
         }
         else if (is_cfw_config == 2){
-            if (sce_paf_private_strcmp(name, "Import Classic Plugins") == 0){
+            if (strcmp(name, "Import Classic Plugins") == 0){
                 config.import_plugins = *value;
                 context_mode = PLUGINS_CONTEXT-1;
                 import_classic_plugins(0, *value);
@@ -1470,9 +1469,9 @@ int vshSetRegistryValuePatched(u32 *option, char *name, int size, int *value)
                 sctrlKernelExitVSH(NULL);
                 return 0;
             }
-            if(sce_paf_private_strncmp(name, "plugin_", 7) == 0)
+            if(strncmp(name, "plugin_", 7) == 0)
         	{
-        		u32 i = sce_paf_private_strtoul(name + 7, NULL, 10);
+        		u32 i = strtoul(name + 7, NULL, 10);
                 Plugin* plugin = (Plugin*)(plugins.table[i]);
         		context_mode = PLUGINS_CONTEXT;
         		plugin->active = *value;
@@ -1482,9 +1481,9 @@ int vshSetRegistryValuePatched(u32 *option, char *name, int size, int *value)
                 }
                 return 0;
         	}
-            if (sce_paf_private_strncmp(name, "iplugin_", 8) == 0)
+            if (strncmp(name, "iplugin_", 8) == 0)
         	{
-        		u32 i = sce_paf_private_strtoul(name + 8, NULL, 10);
+        		u32 i = strtoul(name + 8, NULL, 10);
                 Plugin* plugin = (Plugin*)(iplugins.table[i]);
         		context_mode = PLUGINS_CONTEXT+1;
         		plugin->active = *value;
@@ -1499,7 +1498,7 @@ int vshSetRegistryValuePatched(u32 *option, char *name, int size, int *value)
         		return 0;
         	}
         }
-        if (sce_paf_private_strcmp(name, "/CONFIG/SYSTEM/XMB/language") == 0)
+        if (strcmp(name, "/CONFIG/SYSTEM/XMB/language") == 0)
         {
             LoadTextLanguage(*value);
         }
@@ -1527,7 +1526,7 @@ void HijackContext(SceRcoEntry *src, char **options, int n)
     {
         SceRcoEntry *base = (SceRcoEntry *)((u32)mlist + mlist->first_child);
 
-        SceRcoEntry *item = (SceRcoEntry *)sce_paf_private_malloc(base->next_entry * n);
+        SceRcoEntry *item = (SceRcoEntry *)malloc(base->next_entry * n);
         u32 *item_param = (u32 *)((u32)item + base->param);
 
         mlist->first_child = (u32)item - (u32)mlist;
@@ -1540,7 +1539,7 @@ void HijackContext(SceRcoEntry *src, char **options, int n)
         {
             char* opt = options[i];
             char* translated = findTranslation(opt);
-            sce_paf_private_memcpy(item, base, base->next_entry);
+            memcpy(item, base, base->next_entry);
 
             item_param[0] = 0xDEAD;
             item_param[1] = (u32)((translated)? translated : opt);
@@ -1572,7 +1571,7 @@ int PAF_Resource_GetPageNodeByID_Patched(void *resource, char *name, SceRcoEntry
     {
         if(is_cfw_config == 1 || is_cfw_config == 2)
         {
-            if(sce_paf_private_strcmp(name, "page_psp_config_umd_autoboot") == 0)
+            if(strcmp(name, "page_psp_config_umd_autoboot") == 0)
             {
                 HijackContext(*child, item_opts[context_mode].c, item_opts[context_mode].n);
             }
@@ -1750,7 +1749,7 @@ void PatchSysconfPlugin(u32 text_addr, u32 text_size)
     }
 
     for (u32 addr=text_addr+0x33000; addr<text_addr+0x40000; addr++){
-        if (sce_paf_private_strcmp((char*)addr, "fiji") == 0){
+        if (strcmp((char*)addr, "fiji") == 0){
             sysconf_unk = addr+216;
             if (_lw(sysconf_unk+4) == 0) sysconf_unk -= 4; // adjust on TT/DT firmware
             sysconf_option = sysconf_unk + 0x4cc; //CHECK
@@ -1768,15 +1767,15 @@ int OnModuleStart(SceModule *mod)
     u32 text_addr = mod->text_addr;
     u32 text_size = mod->text_size;
 
-    if(sce_paf_private_strcmp(modname, "vsh_module") == 0){
+    if(strcmp(modname, "vsh_module") == 0){
         PatchVshMain(text_addr, text_size);
     }
     
-    else if(sce_paf_private_strcmp(modname, "sceVshAuthPlugin_Module") == 0){
+    else if(strcmp(modname, "sceVshAuthPlugin_Module") == 0){
         PatchAuthPlugin(text_addr, text_size);
     }
     
-    else if(sce_paf_private_strcmp(modname, "sysconf_plugin_module") == 0){
+    else if(strcmp(modname, "sysconf_plugin_module") == 0){
         PatchSysconfPlugin(text_addr, text_size);
     }
 

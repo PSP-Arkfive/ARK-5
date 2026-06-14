@@ -58,16 +58,16 @@ char* plugin_folder_blacklist[] = {
 void plugin_list_cleaner(void* item){
     if (item == NULL) return;
     Plugin* plugin = (Plugin*)item;
-    if (plugin->name) sce_paf_private_free(plugin->name);
-    if (plugin->surname) sce_paf_private_free(plugin->surname);
-    if (plugin->path) sce_paf_private_free(plugin->path);
-    if (plugin->runlevel) sce_paf_private_free(plugin->runlevel);
-    sce_paf_private_free(plugin);
+    if (plugin->name) free(plugin->name);
+    if (plugin->surname) free(plugin->surname);
+    if (plugin->path) free(plugin->path);
+    if (plugin->runlevel) free(plugin->runlevel);
+    free(plugin);
 }
 
 static void processCustomLine(char* line){
-    Plugin* plugin = (Plugin*)sce_paf_private_malloc(sizeof(Plugin));
-    sce_paf_private_memset(plugin, 0, sizeof(Plugin));
+    Plugin* plugin = (Plugin*)malloc(sizeof(Plugin));
+    memset(plugin, 0, sizeof(Plugin));
     plugin->path = line;
     plugin->place = cur_place;
     add_list(&plugins, plugin);
@@ -76,20 +76,20 @@ static void processCustomLine(char* line){
 static int processPlugin(char* runlevel, char* path, char* enabled){
     
     int n = plugins.count;
-    Plugin* plugin = (Plugin*)sce_paf_private_malloc(sizeof(Plugin));
-    sce_paf_private_memset(plugin, 0, sizeof(Plugin));
+    Plugin* plugin = (Plugin*)malloc(sizeof(Plugin));
+    memset(plugin, 0, sizeof(Plugin));
 
-    plugin->name = sce_paf_private_malloc(20);
-    sce_paf_private_snprintf(plugin->name, 20, "plugin_%d", n);
+    plugin->name = malloc(20);
+    snprintf(plugin->name, 20, "plugin_%d", n);
 
-    plugin->surname = sce_paf_private_malloc(20);
-    sce_paf_private_snprintf(plugin->surname, 20, "plugins%d", n);
+    plugin->surname = malloc(20);
+    snprintf(plugin->surname, 20, "plugins%d", n);
 
-    plugin->path = sce_paf_private_malloc(strlen(path) + 1);
-    sce_paf_private_strcpy(plugin->path, path);
+    plugin->path = malloc(strlen(path) + 1);
+    strcpy(plugin->path, path);
 
-    plugin->runlevel = sce_paf_private_malloc(strlen(runlevel) + 1);
-    sce_paf_private_strcpy(plugin->runlevel, runlevel);
+    plugin->runlevel = malloc(strlen(runlevel) + 1);
+    strcpy(plugin->runlevel, runlevel);
 
     plugin->place = cur_place;
     plugin->active = isRunlevelEnabled(enabled);
@@ -102,17 +102,17 @@ static int processPlugin(char* runlevel, char* path, char* enabled){
 static int processInstallablePlugin(char* plugin_name, int place){
 
     int n = iplugins.count;
-    Plugin* plugin = sce_paf_private_malloc(sizeof(Plugin));
-    sce_paf_private_memset(plugin, 0, sizeof(Plugin));
+    Plugin* plugin = malloc(sizeof(Plugin));
+    memset(plugin, 0, sizeof(Plugin));
 
-    plugin->name = sce_paf_private_malloc(20);
+    plugin->name = malloc(20);
     sprintf(plugin->name, "iplugin_%d", n);
 
-    plugin->surname = sce_paf_private_malloc(20);
+    plugin->surname = malloc(20);
     sprintf(plugin->surname, "iplugins%d", n);
 
-    plugin->path = sce_paf_private_malloc(sce_paf_private_strlen(plugin_name)+1);
-    sce_paf_private_strcpy(plugin->path, plugin_name);
+    plugin->path = malloc(strlen(plugin_name)+1);
+    strcpy(plugin->path, plugin_name);
 
     plugin->place = place;
 
@@ -142,15 +142,15 @@ void loadPlugins(){
 
     if (plugins.count == 0){
         // Add example plugin
-        Plugin* plugin = (Plugin*)sce_paf_private_malloc(sizeof(Plugin));
-        plugin->name = (char*)sce_paf_private_malloc(20);
-        plugin->surname = (char*)sce_paf_private_malloc(20);
-        plugin->path = (char*)sce_paf_private_malloc(sce_paf_private_strlen(sample_plugin_path)+1);
+        Plugin* plugin = (Plugin*)malloc(sizeof(Plugin));
+        plugin->name = (char*)malloc(20);
+        plugin->surname = (char*)malloc(20);
+        plugin->path = (char*)malloc(strlen(sample_plugin_path)+1);
         plugin->active = 1;
         plugin->place = 0;
-        sce_paf_private_strcpy(plugin->name, "plugin_0");
-        sce_paf_private_strcpy(plugin->surname, "plugins0");
-        sce_paf_private_strcpy(plugin->path, sample_plugin_path);
+        strcpy(plugin->name, "plugin_0");
+        strcpy(plugin->surname, "plugins0");
+        strcpy(plugin->path, sample_plugin_path);
         add_list(&plugins, plugin);
     }
 }
@@ -233,7 +233,7 @@ int isPluginDirBlacklisted(char* plugin_dir){
 
 static void findInstallablePluginsSubfolder(int place, char* subfolder){
     char fullpath[128];
-    sce_paf_private_strcpy(fullpath, plugins_paths[place]);
+    strcpy(fullpath, plugins_paths[place]);
     strcat(fullpath, subfolder);
 
     SceUID dir = sceIoDopen(fullpath);
@@ -242,14 +242,14 @@ static void findInstallablePluginsSubfolder(int place, char* subfolder){
 
     while ((sceIoDread(dir, &dit)) > 0){
         if (dit.d_name[0] == '.') continue;
-        char* ext = sce_paf_private_strrchr(dit.d_name, '.');
+        char* ext = strrchr(dit.d_name, '.');
         if (    ext &&
                 strcasecmp(ext, ".prx") == 0 &&
                 !isPluginBlacklisted(dit.d_name) &&
                 !isPluginInstalled(plugins_paths[place], dit.d_name)
             ){
             char plugin_name[64];
-            sce_paf_private_sprintf(plugin_name, "%s/%s", subfolder, dit.d_name);
+            sprintf(plugin_name, "%s/%s", subfolder, dit.d_name);
             processInstallablePlugin(plugin_name, place);
         }
     }
@@ -271,7 +271,7 @@ void findInstallablePlugins(){
                     findInstallablePluginsSubfolder(i, dit.d_name);
                 continue;
             }
-            char* ext = sce_paf_private_strrchr(dit.d_name, '.');
+            char* ext = strrchr(dit.d_name, '.');
             if (    ext &&
                     strcasecmp(ext, ".prx") == 0 &&
                     !isPluginBlacklisted(dit.d_name) &&
@@ -299,7 +299,7 @@ void installPlugin(Plugin* plugin, char* opt){
     if (opt == NULL) opt = runlevels[plugin->active];
 
     char txtpath[128];
-    sce_paf_private_strcpy(txtpath, plugins_paths[plugin->place]);
+    strcpy(txtpath, plugins_paths[plugin->place]);
     strcat(txtpath, PLUGINS_FILE);
 
     SceUID fd = sceIoOpen(txtpath, PSP_O_WRONLY|PSP_O_CREAT|PSP_O_APPEND, 0777);
@@ -315,9 +315,9 @@ void installPlugin(Plugin* plugin, char* opt){
 
 char* getPluginName(char* plugin_path, char* file){
 
-    char *p = sce_paf_private_strrchr(plugin_path, '/');
+    char *p = strrchr(plugin_path, '/');
     if (!p)
-        p = sce_paf_private_strchr(plugin_path, ',');
+        p = strchr(plugin_path, ',');
     if (p)
     {
         p = strtrim(p+1);
@@ -328,11 +328,11 @@ char* getPluginName(char* plugin_path, char* file){
     }
     
     int len = strlen(p);
-    char *p2 = sce_paf_private_strchr(p + 1, '.');
+    char *p2 = strchr(p + 1, '.');
     
     if(p2) len = (int)(p2 - p);
 
-    sce_paf_private_strncpy(file, p, len);
+    strncpy(file, p, len);
     file[len] = '\0';
 
     return file;

@@ -24,7 +24,7 @@ u32 eeprom_write(u8 addr, u16 data) {
     param[0x0F] = data;
     param[0x10] = data >> 8;
 
-    sce_paf_private_memset(&args, 0, sizeof(args));
+    memset(&args, 0, sizeof(args));
     args.arg1 = (int)param;
     kuKernelCall(SysconCmdExec, &args);
     res = args.ret1;
@@ -47,7 +47,7 @@ u32 eeprom_read(u8 addr) {
     param[0x0D] = 3;
     param[0x0E] = addr;
 
-    sce_paf_private_memset(&args, 0, sizeof(args));
+    memset(&args, 0, sizeof(args));
     args.arg1 = (int)param;
     kuKernelCall(SysconCmdExec, &args);
     res = args.ret1;
@@ -118,11 +118,11 @@ int battery_init(void) {
     SysregGetTachyonVersion = (u32 (*)(void))sctrlHENFindFunction("sceLowIO_Driver", "sceSysreg_driver", 0xE2A5D1EE);
     SysconCmdExec = (int (*)(u8*, int))sctrlHENFindFunction("sceSYSCON_Driver", "sceSyscon_driver", 0x5B9ACC97);
 
-    sce_paf_private_memset(&args, 0, sizeof(args));
+    memset(&args, 0, sizeof(args));
     args.arg1 = (int)&baryon;
     kuKernelCall(SysconGetBaryonVersion, &args);
 
-    sce_paf_private_memset(&args, 0, sizeof(args));
+    memset(&args, 0, sizeof(args));
     kuKernelCall(SysregGetTachyonVersion, &args);
     tachyon = args.ret1;
 

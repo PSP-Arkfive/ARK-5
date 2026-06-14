@@ -138,7 +138,7 @@ void ProcessConfigFile(char* path, int (process_line)(char*, char*, char*), void
         int fsize = sceIoLseek(fd, 0, PSP_SEEK_END);
         sceIoLseek(fd, 0, PSP_SEEK_SET);
 
-        u8* buf = sce_paf_private_malloc(fsize+1);
+        u8* buf = malloc(fsize+1);
         if (buf == NULL){
             sceIoClose(fd);
             return;
@@ -149,7 +149,7 @@ void ProcessConfigFile(char* path, int (process_line)(char*, char*, char*), void
         buf[fsize] = 0;
 
         // Allocate Line Buffer
-        char* line = sce_paf_private_malloc(LINE_BUFFER_SIZE);        
+        char* line = malloc(LINE_BUFFER_SIZE);        
         // Buffer Allocation Success
         if(line != NULL)
         {
@@ -159,18 +159,18 @@ void ProcessConfigFile(char* path, int (process_line)(char*, char*, char*), void
             while ((nread=readLine((char*)buf+total_read, line))>0)
             {
                 total_read += nread;
-                char* dupline = sce_paf_private_malloc(strlen(line)+1);
+                char* dupline = malloc(strlen(line)+1);
                 strcpy(dupline, line);
                 // Process Line
                 if (processLine(strtrim(line), process_line)){
-                    sce_paf_private_free(dupline);
+                    free(dupline);
                 }
                 else{
                     process_custom(dupline);
                 }
             }
-            sce_paf_private_free(line);
+            free(line);
         }
-        sce_paf_private_free(buf);
+        free(buf);
     }
 }

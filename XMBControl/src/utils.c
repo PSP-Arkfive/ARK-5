@@ -71,10 +71,6 @@ int utf8_to_unicode(wchar_t *dest, char *src)
     return x;
 }
 
-int atoi(const char* txt){
-    return sce_paf_private_strtoul(txt, NULL, 10);
-}
-
 // Whitespace Detection
 int isspace(int c)
 {

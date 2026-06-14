@@ -22,6 +22,10 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 #include <systemctrl_ark.h>
 #include <rebootexconfig.h>
 #include <systemctrl.h>
@@ -141,27 +145,9 @@ int vshcube_init();
 void findAllTranslatableStrings();
 int OnModuleStart(SceModule *mod);
 
-int sce_paf_private_wcslen(wchar_t *);
-int sce_paf_private_wcscpy(wchar_t* str1, wchar_t* str2);
-int sce_paf_private_wcsprintf(wchar_t* string, int len, wchar_t* buf, ...);
-int sce_paf_private_sprintf(char *, const char *, ...);
-int sce_paf_private_snprintf(char *, int, const char *, ...);
-void *sce_paf_private_memcpy(void *, void *, int);
-void *sce_paf_private_memset(void *, char, int);
-int sce_paf_private_strlen(char *);
-char *sce_paf_private_strcpy(char *, const char *);
-char *sce_paf_private_strncpy(char *, const char *, int);
-int sce_paf_private_strcmp(const char *, const char *);
-int sce_paf_private_strncmp(const char *, const char *, int);
-int sce_paf_private_strcat(char *, const char *);
-char *sce_paf_private_strchr(const char *, int);
-char *sce_paf_private_strrchr(const char *, int);
-int sce_paf_private_strpbrk(const char *, const char *);
-int sce_paf_private_strtoul(const char *, char **, int);
-void *sce_paf_private_malloc(int);
-void sce_paf_private_free(void *);
+char * strtrim(char * text);
 
-wchar_t *scePafGetText(void *, char *);
+wchar_t* scePafGetText(void *, char *);
 int PAF_Resource_GetPageNodeByID(void *, char *, SceRcoEntry **);
 int PAF_Resource_ResolveRefWString(void *, u32 *, int *, char **, int *);
 

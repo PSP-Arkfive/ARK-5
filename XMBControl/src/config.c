@@ -187,7 +187,7 @@ static void processCustomConfig(char* line){
 }
 
 void list_cleaner(void* item){
-    sce_paf_private_free(item);
+    free(item);
 }
 
 void loadSettings(){
@@ -278,7 +278,7 @@ void saveSettings(){
         fd = sceIoOpen(path, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, 0777);
     }
 
-    char* line = sce_paf_private_malloc(LINE_BUFFER_SIZE);
+    char* line = malloc(LINE_BUFFER_SIZE);
 
     processSetting(fd, line, "usbcharge", config.usbcharge);
 
@@ -342,5 +342,5 @@ void saveSettings(){
 
     sceIoClose(fd);
 
-    sce_paf_private_free(line);
+    free(line);
 }
