@@ -58,6 +58,7 @@ struct LbaParams {
 struct IsoOpenSlot {
     int enabled;
     u32 offset;
+	u32 last_read_byte_pos;
 };
 
 struct IoIoctlSeekCmd {
@@ -85,6 +86,8 @@ static const char *g_umd_ids[] = {
 
 // 0x00002480
 int g_game_fix_type = 0;
+
+static int ioctl_seeking = 0;
 
 int inferno_mount(SceSize args, void *arg)
 {
@@ -220,6 +223,7 @@ static int IoOpen(PspIoDrvFileArg *arg, char *file, int flags, SceMode mode)
     arg->arg = (void*)i;
     g_open_slot[i].enabled = 1;
     g_open_slot[i].offset = 0;
+	g_open_slot[i].last_read_byte_pos = 0;
 
     ret = sceKernelSignalSema(g_umd9660_sema_id, 1);
 
@@ -290,6 +294,19 @@ static int IoRead(PspIoDrvFileArg *arg, char *data, int len)
     if(g_total_sectors < offset + len) {
         read_len = g_total_sectors - offset;
     }
+	
+	// per-fd seek delay
+	if (umd_seek) {
+	  u32 read_byte_pos = offset * ISO_SECTOR_SIZE;
+	  u32 last = g_open_slot[idx].last_read_byte_pos;
+	  u32 diff = (last > read_byte_pos) ? last - read_byte_pos : read_byte_pos - last;
+	  sceKernelDelayThread((diff * umd_seek) / 1024);
+	}
+
+	// per-fd speed delay
+	if (umd_speed) {
+	  sceKernelDelayThread(read_len * ISO_SECTOR_SIZE * umd_speed);
+	}
 
     retv = iso_read_with_stack(offset * ISO_SECTOR_SIZE, data, read_len * ISO_SECTOR_SIZE);
 
@@ -307,6 +324,7 @@ static int IoRead(PspIoDrvFileArg *arg, char *data, int len)
     }
 
     g_open_slot[idx].offset += retv;
+	g_open_slot[idx].last_read_byte_pos = (offset + retv) * ISO_SECTOR_SIZE;
     ret = sceKernelSignalSema(g_umd9660_sema_id, 1);
 
     if(ret < 0) {
@@ -370,9 +388,10 @@ static SceOff IoLseek(PspIoDrvFileArg *arg, SceOff ofs, int whence)
     ret = g_open_slot[idx].offset;
 
 exit:
-
-    if (ret>=0) cur_offset = ret;
-
+	if (ret >= 0 && !ioctl_seeking) {
+	  idx = (int)arg->arg;
+	  g_open_slot[idx].last_read_byte_pos = ret * ISO_SECTOR_SIZE;
+	}
     return ret;
 }
 
@@ -421,7 +440,10 @@ static int IoIoctl(PspIoDrvFileArg *arg, unsigned int cmd, void *indata, int inl
         }
 
         seek_cmd = (struct IoIoctlSeekCmd *)indata;
+		ioctl_seeking = 1;
         ret = IoLseek(arg, seek_cmd->offset, seek_cmd->whence);
+		ioctl_seeking = 0;
+		if (ret >=0) ret = 0;
 
         goto exit;
     } else if(cmd == 0x01F30003) {
