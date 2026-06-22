@@ -59,8 +59,6 @@ static int is_compressed = 0;
 // UMD delay
 unsigned char umd_seek = 0;
 unsigned char umd_speed = 0;
-u32 cur_offset = 0;
-u32 last_read_offset = 0;
 
 
 // for libcisoread
@@ -217,21 +215,6 @@ int iso_read_with_stack(u32 offset, void *ptr, u32 data_len)
 
     if(ret < 0) {
         return -1;
-    }
-
-    if (umd_seek){
-        // simulate seek time
-        u32 diff = 0;
-        last_read_offset = offset+data_len;
-        if (cur_offset>last_read_offset) diff = cur_offset-last_read_offset;
-        else diff = last_read_offset-cur_offset;
-        cur_offset = last_read_offset;
-        u32 seek_time = (diff*umd_seek)/1024;
-        sceKernelDelayThread(seek_time);
-    }
-    if (umd_speed){
-        // simulate read time
-        sceKernelDelayThread(data_len*umd_speed);
     }
 
     return retv;
