@@ -117,6 +117,17 @@ static int sceGpioPortReadPatched(void) {
     return GPRValue;
 }
 
+// This patch injects Inferno with no ISO to simulate an empty UMD drive on homebrew
+int (*_sctrlKernelLoadExecVSHWithApitype)(int apitype, const char * file, struct SceKernelLoadExecVSHParam * param) = NULL;
+int sctrlKernelLoadExecVSHWithApitypeNoUMD(int apitype, const char * file, struct SceKernelLoadExecVSHParam * param)
+{
+    if (apitype < 0x123 && apitype > 0x126 && sctrlSEGetBootConfFileIndex() != MODE_INFERNO){ // homebrew API not using Inferno
+        sctrlSESetBootConfFileIndex(MODE_INFERNO); // force inferno to simulate UMD drive
+        sctrlSESetUmdFile(""); // empty UMD drive (makes sceUmdCheckMedium return false)
+    }
+    return _sctrlKernelLoadExecVSHWithApitype(apitype, file, param);
+}
+
 int (*_sceSysconCtrlLEDOrig)(int, int);
 void disableLEDs(){
     if (se_config->noled){
@@ -139,13 +150,15 @@ void disableUMD(){
                 REDIRECT_FUNCTION(f, sceUmdRegisterUMDCallBackPatched);
             }
             // remove umd driver
-            sceIoDelDrv("umd");
+            //sceIoDelDrv("umd");
             // force UMD check medium to always return 0 (no medium)
             u32 CheckMedium = sctrlHENFindFunction("sceUmd_driver", "sceUmdUser", 0x46EBB729);
             if (CheckMedium){
                 MAKE_DUMMY_FUNCTION_RETURN_0(CheckMedium);
             }
         }
+        // patch loadexec to use inferno for UMD drive emulation (needed for some homebrews to load)
+        HIJACK_FUNCTION(K_EXTRACT_IMPORT(sctrlKernelLoadExecVSHWithApitype), sctrlKernelLoadExecVSHWithApitypeNoUMD, _sctrlKernelLoadExecVSHWithApitype);
         // patch GPIO to disable UMD drive electrically
         u32 sceGpioPortRead = sctrlHENFindFunction("sceLowIO_Driver", "sceGpio_driver", 0x4250D44A);
         REDIRECT_FUNCTION(sceGpioPortRead, sceGpioPortReadPatched);
@@ -172,9 +185,6 @@ void processSettings(){
 
     // Disable LED
     disableLEDs();
-
-    // Disable UMD Drive
-    disableUMD();
 }
 
 int PSPOnModuleStart(SceModule * mod){
@@ -227,6 +237,8 @@ int PSPOnModuleStart(SceModule * mod){
         if (se_config->disable_pause){
             disable_PauseGame(mod);
         }
+        // Disable UMD Drive
+        disableUMD();
         goto flush;
     }
 
