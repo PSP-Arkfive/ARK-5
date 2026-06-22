@@ -84,10 +84,22 @@ static const char *g_umd_ids[] = {
     "ULAS-42009",
 };
 
+static const char *djmax_umd_ids[] = {
+    "ULKS-46116",
+    "ULKS-46189",
+    "ULJM-06034",
+    "ULKS-46190",
+	"ULKS-46191",
+	"ULKS-46240",
+	"ULKS-46236",
+	"ULUS-10538",
+	"ULJM-05836",
+};
+
 // 0x00002480
 int g_game_fix_type = 0;
 
-static int ioctl_seeking = 0;
+static u32 global_head_pos = 0;
 
 int inferno_mount(SceSize args, void *arg)
 {
@@ -109,6 +121,13 @@ int inferno_mount(SceSize args, void *arg)
             goto out;
         }
     }
+	
+    for(i=0; i<NELEMS(djmax_umd_ids); ++i) {
+        if(0 == memcmp(g_read_arg.address + 0x00000373, djmax_umd_ids[i], 10)) {
+            g_game_fix_type = 3;
+            goto out;
+        }
+    }	
 
     if(g_game_fix_type) {
         goto out;
@@ -223,7 +242,7 @@ static int IoOpen(PspIoDrvFileArg *arg, char *file, int flags, SceMode mode)
     arg->arg = (void*)i;
     g_open_slot[i].enabled = 1;
     g_open_slot[i].offset = 0;
-	g_open_slot[i].last_read_byte_pos = 0;
+	g_open_slot[i].last_read_byte_pos = global_head_pos;
 
     ret = sceKernelSignalSema(g_umd9660_sema_id, 1);
 
@@ -294,7 +313,7 @@ static int IoRead(PspIoDrvFileArg *arg, char *data, int len)
     if(g_total_sectors < offset + len) {
         read_len = g_total_sectors - offset;
     }
-	
+
 	// per-fd seek delay
 	if (umd_seek) {
 	  u32 read_byte_pos = offset * ISO_SECTOR_SIZE;
@@ -307,7 +326,7 @@ static int IoRead(PspIoDrvFileArg *arg, char *data, int len)
 	if (umd_speed) {
 	  sceKernelDelayThread(read_len * ISO_SECTOR_SIZE * umd_speed);
 	}
-
+	
     retv = iso_read_with_stack(offset * ISO_SECTOR_SIZE, data, read_len * ISO_SECTOR_SIZE);
 
     if(retv <= 0) {
@@ -325,6 +344,7 @@ static int IoRead(PspIoDrvFileArg *arg, char *data, int len)
 
     g_open_slot[idx].offset += retv;
 	g_open_slot[idx].last_read_byte_pos = (offset + retv) * ISO_SECTOR_SIZE;
+	global_head_pos = g_open_slot[idx].last_read_byte_pos;
     ret = sceKernelSignalSema(g_umd9660_sema_id, 1);
 
     if(ret < 0) {
@@ -388,10 +408,6 @@ static SceOff IoLseek(PspIoDrvFileArg *arg, SceOff ofs, int whence)
     ret = g_open_slot[idx].offset;
 
 exit:
-	if (ret >= 0 && !ioctl_seeking) {
-	  idx = (int)arg->arg;
-	  g_open_slot[idx].last_read_byte_pos = ret * ISO_SECTOR_SIZE;
-	}
     return ret;
 }
 
@@ -440,9 +456,7 @@ static int IoIoctl(PspIoDrvFileArg *arg, unsigned int cmd, void *indata, int inl
         }
 
         seek_cmd = (struct IoIoctlSeekCmd *)indata;
-		ioctl_seeking = 1;
         ret = IoLseek(arg, seek_cmd->offset, seek_cmd->whence);
-		ioctl_seeking = 0;
 		if (ret >=0) ret = 0;
 
         goto exit;
@@ -462,6 +476,9 @@ static int IoIoctl(PspIoDrvFileArg *arg, unsigned int cmd, void *indata, int inl
         }
 
         ret = IoRead(arg, outdata, len);
+		if (g_game_fix_type == 3) {
+		  sceKernelDelayThread(55000);
+		}
         goto exit;
     }
 

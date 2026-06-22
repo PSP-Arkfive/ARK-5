@@ -29,6 +29,10 @@ static char *g_blacklist[] = {
     "seplugins",
     "isocache.bin",
     "irshell",
+	"cso",
+	"dax",
+	"pbp",
+	"ini",
 };
 
 static inline int is_in_blacklist(const char *dname)
@@ -54,17 +58,66 @@ int hideIoDread(SceUID fd, SceIoDirent * dir)
     int k1 = pspSdkSetK1(0);
     int result = sceIoDread(fd, dir);
 
-    if(result > 0 && is_in_blacklist(dir->d_name)) {
-        result = sceIoDread(fd, dir);
+    if(result >= 0 && is_in_blacklist(dir->d_name)) {
+		memset(dir, 0, sizeof(SceIoDirent));
+		if (result == 0) {
+			return 0x80020142;
+		}
+        result = hideIoDread(fd, dir);
     }
 
     pspSdkSetK1(k1);
     return result;
 }
 
-// hide cfw folders, this avoids crashing the weird dj max portable 3 savegame algorithm
+int hideIoGetstat(const char *file, SceIoStat *stat)
+{
+    int k1 = pspSdkSetK1(0);
+    int result = sceIoGetstat(file, stat);
+
+    if(result > 0 && is_in_blacklist(file)) {
+        result = 0x80020142;
+    }
+
+    pspSdkSetK1(k1);
+    return result;
+}
+
+SceUID hideIoOpen(const char *file, int flags, SceMode mode)
+{
+    int k1 = pspSdkSetK1(0);
+    int result = sceIoOpen(file, flags, mode);
+
+    if(result > 0 && is_in_blacklist(file)) {
+        result = 0x80020142;
+    }
+
+    pspSdkSetK1(k1);
+    return result;
+}
+
+SceUID hideIoDopen(const char *dirname)
+{
+    int k1 = pspSdkSetK1(0);
+    int result = sceIoDopen(dirname);
+
+    if(result > 0 && is_in_blacklist(dirname)) {
+        result = 0x80020142;
+    }
+
+    pspSdkSetK1(k1);
+    return result;
+}
+
+// hide cfw folders to fix djmax
 void hide_cfw_folder(SceModule * mod)
 {
     // hide dread
     sctrlHookImportByNID(mod, "IoFileMgrForUser", 0xE3EB004C, &hideIoDread);
+	// hide dopen
+	sctrlHookImportByNID(mod, "IoFileMgrForUser", 0xB29DDF9C, &hideIoDopen);
+	// hide open
+	sctrlHookImportByNID(mod, "IoFileMgrForUser", 0x109F50BC, &hideIoOpen);
+	// hide getstat
+	sctrlHookImportByNID(mod, "IoFileMgrForUser", 0xACE946E8, &hideIoGetstat);
 }

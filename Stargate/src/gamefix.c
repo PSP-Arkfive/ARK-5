@@ -82,24 +82,7 @@ void applyFixesByModule(SceModule* mod){
         // Patch CFW dirs
         hide_cfw_folder(mod);
 
-        if (se_config->umdseek == 0 && se_config->umdspeed == 0){
-            // enable UMD reading speed
-            void (*SetUmdDelay)(int, int) = (void*)sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0xB6522E93);
-            if (SetUmdDelay) SetUmdDelay(2, 2);
-            se_config->umdseek = 2;
-            se_config->umdspeed = 2;
-        }
-
-        // disable Inferno Cache
-        int (*CacheInit)(int, int, int) = (void*)sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0x8CDE7F95);
-        if (CacheInit) CacheInit(0, 0, 0);
-
-        // disable memory stick cache
-        sctrlMsCacheInit(NULL, 0);
-
-        // prevent Inferno Cache and MS Cache from being re-enabled
-        se_config->iso_cache_type = 0;
-        se_config->msspeed = 0;
+		//Read speed fixes under cmd 0x01F30003
     }
 
     sctrlFlushCache();
