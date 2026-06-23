@@ -34,14 +34,13 @@
 PSP_MODULE_INFO("SystemControl", 0x3007, 4, 0);
 
 // default config when none provided by the bootloader
-static ARKConfig _ark_conf = {
+ARKConfig ark_config = {
     .magic = ARK_CONFIG_MAGIC,
     .arkpath = DEFAULT_ARK_PATH,
     .exploit_id = {0}, // None by default
     .exec_mode = DEV_UNK, // set by compat layer
     .recovery = 0,
 };
-ARKConfig* ark_config = &_ark_conf;
 
 
 // Boot Time Entry Point

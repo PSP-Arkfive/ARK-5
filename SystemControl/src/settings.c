@@ -32,7 +32,7 @@
 
 
 
-extern ARKConfig* ark_config;
+extern ARKConfig ark_config;
 extern SEConfigARK se_config;
 
 int settingsLoaded = 0;
@@ -187,7 +187,7 @@ void loadSettings(){
 
         // process settings file
     char path[ARK_PATH_SIZE];
-    strcpy(path, ark_config->arkpath);
+    strcpy(path, ark_config.arkpath);
     strcat(path, ARK_SETTINGS);
     if (processConfigFile(NULL, path, settingsEnabler, settingsDisabler) < 0) // try external settings
         processConfigFile(NULL, ARK_SETTINGS_FLASH, settingsEnabler, settingsDisabler); // retry flash1 settings

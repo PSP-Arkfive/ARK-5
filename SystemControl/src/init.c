@@ -32,7 +32,7 @@
 
 
 extern SEConfigARK se_config;
-extern ARKConfig* ark_config;
+extern ARKConfig ark_config;
 
 // init.prx Text Address
 u32 sceInitTextAddr = 0;
@@ -42,24 +42,24 @@ int (* customStartModule)(int modid, SceSize argsize, void * argp, int * modstat
 
 
 static void checkArkPath(){
-    if (strcmp(ark_config->arkpath, SEPLUGINS_MS0) == 0){ // attempt revert to default path 
-        strcpy(ark_config->arkpath, DEFAULT_ARK_PATH_GO);
+    if (strcmp(ark_config.arkpath, SEPLUGINS_MS0) == 0){ // attempt revert to default path 
+        strcpy(ark_config.arkpath, DEFAULT_ARK_PATH_GO);
     }
-    int res = sceIoDopen(ark_config->arkpath);
+    int res = sceIoDopen(ark_config.arkpath);
     if (res < 0){
         // fix for PSP-Go with dead ef (or non-Go units)
-        if (ark_config->arkpath[0]=='e' && ark_config->arkpath[1]=='f'){
-            ark_config->arkpath[0] = 'm'; ark_config->arkpath[1] = 's';
+        if (ark_config.arkpath[0]=='e' && ark_config.arkpath[1]=='f'){
+            ark_config.arkpath[0] = 'm'; ark_config.arkpath[1] = 's';
         }
         else {
-            ark_config->arkpath[0] = 'e'; ark_config->arkpath[1] = 'f';
+            ark_config.arkpath[0] = 'e'; ark_config.arkpath[1] = 'f';
         }
-        if ((res=sceIoDopen(ark_config->arkpath))>=0){
+        if ((res=sceIoDopen(ark_config.arkpath))>=0){
             sceIoDclose(res);
             return;
         }
         // no ARK install folder, default to SEPLUGINS
-        strcpy(ark_config->arkpath, SEPLUGINS_MS0);
+        strcpy(ark_config.arkpath, SEPLUGINS_MS0);
         sceIoMkdir(SEPLUGINS_MS0, 0777);
     }
     else{
@@ -80,7 +80,7 @@ static int InitKernelStartModule(int modid, SceSize argsize, void * argp, int * 
     // VSH replacement
     if (strcmp(modname, "vsh_module") == 0){
         // system in recovery or launcher mode
-        if (ark_config->recovery || ark_config->launcher[0] || se_config.launcher_mode){
+        if (ark_config.recovery || ark_config.launcher[0] || se_config.launcher_mode){
             int (*LoadExecForKernel_AA2029EC)() = (int(*)())sctrlHENFindFunction("sceLoadExec", "LoadExecForKernel", 0xAA2029EC);
             if (LoadExecForKernel_AA2029EC) LoadExecForKernel_AA2029EC();
             sctrlArkExitLauncher(); // reboot VSH into custom menu

@@ -628,12 +628,12 @@ int sctrlIsLoadingPlugins(){
 
 ARKConfig* sctrlArkGetConfig(ARKConfig* conf){
     if (conf){
-        memcpy(conf, ark_config, sizeof(ARKConfig));
+        memcpy(conf, &ark_config, sizeof(ARKConfig));
         return conf;
     }
-    return ark_config;
+    return &ark_config;
 }
 
 void sctrlArkSetConfig(ARKConfig* conf){
-	if (conf) memcpy(ark_config, conf, sizeof(ARKConfig));
+	if (conf) memcpy(&ark_config, conf, sizeof(ARKConfig));
 }

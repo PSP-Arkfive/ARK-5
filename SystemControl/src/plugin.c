@@ -32,7 +32,7 @@
 
 
 
-extern ARKConfig* ark_config;
+extern ARKConfig ark_config;
 extern SEConfigARK se_config;
 
 #define MAX_PLUGINS 64
@@ -115,9 +115,9 @@ void loadPlugins(){
     
     // Open Plugin Config from ARK's installation folder
     char path[ARK_PATH_SIZE];
-    strcpy(path, ark_config->arkpath);
+    strcpy(path, ark_config.arkpath);
     strcat(path, PLUGINS_FILE);
-    processConfigFile(ark_config->arkpath, path, addPlugin, removePlugin);
+    processConfigFile(ark_config.arkpath, path, addPlugin, removePlugin);
     
     // Open Plugin Config from SEPLUGINS
     processConfigFile(SEPLUGINS_MS0, PLUGINS_PATH, addPlugin, removePlugin);

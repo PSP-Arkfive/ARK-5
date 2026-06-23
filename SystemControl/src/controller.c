@@ -16,7 +16,7 @@
 #define MUTE_MASK (PSP_CTRL_VOLUP | PSP_CTRL_VOLDOWN)
 
 extern SEConfigARK se_config;
-extern ARKConfig* ark_config;
+extern ARKConfig ark_config;
 extern int disable_plugins;
 extern int disable_settings;
 
@@ -37,7 +37,7 @@ static int exitVsh(){
     if (setHoldMode) setHoldMode(0);
 
     // reset some flags
-    ark_config->recovery = 0;
+    ark_config.recovery = 0;
     SetUmdFile(NULL);
     sctrlSESetBootConfFileIndex(MODE_UMD);
 
@@ -207,7 +207,7 @@ int read_negative(SceCtrlData * pad_data, int count)
     return count;
 }
 static int isRecoveryMode(){
-    if (ark_config->recovery) return 1; // recovery mode set
+    if (ark_config.recovery) return 1; // recovery mode set
     char* filename = sceKernelInitFileName();
     if (filename == NULL) return 0; // not running any app
     // check if running a recovery app

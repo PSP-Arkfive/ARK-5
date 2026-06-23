@@ -28,7 +28,7 @@
 #include "rebootex.h"
 
 
-extern ARKConfig* ark_config;
+extern ARKConfig ark_config;
 extern SEConfig se_config;
 
 // Original Load Reboot Buffer Function
@@ -58,7 +58,7 @@ void backupRebootBuffer(void)
     
     // Copy ARK runtime Config
     if (IS_ARK_CONFIG(ARK_CONFIG))
-        memcpy(ark_config, (void*)ARK_CONFIG, sizeof(ARKConfig));
+        memcpy(&ark_config, (void*)ARK_CONFIG, sizeof(ARKConfig));
     
     // Flush Cache
     sctrlFlushCache();
@@ -86,7 +86,7 @@ void restoreRebootBuffer(void)
     memcpy((void *)REBOOTEX_CONFIG, &rebootex_config, sizeof(RebootexConfigARK));
 
     // Restore ARK Configuration
-    memcpy((void*)ARK_CONFIG, ark_config, sizeof(ARKConfig));
+    memcpy((void*)ARK_CONFIG, &ark_config, sizeof(ARKConfig));
 }
 
 // Reboot Buffer Loader

@@ -27,13 +27,13 @@
 #include <systemctrl_se.h>
 
 
-extern ARKConfig* ark_config;
+extern ARKConfig ark_config;
 
 
 int sctrlArkIsLauncher(){
     char path[ARK_PATH_SIZE];
-    strcpy(path, ark_config->arkpath);
-    if (ark_config->launcher[0]) strcat(path, ark_config->launcher);
+    strcpy(path, ark_config.arkpath);
+    if (ark_config.launcher[0]) strcat(path, ark_config.launcher);
     else                         strcat(path, VBOOT_PBP);
     return (strcmp(path, sceKernelInitFileName())==0);
 }
@@ -56,9 +56,9 @@ int sctrlArkExitLauncher()
 
     // set exit app
     char path[ARK_PATH_SIZE];
-    strcpy(path, ark_config->arkpath);
-    if (ark_config->recovery) strcat(path, ARK_RECOVERY);
-    else if (ark_config->launcher[0]) strcat(path, ark_config->launcher);
+    strcpy(path, ark_config.arkpath);
+    if (ark_config.recovery) strcat(path, ARK_RECOVERY);
+    else if (ark_config.launcher[0]) strcat(path, ark_config.launcher);
     else strcat(path, VBOOT_PBP);
 
     int (*setHoldMode)(int) = (void*)sctrlHENFindFunction("sceDisplay_Service", "sceDisplay", 0x7ED59BC4);
@@ -80,12 +80,12 @@ int sctrlArkExitLauncher()
         param.argp = path;
         param.key = "game";
         // Trigger Reboot
-        ark_config->recovery = 0; // reset recovery mode for next reboot
+        ark_config.recovery = 0; // reset recovery mode for next reboot
         sctrlKernelLoadExecVSHWithApitype(0x141, path, &param);
     }
-    else if (ark_config->recovery){
+    else if (ark_config.recovery){
         // no recovery app? try classic module
-        strcpy(path, ark_config->arkpath);
+        strcpy(path, ark_config.arkpath);
         strcat(path, RECOVERY_PRX);
         res = sceIoGetstat(path, &stat);
         if (res < 0){
@@ -95,13 +95,13 @@ int sctrlArkExitLauncher()
         SceUID modid = sceKernelLoadModule(path, 0, NULL);
         if(modid >= 0) {
         	sceKernelStartModule(modid, strlen(path) + 1, path, NULL, NULL);
-        	ark_config->recovery = 0; // reset recovery mode for next reboot
-        	ark_config->launcher[0] = 0; // reset launcher mode for next reboot
+        	ark_config.recovery = 0; // reset recovery mode for next reboot
+        	ark_config.launcher[0] = 0; // reset launcher mode for next reboot
         	pspSdkSetK1(k1);
         	return 0;
         }
     }
 
-    ark_config->recovery = 0;
+    ark_config.recovery = 0;
     return sctrlKernelExitVSH(NULL);
 }

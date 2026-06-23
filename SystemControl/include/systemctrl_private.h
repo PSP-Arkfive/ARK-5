@@ -31,7 +31,7 @@ extern "C"{
  * only functions of systemctrl.prx.
  */
 
-extern ARKConfig* ark_config;
+extern ARKConfig ark_config;
 
 // Get PSID hash
 int sctrlKernelGetPSIDHash(unsigned char psidHash[16]);

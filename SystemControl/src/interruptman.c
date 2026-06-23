@@ -25,7 +25,7 @@
 #include <systemctrl.h>
 
 
-extern ARKConfig* ark_config;
+extern ARKConfig ark_config;
 
 // Interrupt Manager Patch
 SceModule* patchInterruptMan(void)

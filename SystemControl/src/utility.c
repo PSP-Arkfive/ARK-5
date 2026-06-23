@@ -16,7 +16,7 @@ typedef struct {
     char* libname; // prx name in LIBS folder
 } CustomUtilityModule;
 
-extern ARKConfig* ark_config;
+extern ARKConfig ark_config;
 
 static CustomUtilityModule custom_utility_modules[] = {
     {PSP_MODULE_NET_FTP,           -1, PSPFTP_PRX},
@@ -72,7 +72,7 @@ static int findModulePath(CustomUtilityModule* module, char* path){
     if (sceIoGetstat(path, &stat) >= 0) return 0; // found
     
     // try in ark path
-    strcpy(path, ark_config->arkpath);
+    strcpy(path, ark_config.arkpath);
     strcat(path, module->prxname);
 
     if (sceIoGetstat(path, &stat) >= 0) return 0; // found

@@ -256,7 +256,7 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
                     break;
             }
 
-            ark_config->recovery = 0; // reset recovery mode for next reboot
+            ark_config.recovery = 0; // reset recovery mode for next reboot
 
             // Boot Complete Action done
             booted = 1;

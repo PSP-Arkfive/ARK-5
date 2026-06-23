@@ -419,13 +419,13 @@ int sctrlHENIsToolKit()
     int k1 = pspSdkSetK1(0);
     int level = sctrlKernelSetUserLevel(8);
 
-    if (ark_config->exec_mode == PSP_ORIG){
+    if (ark_config.exec_mode == PSP_ORIG){
         SceIoStat stat;
         if (sceIoGetstat("flash0:/kd/vshbridge_tool.prx", &stat) >= 0)
-            ark_config->exec_mode = PSP_TOOL;
+            ark_config.exec_mode = PSP_TOOL;
     }
 
-    if (ark_config->exec_mode == PSP_TOOL){
+    if (ark_config.exec_mode == PSP_TOOL){
         int baryon_ver = 0;
         int (*getBaryonVer)(void*) = (void*)sctrlHENFindFunction("sceSYSCON_Driver", "sceSyscon_driver", 0x7EC5A957);
         if (getBaryonVer) getBaryonVer(&baryon_ver);
