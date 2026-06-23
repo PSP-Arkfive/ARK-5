@@ -27,7 +27,9 @@ OBJS = \
 	src/exitgame.o \
 	src/controller.o \
 	src/gameinfo.o \
+	src/configparser.o \
 	src/plugin.o \
+	src/settings.o \
 	src/leda.o \
 	src/psnfix.o \
 	src/cpuclock.o   \

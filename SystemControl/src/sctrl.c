@@ -31,6 +31,7 @@
 #include <systemctrl_se.h>
 #include <systemctrl_ark.h>
 
+#include "config.h"
 #include "rebootex.h"
 #include "nidresolver.h"
 #include "modulemanager.h"
@@ -619,6 +620,10 @@ int sctrlKernelQuerySystemCall(void *func_addr)
     int ret = sceKernelQuerySystemCall(func_addr);
     pspSdkSetK1(k1);
     return ret;
+}
+
+int sctrlIsLoadingPlugins(){
+    return is_plugins_loading;
 }
 
 ARKConfig* sctrlArkGetConfig(ARKConfig* conf){

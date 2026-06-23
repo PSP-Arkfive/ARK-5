@@ -28,7 +28,7 @@
 
 #include "modulemanager.h"
 #include "nidresolver.h"
-#include "plugin.h"
+#include "config.h"
 #include "elf.h"
 #include "loadercore.h"
 #include "cryptography.h"

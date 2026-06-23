@@ -26,7 +26,7 @@
 #include <systemctrl_se.h>
 #include <systemctrl_ark.h>
 
-#include "plugin.h"
+#include "config.h"
 #include "controller.h"
 #include "gameinfo.h"
 

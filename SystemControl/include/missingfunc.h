@@ -34,6 +34,9 @@ char * strtok(char * s, const char * delim);
 char * strtok_r(char * s, const char * delim, char ** last);
 int strtol10(const char * str, int * res);
 int strcasecmp(const char * a, const char * b);
+int lowerString(char*, char*, int);
+char * strtrim(char * text);
+
 
 #endif
 

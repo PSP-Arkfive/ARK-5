@@ -150,7 +150,7 @@ void disableUMD(){
                 REDIRECT_FUNCTION(f, sceUmdRegisterUMDCallBackPatched);
             }
             // remove umd driver
-            //sceIoDelDrv("umd");
+            sceIoDelDrv("umd");
             // force UMD check medium to always return 0 (no medium)
             u32 CheckMedium = sctrlHENFindFunction("sceUmd_driver", "sceUmdUser", 0x46EBB729);
             if (CheckMedium){
@@ -162,6 +162,35 @@ void disableUMD(){
         // patch GPIO to disable UMD drive electrically
         u32 sceGpioPortRead = sctrlHENFindFunction("sceLowIO_Driver", "sceGpio_driver", 0x4250D44A);
         REDIRECT_FUNCTION(sceGpioPortRead, sceGpioPortReadPatched);
+    }
+}
+
+int (* _sceIoAddDrv)(PspIoDrv *drv);
+int sceIoAddDrvHook(PspIoDrv *drv){
+    if (strcmp(drv->name, "fatef")==0 || strcmp(drv->name, "fateh")==0){
+    	return 0;
+    }
+    return _sceIoAddDrv(drv);
+}
+
+int (* _sceIoAssign)(const char *dev1, const char *dev2, const char *dev3, int mode, void* unk1, long unk2);
+int sceIoAssignHook(const char *dev1, const char *dev2, const char *dev3, int mode, void* unk1, long unk2){
+    if (strcmp(dev1, "ef0")==0 || strcmp(dev1, "eh0")==0 || strcmp(dev1, "fatef0")==0 || strcmp(dev1, "fateh0")==0 || strncmp(dev1, "eflash", 6)==0){
+    	return 0;
+    }
+    return _sceIoAssign(dev1, dev2, dev3, mode, unk1, unk2);
+}
+
+void disableEf0(){
+    if (se_config->deadef && psp_model == PSP_GO){
+        // remove ef0 driver
+        sceIoDelDrv("fatef");
+        sceIoDelDrv("fateh");
+        // patch driver functions
+        u32 IoAddDrv = sctrlHENFindFunction("sceIOFileManager", "IoFileMgrForKernel", 0x8E982A74);
+        u32 IoAssign = sctrlHENFindFunction("sceIOFileManager", "IoFileMgrForKernel", 0xB2A628C1);
+        HIJACK_FUNCTION(IoAddDrv, sceIoAddDrvHook, _sceIoAddDrv);
+        HIJACK_FUNCTION(IoAssign, sceIoAssignHook, _sceIoAssign);
     }
 }
 
@@ -239,6 +268,7 @@ int PSPOnModuleStart(SceModule * mod){
         }
         // Disable UMD Drive
         disableUMD();
+        disableEf0();
         goto flush;
     }
 

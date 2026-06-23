@@ -27,5 +27,12 @@ extern int is_plugins_loading;
 void loadPlugins();
 void loadSettings();
 
+int processConfigFile(
+    const char* parent,
+    const char* path,
+    void (*enabler)(const char*),
+    void (*disabler)(const char*)
+);
+
 #endif
 
