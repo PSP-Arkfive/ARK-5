@@ -41,8 +41,6 @@
 #include "gameinfo.h"
 #include "systemctrl_private.h"
 
-// Missing from SDK
-#define PSP_INIT_APITYPE_EF2 0x152
 
 // Load Execute Module via Kernel Internal Function
 int (* _sceLoadExecVSHWithApitype)(int, const char*, struct SceKernelLoadExecVSHParam*, unsigned int) = NULL;
