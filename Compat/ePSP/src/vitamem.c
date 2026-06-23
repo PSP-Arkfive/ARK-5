@@ -15,6 +15,8 @@
 
 extern SEConfigARK* se_config;
 
+int highmem_enabled = 1;
+
 int unlockVitaMemory(u32 user_size_mib){
 
     int apitype = sceKernelInitApitype(); // prevent in pops and vsh
@@ -70,7 +72,9 @@ int memoryHandlerVita(u32 p2){
 SceUID (*origAllocPartitionMemory)(int partition, char* name, int place, int size, void* addr) = NULL;
 SceUID extraAllocPartitionMemory(int partition, char* name, int place, int size, void* addr){
     // adjust partition
-    if (partition == 2 && addr == NULL &&
+    if (addr == NULL &&
+        partition == 2 &&
+        highmem_enabled &&
         !se_config->force_high_memory &&
         sctrlIsLoadingPlugins()
     ){
