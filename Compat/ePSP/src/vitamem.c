@@ -47,7 +47,7 @@ int unlockVitaMemory(u32 user_size_mib){
 int (*_sctrlHENApplyMemory)(u32) = NULL;
 int memoryHandlerVita(u32 p2){
     // sanity checks
-    if (p2<=24) return -1;
+    if (p2<=24 || !highmem_enabled) return -1;
 
     // the first 16MB are stable and good enough for most use cases
     // but homebrew that require extra ram will be allowed to use (some of) the upper 16MB
