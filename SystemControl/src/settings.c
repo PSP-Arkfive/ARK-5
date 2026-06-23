@@ -113,6 +113,9 @@ static void settingsHandler(const char* path, u8 enabled){
     else if (strcasecmp(path, "noumd") == 0){
         se_config.noumd = enabled;
     }
+    else if (strcasecmp(path, "deadef") == 0){
+        se_config.deadef = enabled;
+    }
     else if (strcasecmp(path, "noanalog") == 0){
         se_config.noanalog = enabled;
     }

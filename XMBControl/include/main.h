@@ -69,6 +69,7 @@ typedef struct
     u8 hidedlc;
     u8 noled;
     u8 noumd;
+    u8 deadef;
     u8 noanalog;
     u8 vitamute;
     u8 umdregion;

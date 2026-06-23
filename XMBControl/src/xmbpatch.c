@@ -94,6 +94,7 @@ enum{
     HIDE_DLC,
     DISABLE_LED,
     DISABLE_UMD,
+    DISABLE_EF0,
     DISABLE_ANALOG,
     VITA_MUTE,
     UMD_REGION,
@@ -113,47 +114,16 @@ enum {
 };
 
 #define PLUGINS_CONTEXT 2
+#define ITEM_OPT(i) { NELEMS(i), i }
 
 typedef struct
 {
     int mode;
     int negative;
     char *item;
-} GetItem;
+} XmbControlItem;
 
-GetItem GetItemes[] =
-{
-    { SYSTEM_OPTIONS      +PLUGINS_CONTEXT+2, 0, "System Options" },
-    { ACTIVATE_CODECS     +PLUGINS_CONTEXT+2, 0, "Activate Flash and WMA Codecs" },
-    { USB_DEVICE          +PLUGINS_CONTEXT+2, 0, "USB Device" },
-    { USB_READONLY        +PLUGINS_CONTEXT+2, 0, "USB Read-Only" },
-    { USB_CHARGE          +PLUGINS_CONTEXT+2, 0, "USB Charge" },
-    { CPU_CLOCK_GAME      +PLUGINS_CONTEXT+2, 0, "CPU Clock in Game" },
-    { CPU_CLOCK_VSH       +PLUGINS_CONTEXT+2, 0, "CPU Clock in XMB" },
-    { WPA2_SUPPORT        +PLUGINS_CONTEXT+2, 0, "WPA2 Support" },
-    { AUTOBOOT_LAUNCHER   +PLUGINS_CONTEXT+2, 0, "Autoboot Launcher" },
-    { USE_EXTRA_MEM       +PLUGINS_CONTEXT+2, 0, "Use Extra Memory" },
-    { MEM_STICK_SPEEDUP   +PLUGINS_CONTEXT+2, 0, "Memory Stick Speedup" },
-    { INFERNO_CACHE       +PLUGINS_CONTEXT+2, 0, "Inferno Cache" },
-    { DISABLE_GO_PAUSE    +PLUGINS_CONTEXT+2, 0, "Disable PSP Go Pause" },
-    { OLD_GO_PLUGINS      +PLUGINS_CONTEXT+2, 0, "Old Plugins on ef0" },
-    { NO_HIB_DELETE       +PLUGINS_CONTEXT+2, 0, "Prevent hibernation deletion on PSP Go" },
-    { SKIP_LOGOS          +PLUGINS_CONTEXT+2, 0, "Skip Sony logos" },
-    { HIDE_PICS           +PLUGINS_CONTEXT+2, 0, "Hide PIC0 and PIC1" },
-    { HIDE_MAC            +PLUGINS_CONTEXT+2, 0, "Hide MAC Address" },
-    { HIDE_DLC            +PLUGINS_CONTEXT+2, 0, "Hide DLC" },
-    { DISABLE_LED         +PLUGINS_CONTEXT+2, 0, "Turn off LEDs" },
-    { DISABLE_UMD         +PLUGINS_CONTEXT+2, 0, "Disable UMD Drive" },
-    { DISABLE_ANALOG      +PLUGINS_CONTEXT+2, 0, "Disable Analog Stick" },
-    { VITA_MUTE           +PLUGINS_CONTEXT+2, 0, "Vita-style mute" },
-    { UMD_REGION          +PLUGINS_CONTEXT+2, 0, "UMD Region" },
-    { VSH_REGION          +PLUGINS_CONTEXT+2, 0, "VSH Region" },
-    { CONFIRM_BUTTON      +PLUGINS_CONTEXT+2, 0, "Confirm Button" },
-    { BATTERY_CONVERT     +PLUGINS_CONTEXT+2, 0, "Battery Convert" },
-    { QA_FLAGS            +PLUGINS_CONTEXT+2, 0, "QA Flags" },
-    { GO_PAUSE_DELETE     +PLUGINS_CONTEXT+2, 0, "Delete PSP Go Pause" },
-    { RESET_SETTINGS      +PLUGINS_CONTEXT+2, 0, "Reset Settings" },
-};
+
 
 char* system_opts[] = {
     "Cancel",
@@ -276,7 +246,41 @@ char* plugins_install_options[] = {
 };
 
 
-#define ITEM_OPT(i) { NELEMS(i), i }
+XmbControlItem xmbitems[] =
+{
+    { SYSTEM_OPTIONS      +PLUGINS_CONTEXT+2, 0, "System Options" },
+    { ACTIVATE_CODECS     +PLUGINS_CONTEXT+2, 0, "Activate Flash and WMA Codecs" },
+    { USB_DEVICE          +PLUGINS_CONTEXT+2, 0, "USB Device" },
+    { USB_READONLY        +PLUGINS_CONTEXT+2, 0, "USB Read-Only" },
+    { USB_CHARGE          +PLUGINS_CONTEXT+2, 0, "USB Charge" },
+    { CPU_CLOCK_GAME      +PLUGINS_CONTEXT+2, 0, "CPU Clock in Game" },
+    { CPU_CLOCK_VSH       +PLUGINS_CONTEXT+2, 0, "CPU Clock in XMB" },
+    { WPA2_SUPPORT        +PLUGINS_CONTEXT+2, 0, "WPA2 Support" },
+    { AUTOBOOT_LAUNCHER   +PLUGINS_CONTEXT+2, 0, "Autoboot Launcher" },
+    { USE_EXTRA_MEM       +PLUGINS_CONTEXT+2, 0, "Use Extra Memory" },
+    { MEM_STICK_SPEEDUP   +PLUGINS_CONTEXT+2, 0, "Memory Stick Speedup" },
+    { INFERNO_CACHE       +PLUGINS_CONTEXT+2, 0, "Inferno Cache" },
+    { DISABLE_GO_PAUSE    +PLUGINS_CONTEXT+2, 0, "Disable PSP Go Pause" },
+    { OLD_GO_PLUGINS      +PLUGINS_CONTEXT+2, 0, "Old Plugins on ef0" },
+    { NO_HIB_DELETE       +PLUGINS_CONTEXT+2, 0, "Prevent hibernation deletion on PSP Go" },
+    { SKIP_LOGOS          +PLUGINS_CONTEXT+2, 0, "Skip Sony logos" },
+    { HIDE_PICS           +PLUGINS_CONTEXT+2, 0, "Hide PIC0 and PIC1" },
+    { HIDE_MAC            +PLUGINS_CONTEXT+2, 0, "Hide MAC Address" },
+    { HIDE_DLC            +PLUGINS_CONTEXT+2, 0, "Hide DLC" },
+    { DISABLE_LED         +PLUGINS_CONTEXT+2, 0, "Turn off LEDs" },
+    { DISABLE_UMD         +PLUGINS_CONTEXT+2, 0, "Disable UMD Drive" },
+    { DISABLE_EF0         +PLUGINS_CONTEXT+2, 0, "Disable Internal Storage"},
+    { DISABLE_ANALOG      +PLUGINS_CONTEXT+2, 0, "Disable Analog Stick" },
+    { VITA_MUTE           +PLUGINS_CONTEXT+2, 0, "Vita-style mute" },
+    { UMD_REGION          +PLUGINS_CONTEXT+2, 0, "UMD Region" },
+    { VSH_REGION          +PLUGINS_CONTEXT+2, 0, "VSH Region" },
+    { CONFIRM_BUTTON      +PLUGINS_CONTEXT+2, 0, "Confirm Button" },
+    { BATTERY_CONVERT     +PLUGINS_CONTEXT+2, 0, "Battery Convert" },
+    { QA_FLAGS            +PLUGINS_CONTEXT+2, 0, "QA Flags" },
+    { GO_PAUSE_DELETE     +PLUGINS_CONTEXT+2, 0, "Delete PSP Go Pause" },
+    { RESET_SETTINGS      +PLUGINS_CONTEXT+2, 0, "Reset Settings" },
+};
+
 struct {
     int n;
     char** c;
@@ -306,6 +310,7 @@ struct {
     ITEM_OPT(boolean_settings), // Hide DLC
     ITEM_OPT(boolean_settings), // Turn off LEDs
     ITEM_OPT(boolean_settings), // Disable UMD Drive
+    ITEM_OPT(boolean_settings), // Disable ef0
     ITEM_OPT(boolean_settings), // Disable Analog Stick 
     ITEM_OPT(boolean_settings), // Vita Mute
     ITEM_OPT(umdregion_settings), // UMD Region
@@ -697,8 +702,8 @@ void findAllTranslatableStrings(){
     language_strings[n_translated++].orig = "xmbmsgtop_custom_app";
     language_strings[n_translated++].orig = "xmbmsgtop_150_reboot";
     
-    for (int i=0; i<NELEMS(GetItemes); i++){
-        language_strings[n_translated++].orig = GetItemes[i].item;
+    for (int i=0; i<NELEMS(xmbitems); i++){
+        language_strings[n_translated++].orig = xmbitems[i].item;
     }
 
     for (int i=0; i<NELEMS(item_opts); i++){
@@ -1061,7 +1066,8 @@ int skipSetting(int i){
         i == DISABLE_GO_PAUSE ||
         i == OLD_GO_PLUGINS ||
         i == NO_HIB_DELETE  ||
-        i == GO_PAUSE_DELETE
+        i == GO_PAUSE_DELETE ||
+        i == DISABLE_EF0
     );
     else if (psp_model == PSP_GO) return (
         i == DISABLE_UMD ||
@@ -1103,13 +1109,13 @@ void OnInitMenuPspConfigPatched()
             
             loadSettings();
             
-            for (int i = 0; i < NELEMS(GetItemes); i++)
+            for (int i = 0; i < NELEMS(xmbitems); i++)
             {
                 if (skipSetting(i)){
                     continue;
                 }
                 else{
-                    AddSysconfContextItem(GetItemes[i].item, NULL, GetItemes[i].item);
+                    AddSysconfContextItem(xmbitems[i].item, NULL, xmbitems[i].item);
                 }
             }
         }
@@ -1156,11 +1162,11 @@ SceSysconfItem *GetSysconfItemPatched(void *a0, void *a1)
     if(is_cfw_config == 1)
     {
         int i;
-        for(i = 0; i < NELEMS(GetItemes); i++)
+        for(i = 0; i < NELEMS(xmbitems); i++)
         {
-            if(strcmp(item->text, GetItemes[i].item) == 0)
+            if(strcmp(item->text, xmbitems[i].item) == 0)
             {
-                context_mode = GetItemes[i].mode;
+                context_mode = xmbitems[i].mode;
             }
         }
     }
@@ -1322,11 +1328,11 @@ int vshGetRegistryValuePatched(u32 *option, char *name, void *arg2, int size, in
             };
             
             int i;
-            for(i = 0; i < NELEMS(GetItemes); i++)
+            for(i = 0; i < NELEMS(xmbitems); i++)
             {
-                if (strcmp(name, GetItemes[i].item) == 0)
+                if (strcmp(name, xmbitems[i].item) == 0)
                 {
-                    context_mode = GetItemes[i].mode;
+                    context_mode = xmbitems[i].mode;
                     *value = configs[i];
                     return 0;
                 }
@@ -1403,11 +1409,11 @@ int vshSetRegistryValuePatched(u32 *option, char *name, int size, int *value)
                 &config.reset_settings,
             };
         
-            for (int i = 0; i < NELEMS(GetItemes); i++)
+            for (int i = 0; i < NELEMS(xmbitems); i++)
             {
-                if (strcmp(name, GetItemes[i].item) == 0)
+                if (strcmp(name, xmbitems[i].item) == 0)
                 {
-                    *configs[i] = GetItemes[i].negative ? !(*value) : *value;
+                    *configs[i] = xmbitems[i].negative ? !(*value) : *value;
                     saveSettings();
                     
                     if (i == SYSTEM_OPTIONS){

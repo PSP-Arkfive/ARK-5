@@ -4,8 +4,8 @@ TARGET = xmbctrl
 OBJS = main.o stub.o \
 	src/xmbpatch.o \
 	src/list.o \
+	src/configparser.o \
 	src/settings.o \
-	src/config.o \
 	src/plugins.o \
 	src/battery.o \
 	src/utils.o \
