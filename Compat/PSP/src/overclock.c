@@ -13,13 +13,13 @@
 
 
 #define PLL_DEN                       20
-#define PLL_DEN_STREET                2
+#define PLL_DEN_OTHER                2
 #define PLL_BASE_FREQ                 37
-#define PLL_BASE_FREQ_STREET          12
+#define PLL_BASE_FREQ_OTHER          12
 #define PLL_RATIO_INDEX               5
-#define PLL_RATIO_INDEX_STREET        5
+#define PLL_RATIO_INDEX_OTHER        5
 #define PLL_MUL_MSB                   0x0124
-#define PLL_MUL_MSB_STREET            0x0122
+#define PLL_MUL_MSB_OTHER            0x0122
 
 //#define PLL_CUSTOM_FLAG             27
 #define FREQUENCY_STEP                10  /*PLL_BASE_FREQ / 2*/
@@ -224,11 +224,11 @@ static void adjustInitialFrequencies() {
 
 static void adjustValues(){
   extern int psp_model;
-  if (psp_model == PSP_STREET){
-    pll_den           = PLL_DEN_STREET;
-    pll_base_freq     = PLL_BASE_FREQ_STREET;
-    pll_mul_msb       = PLL_MUL_MSB_STREET;
-    pll_ratio_index   = PLL_RATIO_INDEX_STREET;
+  if (psp_model == PSP_4000 || psp_model > PSP_GO){
+    pll_den           = PLL_DEN_OTHER;
+    pll_base_freq     = PLL_BASE_FREQ_OTHER;
+    pll_mul_msb       = PLL_MUL_MSB_OTHER;
+    pll_ratio_index   = PLL_RATIO_INDEX_OTHER;
   }
 }
 
