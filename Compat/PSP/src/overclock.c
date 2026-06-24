@@ -13,13 +13,13 @@
 
 
 #define PLL_DEN                       20
-#define PLL_DEN_OTHER                2
+#define PLL_DEN_OTHER                 2
 #define PLL_BASE_FREQ                 37
-#define PLL_BASE_FREQ_OTHER          12
+#define PLL_BASE_FREQ_OTHER           12
 #define PLL_RATIO_INDEX               5
-#define PLL_RATIO_INDEX_OTHER        5
+#define PLL_RATIO_INDEX_OTHER         5
 #define PLL_MUL_MSB                   0x0124
-#define PLL_MUL_MSB_OTHER            0x0122
+#define PLL_MUL_MSB_OTHER             0x0122
 
 //#define PLL_CUSTOM_FLAG             27
 #define FREQUENCY_STEP                10  /*PLL_BASE_FREQ / 2*/
