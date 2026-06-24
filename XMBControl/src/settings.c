@@ -326,7 +326,7 @@ void saveSettings(){
     processSetting(fd, line, "hidedlc", config.hidedlc);
     processSetting(fd, line, "noled", config.noled);
     processSetting(fd, line, "noumd", config.noumd);
-    processSetting(fd, line, "deafef", config.deadef);
+    processSetting(fd, line, "deadef", config.deadef);
     processSetting(fd, line, "noanalog", config.noanalog);
     processSetting(fd, line, "vitamute", config.vitamute);
     processSetting(fd, line, "qaflags", config.qaflags);
