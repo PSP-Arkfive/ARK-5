@@ -1772,6 +1772,8 @@ void PatchSysconfPlugin(u32 text_addr, u32 text_size)
 int OnModuleStart(SceModule *mod)
 {
 
+    if (previous) previous(mod);
+
     char *modname = mod->modname;
     u32 text_addr = mod->text_addr;
     u32 text_size = mod->text_size;
@@ -1788,6 +1790,5 @@ int OnModuleStart(SceModule *mod)
         PatchSysconfPlugin(text_addr, text_size);
     }
 
-    if (previous) return previous(mod);
     return 0;
 }
