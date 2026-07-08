@@ -11,7 +11,7 @@ PSP_EXPORT_FUNC(xmbctrlExitVshMenuMode)
 PSP_EXPORT_FUNC(xmbctrlRegisterVshMenu)
 PSP_EXPORT_END
 
-PSP_EXPORT_START(guglue, 0, 0x0001)
+PSP_EXPORT_START(guglue, 0, 0x0009)
 PSP_EXPORT_FUNC(sceGuClutMode)
 PSP_EXPORT_FUNC(sceGuClutLoad)
 PSP_EXPORT_FUNC(sceGuEnable)
