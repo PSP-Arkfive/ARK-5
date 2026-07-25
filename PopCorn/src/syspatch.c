@@ -897,7 +897,9 @@ static int saveKeysBin(const char *keypath, unsigned char *key, int size)
 {
     SceUID keys;
     int ret;
+    unsigned int k1;
 
+    k1 = pspSdkSetK1(0);
     keys = sceIoOpen(keypath, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, 0777);
 
     if (keys < 0)
@@ -918,6 +920,7 @@ static int saveKeysBin(const char *keypath, unsigned char *key, int size)
 
     sceIoClose(keys);
 
+    pspSdkSetK1(k1);
     return ret;
 }
 
