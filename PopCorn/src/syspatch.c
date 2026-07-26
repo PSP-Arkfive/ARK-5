@@ -38,10 +38,6 @@ int g_icon0Status;
 static int g_keysBinFound;
 static SceUID g_plain_doc_fd = -1;
 
-//patch_popsman()
-char ebootpath[256], g_pgd_path[256];
-u8 pgdbuf[0x90], g_eboot_key[16];
-
 #define PGD_ID "XX0000-XXXX00000_00-XXXXXXXXXX000XXX"
 #define ACT_DAT "flash2:/act.dat"
 #define RIF_MAGIC_FD 0x10000
@@ -85,7 +81,7 @@ static unsigned char g_keys[16];
 static int getKeysBinPath(char *keypath, unsigned int size);
 
 // dump keys
-int dumpPS1key(const char *path, u8 *buf);
+void dumpKey(const char *path, u8 *buf);
 
 // Save keys.bin
 static int saveKeysBin(const char *keypath, unsigned char *key, int size);
@@ -606,7 +602,7 @@ static int _sceNpDrmGetVersionKey(unsigned char * key, unsigned char * act, unsi
         if (result == 0)
         {
             memcpy(g_keys, key, sizeof(g_keys));
-            saveKeysBin(keypath, g_keys, sizeof(g_keys));
+            //saveKeysBin(keypath, g_keys, sizeof(g_keys));
         }
         else
         {
@@ -935,12 +931,43 @@ u32 tou32(u8 *buf)
 	return (u32)(buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24));
 }
 
-void patch_popsman()
+void dumpKey(const char *path, u8 *buf)
 {
-	//patch only in pops mode
-	//if (applicationType != PSP_INIT_KEYCONFIG_POPS)
-	//	return;
 
+	int flag = 2;
+	PGD_DESC PGD;
+	memset(&PGD, 0, sizeof(PGD_DESC));
+	MAC_KEY mkey;
+
+	PGD.buf = buf;
+	PGD.key_index = *(u32*)(buf + 4);
+	PGD.drm_type = *(u32*)(buf + 8);
+
+	// Set the hashing, crypto and open modes.
+	if (PGD.drm_type == 1) {
+		PGD.mac_type = 1;
+		flag |= 4;
+
+		if (PGD.key_index > 1) {
+			PGD.mac_type = 3;
+			flag |= 8;
+		}
+	} else
+		PGD.mac_type = 2;
+
+	PGD.open_flag = flag;
+
+	sceDrmBBMacInit((u8 *)&mkey, PGD.mac_type);
+	sceDrmBBMacUpdate((u8 *)&mkey, buf, 0x70);
+	bbmac_getkey(&mkey, buf + 0x70, PGD.vkey);
+	memcpy(g_keys, PGD.vkey, sizeof(g_keys));
+
+}
+
+void recoverKeys()
+{
+    char ebootpath[256];
+    u8 pgdbuf[0x90];
 	//just a patch to generate KEYS.BIN if necessary
 	strcpy(ebootpath, sceKernelInitFileName());
 	SceUID fd = sceIoOpen(ebootpath, PSP_O_RDONLY, 0);
@@ -958,7 +985,7 @@ void patch_popsman()
 		sceIoRead(fd, pgdbuf, 0x90);
 
 		if (!memcmp(pgdbuf, "\x00PGD", 4))
-			dumpPS1key(ebootpath, pgdbuf);
+			dumpKey(ebootpath, pgdbuf);
 	}
 
 	sceIoClose(fd);
@@ -970,7 +997,6 @@ void getKeys(void)
     int ret;
     SceIoStat stat;
 
-    patch_popsman();
     getKeysBinPath(keypath, sizeof(keypath));
     ret = sceIoGetstat(keypath, &stat);
     g_keysBinFound = 0;
@@ -981,6 +1007,11 @@ void getKeys(void)
         {
             g_keysBinFound = 1;
         }
+    }
+    else
+    {
+        recoverKeys();
+        g_keysBinFound = 1;
     }
 
 }
