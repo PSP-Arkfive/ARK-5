@@ -6,9 +6,11 @@ OBJS = main.o \
 	src/icon.o \
 	src/syspatch.o \
 	src/libcrypt.o \
+	src/pgd.o \
+	src/imports.o \
 
 all: $(TARGET).prx
-INCDIR = 
+INCDIR = include
 CFLAGS = -std=c99 -Oz -G0 -Wall -fno-pic
 
 PSP_FW_VERSION = 660

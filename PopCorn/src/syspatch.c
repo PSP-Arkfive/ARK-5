@@ -25,6 +25,8 @@
 #include <cfwmacros.h>
 #include <systemctrl.h>
 
+#include "pgd.h"
+
 extern unsigned char g_icon_png[6108];
 
 STMOD_HANDLER g_previous = NULL;
@@ -35,6 +37,10 @@ int g_icon0Status;
 
 static int g_keysBinFound;
 static SceUID g_plain_doc_fd = -1;
+
+//patch_popsman()
+char ebootpath[256], g_pgd_path[256];
+u8 pgdbuf[0x90], g_eboot_key[16];
 
 #define PGD_ID "XX0000-XXXX00000_00-XXXXXXXXXX000XXX"
 #define ACT_DAT "flash2:/act.dat"
@@ -77,6 +83,9 @@ static unsigned char g_keys[16];
 
 // Get keys.bin path
 static int getKeysBinPath(char *keypath, unsigned int size);
+
+// dump keys
+int dumpPS1key(const char *path, u8 *buf);
 
 // Save keys.bin
 static int saveKeysBin(const char *keypath, unsigned char *key, int size);
@@ -921,12 +930,47 @@ static int saveKeysBin(const char *keypath, unsigned char *key, int size)
     return ret;
 }
 
+u32 tou32(u8 *buf)
+{
+	return (u32)(buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24));
+}
+
+void patch_popsman()
+{
+	//patch only in pops mode
+	//if (applicationType != PSP_INIT_KEYCONFIG_POPS)
+	//	return;
+
+	//just a patch to generate KEYS.BIN if necessary
+	strcpy(ebootpath, sceKernelInitFileName());
+	SceUID fd = sceIoOpen(ebootpath, PSP_O_RDONLY, 0);
+	sceIoRead(fd, pgdbuf, 0x28);
+
+	if (!memcmp(pgdbuf, "\x00PBP", 4)) {
+		sceIoLseek(fd, tou32(pgdbuf + 0x24), 0);
+		sceIoRead(fd, pgdbuf, 16);
+
+		if (!memcmp(pgdbuf, "PSTITLE", 7))
+			sceIoLseek(fd, 0x1F0, 1);
+		else if (!memcmp(pgdbuf, "PSISO", 5))
+			sceIoLseek(fd, 0x3F0, 1);
+
+		sceIoRead(fd, pgdbuf, 0x90);
+
+		if (!memcmp(pgdbuf, "\x00PGD", 4))
+			dumpPS1key(ebootpath, pgdbuf);
+	}
+
+	sceIoClose(fd);
+}
+
 void getKeys(void)
 {
     char keypath[512];
     int ret;
     SceIoStat stat;
 
+    patch_popsman();
     getKeysBinPath(keypath, sizeof(keypath));
     ret = sceIoGetstat(keypath, &stat);
     g_keysBinFound = 0;
@@ -938,6 +982,7 @@ void getKeys(void)
             g_keysBinFound = 1;
         }
     }
+
 }
 
 int decompressData(unsigned int destSize, const unsigned char *src, unsigned char *dest)
