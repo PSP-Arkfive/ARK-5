@@ -594,7 +594,8 @@ static int myGetVersionKey(unsigned char * key)
 	SceUID fd = sceIoOpen(filename, PSP_O_RDONLY, 0);
 	sceIoRead(fd, pgdbuf, 0x28);
 
-	if (!memcmp(pgdbuf, "\x00PBP", 4)) { 
+	if (!memcmp(pgdbuf, "\x00PBP", 4)) 
+    { 
 		sceIoLseek(fd, *(u32*)(pgdbuf + 0x24), 0);
 		sceIoRead(fd, pgdbuf, 16);
 
@@ -606,20 +607,23 @@ static int myGetVersionKey(unsigned char * key)
 		sceIoRead(fd, pgdbuf, 0x90);
 
         // if we find the PGD magic we can succeed
-		if (!memcmp(pgdbuf, "\x00PGD", 4)) {
-
+		if (!memcmp(pgdbuf, "\x00PGD", 4)) 
+        {
         	key_index = *(u32*)(pgdbuf + 4);
             drm_type = *(u32*)(pgdbuf + 8);
 
             // determine the mac type
-            if (drm_type == 1) {
-                mac_type = 1;
-
-                if (key_index > 1) {
+            if (drm_type == 1) 
+            {
+                if (key_index > 1)
                     mac_type = 3;
-                }
-            } else
+                else
+                    mac_type = 1;
+            } 
+            else 
+            {
                 mac_type = 2;
+            }
 
 	        sceDrmBBMacInit((u8 *)&mkey, mac_type);
 	        sceDrmBBMacUpdate((u8 *)&mkey, pgdbuf, 0x70);
@@ -653,15 +657,16 @@ static int _scePspNpDrm_driver_9A34AC9F(unsigned char *rif)
 {
     int result = (*scePspNpDrm_driver_9A34AC9F)(rif);
 
-    if (result != 0)
-    {
-        if (g_keysBinFound || g_isCustomPBP)
-        {
-            result = 0;
-        }
-    }
+    // if (result != 0)
+    // {
+    //     if (g_keysBinFound || g_isCustomPBP)
+    //     {
+    //         result = 0;
+    //     }
+    // }
 
-    return result;
+    // return result;
+    return 0;
 }
 
 static int (*_getRifPath)(const char *name, char *path) = NULL;
