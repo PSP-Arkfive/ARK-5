@@ -35,7 +35,7 @@ unsigned int g_pspFwVersion;
 int g_isCustomPBP;
 int g_icon0Status;
 
-static int g_keysBinFound = 1;  //not needed anymore so just declare it found
+//static int g_keysBinFound = 1;  //not needed anymore so just declare it found
 static SceUID g_plain_doc_fd = -1;
 
 #define PGD_ID "XX0000-XXXX00000_00-XXXXXXXXXX000XXX"
@@ -287,8 +287,8 @@ static int myIoOpen(const char *file, int flag, int mode)
 {
     int ret;
 
-    if(g_keysBinFound || g_isCustomPBP)
-    {
+    // if(g_keysBinFound || g_isCustomPBP)
+    // {
         if(strstr(file, PGD_ID))
         {
             ret = RIF_MAGIC_FD;
@@ -301,11 +301,11 @@ static int myIoOpen(const char *file, int flag, int mode)
         {
             ret = sceIoOpenPlain(file, flag, mode);
         }        
-    }
-    else
-    {
-        ret = sceIoOpenPlain(file, flag, mode);
-    }
+    // }
+    // else
+    // {
+    //     ret = sceIoOpenPlain(file, flag, mode);
+    // }
 
     return ret;
 }
@@ -340,8 +340,8 @@ static int myIoGetstat(const char *path, SceIoStat *stat)
 {
     int ret;
 
-    if(g_keysBinFound || g_isCustomPBP)
-    {
+    // if(g_keysBinFound || g_isCustomPBP)
+    // {
         if(strstr(path, PGD_ID))
         {
             stat->st_mode = 0x21FF;
@@ -359,11 +359,11 @@ static int myIoGetstat(const char *path, SceIoStat *stat)
         {
             ret = sceIoGetstat(path, stat);
         }
-    } 
-    else
-    {
-        ret = sceIoGetstat(path, stat);
-    }
+    // } 
+    // else
+    // {
+    //     ret = sceIoGetstat(path, stat);
+    // }
 
     return ret;
 }
@@ -386,8 +386,8 @@ static int myIoRead(int fd, unsigned char *buf, int size)
         pos = 0;
     }
     
-    if(g_keysBinFound|| g_isCustomPBP)
-    {
+    // if(g_keysBinFound|| g_isCustomPBP)
+    // {
         if(fd == RIF_MAGIC_FD)
         {
             size = 152;
@@ -401,7 +401,7 @@ static int myIoRead(int fd, unsigned char *buf, int size)
             ret = size;
             goto exit;
         }
-    }
+    // }
 
     ret = sceIoRead(fd, buf, size);
 
@@ -504,8 +504,8 @@ static SceOff myIoLseek(SceUID fd, SceOff offset, int whence)
 
     k1 = pspSdkSetK1(0);
 
-    if(g_keysBinFound || g_isCustomPBP)
-    {
+    // if(g_keysBinFound || g_isCustomPBP)
+    // {
         if (fd == RIF_MAGIC_FD)
         {
             ret = 0;
@@ -517,11 +517,11 @@ static SceOff myIoLseek(SceUID fd, SceOff offset, int whence)
         {
             ret = sceIoLseek(fd, offset, whence);
         }
-    } 
-    else
-    {
-        ret = sceIoLseek(fd, offset, whence);
-    }
+    // } 
+    // else
+    // {
+    //     ret = sceIoLseek(fd, offset, whence);
+    // }
 
     pspSdkSetK1(k1);
     return ret;
@@ -534,8 +534,8 @@ static int myIoClose(SceUID fd)
 
     k1 = pspSdkSetK1(0);
 
-    if(g_keysBinFound || g_isCustomPBP)
-    {
+    // if(g_keysBinFound || g_isCustomPBP)
+    // {
         if (fd == RIF_MAGIC_FD || fd == ACT_DAT_FD)
         {
             ret = 0;
@@ -544,11 +544,11 @@ static int myIoClose(SceUID fd)
         {
             ret = sceIoClose(fd);
         }
-    } 
-    else
-    {
-        ret = sceIoClose(fd);
-    }
+    // } 
+    // else
+    // {
+    //     ret = sceIoClose(fd);
+    // }
 
     if(g_plain_doc_fd == fd && ret == 0)
     {
@@ -672,9 +672,9 @@ static int _scePspNpDrm_driver_9A34AC9F(unsigned char *rif)
 static int (*_getRifPath)(const char *name, char *path) = NULL;
 static int getRifPatch(char *name, char *path)
 {
-    if(g_keysBinFound || g_isCustomPBP) {
+    // if(g_keysBinFound || g_isCustomPBP) {
         strcpy(name, PGD_ID);
-    }
+    // }
 
     return _getRifPath(name, path);
 }
