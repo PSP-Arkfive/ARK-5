@@ -46,7 +46,7 @@ int module_start(SceSize args, void* argp)
 {
     g_pspFwVersion = sceKernelDevkitVersion();
     
-    getKeys();
+    //getKeys();
     readCustomConfig();
     g_isCustomPBP = isCustomPBP();
     g_icon0Status = getIcon0Status();
