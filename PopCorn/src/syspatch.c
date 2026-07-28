@@ -35,7 +35,6 @@ unsigned int g_pspFwVersion;
 int g_isCustomPBP;
 int g_icon0Status;
 
-//static int g_keysBinFound = 1;  //not needed anymore so just declare it found
 static SceUID g_plain_doc_fd = -1;
 
 #define PGD_ID "XX0000-XXXX00000_00-XXXXXXXXXX000XXX"
@@ -74,18 +73,6 @@ struct FunctionHook
 static u8 custom_config[0x400];
 static int config_size = 0;
 static int psiso_offsets[5] = {0, 0, 0, 0, 0}; // pops supports up to 5 discs, but config is the same for all of them even if it doesn't have to
-
-//static unsigned char g_keys[16];
-
-// Get keys.bin path
-//static int getKeysBinPath(char *keypath, unsigned int size);
-
-// dump keys
-//void recoverKeys();
-//(const char *path, u8 *buf);
-
-// Save keys.bin
-//static int saveKeysBin(const char *keypath, unsigned char *key, int size);
 
 static void patchPops(SceModule *mod);
 
@@ -287,25 +274,18 @@ static int myIoOpen(const char *file, int flag, int mode)
 {
     int ret;
 
-    // if(g_keysBinFound || g_isCustomPBP)
-    // {
-        if(strstr(file, PGD_ID))
-        {
-            ret = RIF_MAGIC_FD;
-        }
-        else if (0 == strcmp(file, ACT_DAT))
-        {
-            ret = ACT_DAT_FD;
-        } 
-        else
-        {
-            ret = sceIoOpenPlain(file, flag, mode);
-        }        
-    // }
-    // else
-    // {
-    //     ret = sceIoOpenPlain(file, flag, mode);
-    // }
+    if(strstr(file, PGD_ID))
+    {
+        ret = RIF_MAGIC_FD;
+    }
+    else if (0 == strcmp(file, ACT_DAT))
+    {
+        ret = ACT_DAT_FD;
+    } 
+    else
+    {
+        ret = sceIoOpenPlain(file, flag, mode);
+    }        
 
     return ret;
 }
@@ -340,30 +320,23 @@ static int myIoGetstat(const char *path, SceIoStat *stat)
 {
     int ret;
 
-    // if(g_keysBinFound || g_isCustomPBP)
-    // {
-        if(strstr(path, PGD_ID))
-        {
-            stat->st_mode = 0x21FF;
-            stat->st_attr = 0x20;
-            stat->st_size = 152;
-            ret = 0;
-        } else if (0 == strcmp(path, ACT_DAT))
-        {
-            stat->st_mode = 0x21FF;
-            stat->st_attr = 0x20;
-            stat->st_size = 4152;
-            ret = 0;
-        } 
-        else
-        {
-            ret = sceIoGetstat(path, stat);
-        }
-    // } 
-    // else
-    // {
-    //     ret = sceIoGetstat(path, stat);
-    // }
+    if(strstr(path, PGD_ID))
+    {
+        stat->st_mode = 0x21FF;
+        stat->st_attr = 0x20;
+        stat->st_size = 152;
+        ret = 0;
+    } else if (0 == strcmp(path, ACT_DAT))
+    {
+        stat->st_mode = 0x21FF;
+        stat->st_attr = 0x20;
+        stat->st_size = 4152;
+        ret = 0;
+    } 
+    else
+    {
+        ret = sceIoGetstat(path, stat);
+    }
 
     return ret;
 }
@@ -386,22 +359,19 @@ static int myIoRead(int fd, unsigned char *buf, int size)
         pos = 0;
     }
     
-    // if(g_keysBinFound|| g_isCustomPBP)
-    // {
-        if(fd == RIF_MAGIC_FD)
-        {
-            size = 152;
-            memset(buf, 0, size);
-            strcpy((char*)(buf+0x10), PGD_ID);
-            ret = size;
-            goto exit;
-        } else if (fd == ACT_DAT_FD)
-        {
-            memset(buf, 0, size);
-            ret = size;
-            goto exit;
-        }
-    // }
+    if(fd == RIF_MAGIC_FD)
+    {
+        size = 152;
+        memset(buf, 0, size);
+        strcpy((char*)(buf+0x10), PGD_ID);
+        ret = size;
+        goto exit;
+    } else if (fd == ACT_DAT_FD)
+    {
+        memset(buf, 0, size);
+        ret = size;
+        goto exit;
+    }
 
     ret = sceIoRead(fd, buf, size);
 
@@ -504,24 +474,17 @@ static SceOff myIoLseek(SceUID fd, SceOff offset, int whence)
 
     k1 = pspSdkSetK1(0);
 
-    // if(g_keysBinFound || g_isCustomPBP)
-    // {
-        if (fd == RIF_MAGIC_FD)
-        {
-            ret = 0;
-        } else if (fd == ACT_DAT_FD)
-        {
-            ret = 0;
-        } 
-        else
-        {
-            ret = sceIoLseek(fd, offset, whence);
-        }
-    // } 
-    // else
-    // {
-    //     ret = sceIoLseek(fd, offset, whence);
-    // }
+    if (fd == RIF_MAGIC_FD)
+    {
+        ret = 0;
+    } else if (fd == ACT_DAT_FD)
+    {
+        ret = 0;
+    } 
+    else
+    {
+        ret = sceIoLseek(fd, offset, whence);
+    }
 
     pspSdkSetK1(k1);
     return ret;
@@ -534,21 +497,14 @@ static int myIoClose(SceUID fd)
 
     k1 = pspSdkSetK1(0);
 
-    // if(g_keysBinFound || g_isCustomPBP)
-    // {
-        if (fd == RIF_MAGIC_FD || fd == ACT_DAT_FD)
-        {
-            ret = 0;
-        }
-        else
-        {
-            ret = sceIoClose(fd);
-        }
-    // } 
-    // else
-    // {
-    //     ret = sceIoClose(fd);
-    // }
+    if (fd == RIF_MAGIC_FD || fd == ACT_DAT_FD)
+    {
+        ret = 0;
+    }
+    else
+    {
+        ret = sceIoClose(fd);
+    }
 
     if(g_plain_doc_fd == fd && ret == 0)
     {
@@ -657,24 +613,13 @@ static int _scePspNpDrm_driver_9A34AC9F(unsigned char *rif)
 {
     int result = (*scePspNpDrm_driver_9A34AC9F)(rif);
 
-    // if (result != 0)
-    // {
-    //     if (g_keysBinFound || g_isCustomPBP)
-    //     {
-    //         result = 0;
-    //     }
-    // }
-
-    // return result;
     return 0;
 }
 
 static int (*_getRifPath)(const char *name, char *path) = NULL;
 static int getRifPatch(char *name, char *path)
 {
-    // if(g_keysBinFound || g_isCustomPBP) {
-        strcpy(name, PGD_ID);
-    // }
+    strcpy(name, PGD_ID);
 
     return _getRifPath(name, path);
 }
@@ -880,168 +825,6 @@ int getIcon0Status(void)
 
     return result;
 }
-
-// static int getKeysBinPath(char *keypath, unsigned int size)
-// {
-//     char *p;
-
-//     strncpy(keypath, sceKernelInitFileName(), size);
-//     keypath[size-1] = '\0';
-//     p = strrchr(keypath, '/');
-
-//     if(p == NULL)
-//     {
-//         return -1;
-//     }
-
-//     p[1] = '\0';
-
-//     if(strlen(keypath) > size - (sizeof("KEYS.BIN") - 1) - 1)
-//     {
-//         return -1;
-//     }
-
-//     strcat(keypath, "KEYS.BIN");
-
-//     return 0;
-// }
-
-// static int loadKeysBin(const char *keypath, unsigned char *key, int size)
-// {
-//     SceUID keys; 
-//     int ret;
-
-//     keys = sceIoOpen(keypath, PSP_O_RDONLY, 0777);
-
-//     if (keys < 0)
-//     {
-//         return -1;
-//     }
-
-//     ret = sceIoRead(keys, key, size); 
-
-//     if (ret == size)
-//     {
-//         ret = 0;
-//     } 
-//     else
-//     {
-//         ret = -2;
-//     }
-
-//     sceIoClose(keys);
-
-//     return ret;
-// }
-
-// static int saveKeysBin(const char *keypath, unsigned char *key, int size)
-// {
-//     SceUID keys;
-//     int ret;
-
-//     keys = sceIoOpen(keypath, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, 0777);
-
-//     if (keys < 0)
-//     {
-//         return -1;
-//     }
-
-//     ret = sceIoWrite(keys, key, size);
-
-//     if(ret == size)
-//     {
-//         ret = 0;
-//     } 
-//     else
-//     {
-//         ret = -2;
-//     }
-
-//     sceIoClose(keys);
-
-//     return ret;
-// }
-
-// void dumpKey(const char *path, u8 *buf)
-// {
-
-//     int key_index;
-//     int drm_type;
-//     int mac_type;
-
-// 	MAC_KEY mkey;
-
-// 	key_index = *(u32*)(buf + 4);
-// 	drm_type = *(u32*)(buf + 8);
-
-// 	// Set the mac type
-// 	if (drm_type == 1) {
-// 		mac_type = 1;
-
-// 		if (key_index > 1) {
-// 			mac_type = 3;
-// 		}
-// 	} else
-// 		mac_type = 2;
-
-// 	sceDrmBBMacInit((u8 *)&mkey, mac_type);
-// 	sceDrmBBMacUpdate((u8 *)&mkey, buf, 0x70);
-//     bbmac_getkey(&mkey, buf + 0x70, g_keys);
-
-// }
-
-// void recoverKeys()
-// {
-//     char ebootpath[256];
-//     u8 pgdbuf[0x90];
-// 	//just a patch to generate KEYS.BIN if necessary
-// 	strcpy(ebootpath, sceKernelInitFileName());
-// 	SceUID fd = sceIoOpen(ebootpath, PSP_O_RDONLY, 0);
-// 	sceIoRead(fd, pgdbuf, 0x28);
-
-// 	if (!memcmp(pgdbuf, "\x00PBP", 4)) {
-//         sceIoLseek(fd, *(u32*)(pgdbuf + 0x24), 0);
-// 		//sceIoLseek(fd, tou32(pgdbuf + 0x24), 0);
-// 		sceIoRead(fd, pgdbuf, 16);
-
-// 		if (!memcmp(pgdbuf, "PSTITLE", 7))
-// 			sceIoLseek(fd, 0x1F0, 1);
-// 		else if (!memcmp(pgdbuf, "PSISO", 5))
-// 			sceIoLseek(fd, 0x3F0, 1);
-
-// 		sceIoRead(fd, pgdbuf, 0x90);
-
-// 		if (!memcmp(pgdbuf, "\x00PGD", 4))
-// 			dumpKey(ebootpath, pgdbuf);
-// 	}
-
-// 	sceIoClose(fd);
-// }
-
-// void getKeys(void)
-// {
-//     char keypath[512];
-//     int ret;
-//     SceIoStat stat;
-
-//     getKeysBinPath(keypath, sizeof(keypath));
-//     ret = sceIoGetstat(keypath, &stat);
-//     g_keysBinFound = 0;
-
-//     if(ret == 0)
-//     {
-//         if(loadKeysBin(keypath, g_keys, sizeof(g_keys)) == 0)
-//         {
-//             g_keysBinFound = 1;
-//         }
-//     }
-//     else
-//     {
-//         recoverKeys();
-//         g_keysBinFound = 1;
-//     }
-
-// }
 
 int decompressData(unsigned int destSize, const unsigned char *src, unsigned char *dest)
 {
