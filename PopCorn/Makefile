@@ -6,9 +6,11 @@ OBJS = main.o \
 	src/icon.o \
 	src/syspatch.o \
 	src/libcrypt.o \
+	src/pgd.o
+
 
 all: $(TARGET).prx
-INCDIR = 
+INCDIR = include
 CFLAGS = -std=c99 -Oz -G0 -Wall -fno-pic
 
 PSP_FW_VERSION = 660
@@ -24,6 +26,6 @@ USE_KERNEL_LIBS=1
 
 LIBDIR = 
 LDFLAGS = -nostartfiles
-LIBS = -lpspsystemctrl_kernel
+LIBS = -lpspsystemctrl_kernel -lpspsemaphore_660
 
 include $(PSPSDK)/lib/build.mak

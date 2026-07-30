@@ -25,6 +25,8 @@
 #include <cfwmacros.h>
 #include <systemctrl.h>
 
+#include "pgd.h"
+
 PSP_MODULE_INFO("PROPopcornManager", 0x1007, 1, 2);
 
 extern STMOD_HANDLER g_previous;
@@ -44,7 +46,6 @@ int module_start(SceSize args, void* argp)
 {
     g_pspFwVersion = sceKernelDevkitVersion();
     
-    getKeys();
     readCustomConfig();
     g_isCustomPBP = isCustomPBP();
     g_icon0Status = getIcon0Status();

@@ -5,6 +5,7 @@ target_sources(popcorn PRIVATE
    src/icon.c
    src/syspatch.c
    src/libcrypt.c
+   src/pgd.c
 )
 
 target_compile_options(popcorn PRIVATE ${COMPILE_OPS})
