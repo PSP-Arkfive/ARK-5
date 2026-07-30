@@ -24,6 +24,7 @@
 
 #include <cfwmacros.h>
 #include <systemctrl.h>
+#include <pspamctrl.h>
 
 #include "pgd.h"
 
@@ -544,7 +545,7 @@ static int myGetVersionKey(unsigned char * key)
     int key_index;
     int drm_type;
     int mac_type;
-	MAC_KEY mkey;
+	SceMacKey mkey;
 	char* filename = sceKernelInitFileName();
 
 	SceUID fd = sceIoOpen(filename, PSP_O_RDONLY, 0);
@@ -581,8 +582,8 @@ static int myGetVersionKey(unsigned char * key)
                 mac_type = 2;
             }
 
-	        sceDrmBBMacInit((u8 *)&mkey, mac_type);
-	        sceDrmBBMacUpdate((u8 *)&mkey, pgdbuf, 0x70);
+	        sceDrmBBMacInit((SceMacKey *)&mkey, mac_type);
+	        sceDrmBBMacUpdate((SceMacKey *)&mkey, pgdbuf, 0x70);
             bbmac_getkey(&mkey, pgdbuf + 0x70, key);
             ret = 0;
         }

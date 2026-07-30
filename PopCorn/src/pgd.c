@@ -36,13 +36,13 @@ int kirk7(u8 *buf, int size, int type)
 	return 0;
 }
 
-int bbmac_getkey(MAC_KEY *mkey, u8 *bbmac, u8 *vkey)
+int bbmac_getkey(SceMacKey *mkey, u8 *bbmac, u8 *vkey)
 {
 	int i, retv, type, code;
 	u8 *kbuf, tmp[16], tmp1[16];
 
 	type = mkey->type;
-	retv = sceDrmBBMacFinal((u8 *)mkey, tmp, NULL);
+	retv = sceDrmBBMacFinal((SceMacKey *)mkey, tmp, NULL);
 
 	if (retv)
 		return retv;
@@ -70,7 +70,7 @@ int bbmac_getkey(MAC_KEY *mkey, u8 *bbmac, u8 *vkey)
 
 int get_version_key(u8 *version_key, char *path)
 {
-	MAC_KEY mkey;
+	SceMacKey mkey;
 	u8 header[256];
 	u32 psar;
 	int ret = 0;
@@ -81,13 +81,13 @@ int get_version_key(u8 *version_key, char *path)
 	sceIoLseek32(fd, psar, PSP_SEEK_SET);
 	sceIoRead(fd, header, sizeof(header));
 
-	sceDrmBBMacInit((u8 *)&mkey, 3);
-	sceDrmBBMacUpdate((u8 *)&mkey, header, 0xC0);
+	sceDrmBBMacInit((SceMacKey *)&mkey, 3);
+	sceDrmBBMacUpdate((SceMacKey *)&mkey, header, 0xC0);
 	bbmac_getkey(&mkey, header + 0xC0, version_key);
 
-	sceDrmBBMacInit((u8 *)&mkey, 3);
-	sceDrmBBMacUpdate((u8 *)&mkey, header, 0xC0);
-	ret = sceDrmBBMacFinal2((u8 *)&mkey, header + 0xC0, version_key);
+	sceDrmBBMacInit((SceMacKey *)&mkey, 3);
+	sceDrmBBMacUpdate((SceMacKey *)&mkey, header, 0xC0);
+	ret = sceDrmBBMacFinal2((SceMacKey *)&mkey, header + 0xC0, version_key);
 
 	return ret;
 }
@@ -96,7 +96,7 @@ int get_edat_key(u8 *vkey, u8 *pgd_buf)
 {
 	int pgd_flag = 2;
 	PGD_DESC *pgd = &g_pgd;
-	MAC_KEY mkey;
+	SceMacKey mkey;
 	u8 *fkey = (u8 *)NULL;
 	memset(pgd, 0, sizeof(PGD_DESC));
 
@@ -127,14 +127,14 @@ int get_edat_key(u8 *vkey, u8 *pgd_buf)
 		return -1;
 
 	// MAC_0x80 check
-	sceDrmBBMacInit((u8 *)&mkey, pgd->mac_type);
-	sceDrmBBMacUpdate((u8 *)&mkey, pgd_buf, 0x80);
-	if (sceDrmBBMacFinal2((u8 *)&mkey, pgd_buf + 0x80, fkey))
+	sceDrmBBMacInit((SceMacKey *)&mkey, pgd->mac_type);
+	sceDrmBBMacUpdate((SceMacKey *)&mkey, pgd_buf, 0x80);
+	if (sceDrmBBMacFinal2((SceMacKey *)&mkey, pgd_buf + 0x80, fkey))
 		return -2;
 
 	// MAC_0x70
-	sceDrmBBMacInit((u8 *)&mkey, pgd->mac_type);
-	sceDrmBBMacUpdate((u8 *)&mkey, pgd_buf, 0x70);
+	sceDrmBBMacInit((SceMacKey *)&mkey, pgd->mac_type);
+	sceDrmBBMacUpdate((SceMacKey *)&mkey, pgd_buf, 0x70);
 
 	if (bbmac_getkey(&mkey, pgd_buf + 0x70, vkey))
 		return -3;
