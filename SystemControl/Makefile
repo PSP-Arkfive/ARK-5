@@ -37,6 +37,8 @@ OBJS = \
 	src/threadman.o \
 	src/utility.o \
 	src/patches.o \
+	src/pgd.o \
+	src/np9660.o \
 	src/missingfunc.o \
 	src/setlongjmp.o
 	

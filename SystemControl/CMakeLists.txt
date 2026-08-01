@@ -32,6 +32,8 @@ target_sources(systemctrl PRIVATE
 	src/threadman.c
 	src/utility.c
 	src/patches.c
+	src/np9660.c
+	src/pgd.c
 	src/setlongjmp.S
 )
 

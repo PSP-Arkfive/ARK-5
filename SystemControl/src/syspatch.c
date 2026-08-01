@@ -36,6 +36,7 @@
 #include "gameinfo.h"
 #include "controller.h"
 #include "systemctrl_private.h"
+#include "np9660.h"
 
 
 extern void extendUtilityModules();
@@ -187,6 +188,10 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
     if (strcmp(mod->modname, "sceNp") == 0) {
         patch_np(mod, 9, 90);
         goto flush;
+    }
+
+    if (strcmp(mod->modname, "sceNp9660_driver") == 0) {
+        patch_np9660(mod);
     }
 
     if (strcmp(mod->modname, "popsloader") == 0 || strcmp(mod->modname, "popscore") == 0){
