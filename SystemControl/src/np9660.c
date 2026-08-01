@@ -18,39 +18,19 @@
 #include <pspkernel.h>
 #include <pspsysmem_kernel.h>
 #include <psputilsforkernel.h>
+#include <systemctrl.h>
 #include <pspiofilemgr.h>
 #include <pspinit.h>
 #include <stdio.h>
 #include <string.h>
 #include <cfwmacros.h>
-//#include "lib.h"
-//#include "sctrl.h"
 #include "pgd.h"
 #include "np9660.h"
 
-
-
-// PSP_MODULE_INFO("npdrm_free", PSP_MODULE_KERNEL, 1, 0);
-// PSP_HEAP_SIZE_KB(0);
-
-//static STMOD_HANDLER previous = NULL;
 char ebootpath[256], g_pgd_path[256];
 u8 pgdbuf[0x90], g_eboot_key[16];
 SceModule *npmod;
 int licensed_eboot = 0, g_is_key = 0;
-int applicationType;
-#define FAKEFD 0x12345678
-
-void ClearCaches(void)
-{
-	sceKernelDcacheWritebackInvalidateAll();
-	sceKernelIcacheInvalidateAll();
-}
-
-u32 tou32(u8 *buf)
-{
-	return (u32)(buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24));
-}
 
 int is_licensed_eboot(const char *path)
 {
@@ -60,7 +40,7 @@ int is_licensed_eboot(const char *path)
 	sceIoRead(fd, buf, sizeof(buf));
 
 	if (!memcmp(buf, "\x00PBP", 4)) {
-		sceIoLseek(fd, tou32(buf + 0x24), 0);
+		sceIoLseek(fd, *(u32*)(buf + 0x24), 0);
 		sceIoRead(fd, buf, 0xC);
 
 		if (!memcmp(buf, "NPUMDIMG", 8))
@@ -108,7 +88,7 @@ void patch_drm()
 		}
 	}
 
-	ClearCaches();
+	sctrlFlushCache();
 }
 
 int (* init_eboot)(const char *eboot, u32 a1) = (void *)NULL;
@@ -127,10 +107,6 @@ void patch_np9660(SceModule *mod)
 	u32 addr, jalcount = 0, data;
 	npmod = mod;
 
-	//do not patch in pops mode
-	if (applicationType == PSP_INIT_KEYCONFIG_POPS)
-		return;
-
 	//prevent from patching again, should fix suspend issue in most cases.
 	if (init_eboot)
 		return;
@@ -143,58 +119,10 @@ void patch_np9660(SceModule *mod)
 
 		if (jalcount == 2) {
 			init_eboot = (void *)(((data & 0x03FFFFFF) << 2) | 0x80000000);
-			//_sw(MAKE_CALL(init_eboot_hook), addr);
             MAKE_CALL(addr, init_eboot_hook);
 			break;
 		}
 	}
 
-	ClearCaches();
+	sctrlFlushCache();
 }
-
-SceModule* patchNp9660()
-{
-    // Find Module
-    SceModule* mod = (SceModule*)sceKernelFindModuleByName("sceNp9660_driver");
-	patch_np9660(mod);
-}
-
-// int modflag = 0;
-// int module_start_handler(SceModule2 *module)
-// {
-
-// 	int ret = previous ? previous(module) : 0;
-
-// 	if (!strcmp(module->modname, "sceNp9660_driver")) {
-// 		patch_np9660(module);
-// 	} else if (!strcmp(module->modname, "sceKernelLibrary")) {
-// 		if (applicationType != PSP_INIT_KEYCONFIG_POPS)
-// 			modflag = 1;
-// 	}
-
-// 	return ret;
-// }
-
-// int thread_start(SceSize args __attribute__((unused)), void *argp __attribute__((unused)))
-// {
-// 	previous = sctrlHENSetStartModuleHandler(module_start_handler);
-
-// 	return sceKernelExitDeleteThread(0);
-// }
-
-// int module_start(SceSize args, void *argp)
-// {
-// 	applicationType = sceKernelInitKeyConfig();
-
-// 	SceUID thid = sceKernelCreateThread("npdrm_free", thread_start, 0x22, 0x2000, 0, NULL);
-
-// 	if (thid >= 0)
-// 		sceKernelStartThread(thid, args, argp);
-
-// 	return 0;
-// }
-
-// int module_stop(SceSize args __attribute__((unused)), void *argp __attribute__((unused)))
-// {
-// 	return 0;
-// }
