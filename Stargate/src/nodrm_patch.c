@@ -24,6 +24,9 @@
 #include <systemctrl_se.h>
 
 #include "nodrm_patch.h"
+#include "pgd.h"
+
+#define PSP_O_NPDRM 0x40000000
 
 // NODRM Hook Entry
 typedef struct _NoDrmHookEntry {
@@ -94,6 +97,13 @@ int myIoCloseAsync(SceUID fd);
 int myIoWaitAsyncCB(SceUID fd, SceIores *result);
 int myIoPollAsync(SceUID fd, SceIores *result);
 
+// nploader
+int patch_drm_driver(void);
+int setup_edat_version_key_hook(u8 *vkey, u8 *edat, int size);
+int (* setup_edat_version_key)(u8 *vkey, u8 *edat, int size);
+char g_pgd_path[256];
+u8 pgdbuf[0x90];
+
 // Hook Table
 static NoDrmHookEntry g_nodrm_hook_map[] = {
     { "sceIOFileManager", "IoFileMgrForUser", 0x109F50BC, myIoOpen },
@@ -115,12 +125,16 @@ void nodrmInit(void)
 {
     // Create Semaphore
     g_nodrm_sema = sceKernelCreateSema("", 0, 1, 1, NULL);
-    
+
+    // graft in npdrm hook
+    patch_drm_driver();
+
     // Find Functions in Memory
     nodrmGetFunctions();
     
     // Hook Functions via Syscall Table
     nodrmHookFunctions();
+
 }
 
 // Find Functions in Memory
@@ -131,6 +145,24 @@ void nodrmGetFunctions(void)
     _sceNpDrmEdataSetupKey = (void *)sctrlHENFindFunction("scePspNpDrm_Driver", "scePspNpDrm_user", 0x08D98894);
     _sceNpDrmEdataGetDataSize = (void *)sctrlHENFindFunction("scePspNpDrm_Driver", "scePspNpDrm_user", 0x219EF5CC);
     _sceKernelLoadModuleNpDrm = (void *)sctrlHENFindFunction("sceModuleManager", "ModuleMgrForUser", 0xF2D8D1B4);
+}
+
+int patch_drm_driver(){
+    u32 addr;
+    //kprintf("finding module scePSPNpDrm_Driver\n");
+    //SceModule2 *mod = sceKernelFindModuleByName("scePspNpDrm_Driver");
+    SceModule* mod = (SceModule*)sceKernelFindModuleByName("scePspNpDrm_Driver");
+    if(mod){
+        for (addr = mod->text_addr; addr < (mod->text_addr + mod->text_size ); addr += 4) {
+            if (_lw(addr) == 0x2CC60080) { //sltiu      $a2, $a2, 128
+                //kprintf("hijack_function at %08X\n", addr - 8);
+                HIJACK_FUNCTION(addr - 8, setup_edat_version_key_hook, setup_edat_version_key);
+            
+                break;
+            }
+        }
+    }
+    return 1;
 }
 
 // Hook Functions via Syscall Table
@@ -164,11 +196,44 @@ int check_memory(const void * addr, int size)
     return 1;
 }
 
+// case insensitive string compare
+// primitive implementation to avoid pulling in more libs
+int strncasecmp(const char *s1, const char *s2, size_t n) 
+{
+    // Loop until we reach n characters, the end of either string, or a mismatch
+    while (n > 0) {
+        char c1 = *s1;
+        char c2 = *s2;
+
+        // Manual ASCII lowercase conversion
+        if (c1 >= 'A' && c1 <= 'Z') c1 |= 0x20;
+        if (c2 >= 'A' && c2 <= 'Z') c2 |= 0x20;
+
+        if (c1 != c2) {
+            return (unsigned char)c1 - (unsigned char)c2;
+        }
+
+        // If we hit the null terminator, strings matched up to this point
+        if (c1 == '\0') {
+            break;
+        }
+
+        s1++;
+        s2++;
+        n--;
+    }
+
+    return 0;
+}
+
 // File Crypto Flag Matcher
 int is_encrypted_flag(int flag)
 {
     // File Crypto Flag Match
     if(flag == 0x40004001 || flag == 0x40000001)
+        return 1;
+
+    if((flag & 0x40000000) == 0x40000000)
         return 1;
     
     // Other Flags
@@ -238,7 +303,7 @@ int check_file_is_encrypted_by_path(const char * path)
     }
     
     // Open Error (we assume its encrypted)
-    else result = 1;
+    else result = fd;
     
     // Restore Permission Level
     pspSdkSetK1(k1);
@@ -372,8 +437,13 @@ int myIoOpen(const char * file, int flag, int mode)
     int fd = -1;
     
     // Encrypted File requested
-    if(is_encrypted_flag(flag))
+    //if(is_encrypted_flag(flag))
+    if (((flag & PSP_O_NPDRM) == PSP_O_NPDRM) && strncasecmp(file, "disc0", 5))
+    //if (((flag & PSP_O_NPDRM) == PSP_O_NPDRM))
     {
+        // Save file name
+        strcpy(g_pgd_path, file);
+
         // Open File in Binary Mode
         fd = sceIoOpen(file, PSP_O_RDONLY, mode);
         
@@ -392,7 +462,7 @@ int myIoOpen(const char * file, int flag, int mode)
             {
                 // Add File Descriptor to Internal List
                 add_nodrm_fd(fd); 
-                
+                flag &= ~PSP_O_NPDRM;
                 // Pass Binary Mode File Descriptor to Caller
                 goto exit;
             }
@@ -418,8 +488,12 @@ int myIoOpenAsync(const char * file, int flag, int mode)
     int is_plain = 0;
     
     // Encrypted File requested
-    if(is_encrypted_flag(flag))
+    //if(is_encrypted_flag(flag))
+    if (((flag & PSP_O_NPDRM) == PSP_O_NPDRM) && strncasecmp(file, "disc0", 5))
     {
+        // Save the file
+        strcpy(g_pgd_path, file);
+
         // Open File in Binary Mode
         fd = sceIoOpen(file, PSP_O_RDONLY, mode);
         
@@ -506,6 +580,30 @@ exit:
     
     // Return Result
     return result;
+}
+
+// utility function
+u32 tou32(u8 *buf)
+{
+    return (u32)(buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24));
+}
+
+//patches sceNpDrmEdataSetupKey and sceNpDrmGetModuleKey
+int setup_edat_version_key_hook(u8 *vkey, u8 *edat, int size)
+{
+    int ret = setup_edat_version_key(vkey, edat, size);
+
+    if (ret < 0) { //generate key from mac if official method fails.
+        ret = sceIoOpen(g_pgd_path, 1, 0);
+        sceIoRead(ret, pgdbuf, 16);
+        sceIoLseek(ret, tou32(pgdbuf + 0xC) & 0xFFFF, 0);
+        sceIoRead(ret, pgdbuf, 0x90);
+        sceIoClose(ret);
+
+        ret = get_edat_key(vkey, pgdbuf);
+    }
+
+    return ret;
 }
 
 // sceNpDrmEdataSetupKey Hook

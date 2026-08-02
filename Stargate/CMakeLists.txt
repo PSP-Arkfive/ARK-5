@@ -10,6 +10,7 @@ target_sources(stargate PRIVATE
    src/pspcipher.c
    src/gamefix.c
    src/hide.c
+   src/pgd.c
    src/chn_iso.c
 )
 

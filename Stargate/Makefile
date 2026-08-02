@@ -11,6 +11,7 @@ C_OBJS = main.o \
 	src/pspcipher.o \
 	src/gamefix.o \
 	src/hide.o \
+	src/pgd.o \
 	src/chn_iso.o \
 
 OBJS = $(C_OBJS)
