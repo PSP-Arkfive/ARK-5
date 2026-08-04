@@ -58,6 +58,11 @@ int stargateSyspatchModuleOnStart(SceModule * mod)
         patch_ISODriverModule(mod);
     }
 
+    // This loads late in UMD mode so reinit nodrm
+    if (strcmp(mod->modname, "scePspNpDrm_Driver") == 0){
+        nodrmInit();
+    }
+    
     // Call Previous Module Start Handler
     if (previous) previous(mod);
     
