@@ -29,7 +29,7 @@
 #include "modulemanager.h"
 
 // Module Start Handler
-STMOD_HANDLER g_module_start_handler = NULL;
+STMOD_HANDLER on_module_start_handler = NULL;
 
 // Partition Check Function
 int (* realPartitionCheck)(unsigned int *, SceLoadCoreExecFileInfo *) = NULL;
@@ -187,10 +187,10 @@ int prologue_module_hook(void * unk0, SceModule * mod)
     if(result >= 0)
     {
         // Module Start Handler
-        if(g_module_start_handler != NULL)
+        if (on_module_start_handler != NULL)
         {
             // Call Module Start Handler
-            g_module_start_handler(mod);
+            on_module_start_handler(mod);
         }
     }
     

@@ -44,8 +44,8 @@ extern u32 sctrlHENFakeDevkitVersion();
 extern int is_plugins_loading;
 extern SEConfigARK se_config;
 
-// Previous Module Start Handler
-STMOD_HANDLER previous = NULL;
+
+SYSBOOT_HANDLER on_system_booted_handler = NULL;
 
 #ifdef DEBUG
 #include <pspdisplay.h>
@@ -261,6 +261,9 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
                     break;
             }
 
+            if (on_system_booted_handler)
+                on_system_booted_handler();
+
             ark_config.recovery = 0; // reset recovery mode for next reboot
 
             // Boot Complete Action done
@@ -277,8 +280,6 @@ flush:
     sctrlFlushCache();
 
 exit:
-    // Forward to previous Handler
-    if(previous) return previous(mod);
     return 0;
 }
 
@@ -286,5 +287,5 @@ exit:
 void syspatchInit(void)
 {
     // Register Module Start Handler
-    previous = sctrlHENSetStartModuleHandler(ARKSyspatchOnModuleStart);
+    sctrlHENSetStartModuleHandler(ARKSyspatchOnModuleStart);
 }

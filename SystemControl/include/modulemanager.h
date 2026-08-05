@@ -21,7 +21,7 @@
 #include <systemctrl.h>
 
 // Module Start Handler
-extern STMOD_HANDLER g_module_start_handler;
+extern STMOD_HANDLER on_module_start_handler;
 
 // Internal Module Manager Apitype Field
 extern int * kernel_init_apitype;

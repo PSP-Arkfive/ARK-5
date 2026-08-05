@@ -22,6 +22,7 @@
 #include "modulemanager.h"
 #include "loadercore.h"
 #include "sysmem.h"
+#include "syspatch.h"
 #include "systemctrl_private.h"
 
 extern SEConfig se_config;
@@ -143,13 +144,26 @@ void sctrlHENPatchSyscall(void * addr, void * newaddr)
 STMOD_HANDLER sctrlHENSetStartModuleHandler(STMOD_HANDLER new_handler)
 {
     // Get Previous Handler
-    STMOD_HANDLER on_module_start = g_module_start_handler;
+    STMOD_HANDLER prev = on_module_start_handler;
 
     // Register Handler
-    g_module_start_handler = (void *)(KERNELIFY(new_handler));
+    on_module_start_handler = (void *)(KERNELIFY(new_handler));
 
     // Return Previous Handler
-    return on_module_start;
+    return prev;
+}
+
+// Register On System Booted Handler
+SYSBOOT_HANDLER sctrlHENSetSystemBootedHandler(SYSBOOT_HANDLER new_handler)
+{
+    // Get Previous Handler
+    SYSBOOT_HANDLER prev = on_system_booted_handler;
+
+    // Register Handler
+    on_system_booted_handler = (void *)(KERNELIFY(new_handler));
+
+    // Return Previous Handler
+    return prev;
 }
 
 u32 sctrlHENFindFunction(const char * modname, const char *library, u32 nid){

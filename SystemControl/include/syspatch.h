@@ -18,6 +18,8 @@
 #ifndef _SYSPATCH_H_
 #define _SYSPATCH_H_
 
+extern SYSBOOT_HANDLER on_system_booted_handler;
+
 // Add Module Start Patcher
 void syspatchInit(void);
 
