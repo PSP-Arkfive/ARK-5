@@ -25,6 +25,8 @@ extern void patchVLF(SceModule * mod);
 
 // Previous Module Start Handler
 STMOD_HANDLER previous = NULL;
+// Previous SystemBooted Handler
+SYSBOOT_HANDLER sysboot_prev = NULL;
 
 // This patch injects Inferno with no ISO to simulate an empty UMD drive on homebrew
 int (*_sctrlKernelLoadExecVSHWithApitype)(int apitype, const char * file, struct SceKernelLoadExecVSHParam * param) = NULL;
@@ -93,9 +95,6 @@ int infernoIoDevctl(const char* drvname, u32 cmd, void* arg2, u32 arg3, void* p,
 
 int ARKVitaOnModuleStart(SceModule * mod){
 
-    // System fully booted Status
-    static int booted = 0;
-
     patchFileManagerImports(mod);
 
     if (strcmp(mod->modname, "PRO_Inferno_Driver") == 0){
@@ -151,48 +150,45 @@ int ARKVitaOnModuleStart(SceModule * mod){
         goto flush;
     }
 
-    // Boot Complete Action not done yet
-    if(booted == 0)
-    {
-        // Boot is complete
-        if(sctrlHENIsSystemBooted())
-        {
-
-            // Initialize Memory Stick Speedup Cache
-            if (se_config->msspeed)
-                sctrlMsCacheInit("ms", MSCACHE_BUFSIZE_MIN);
-
-            // Apply Directory IO PSP Emulation
-            patchFileSystemDirSyscall();
-
-            // Patch sceKernelExitGame Syscalls
-            REDIRECT_FUNCTION(sctrlHENFindFunction("sceLoadExec", "LoadExecForUser", 0x05572A5F), K_EXTRACT_IMPORT(sctrlArkExitLauncher));
-            REDIRECT_FUNCTION(sctrlHENFindFunction("sceLoadExec", "LoadExecForUser", 0x2AC9954B), K_EXTRACT_IMPORT(sctrlArkExitLauncher));
-
-            // Apply Directory IO PSP Emulation
-            patchFileSystemDirSyscall();
-
-            // patch bug in ePSP volatile mem
-            _sceKernelVolatileMemTryLock = (void *)sctrlHENFindFunction("sceSystemMemoryManager", "sceSuspendForUser", 0xA14F40B2);
-            sctrlHENPatchSyscall((void*)_sceKernelVolatileMemTryLock, sceKernelVolatileMemTryLockPatched);
-
-            // fix sound bug in ePSP (make sceAudioOutput2Release behave like real PSP)
-            _sceAudioOutput2GetRestSample = (void *)sctrlHENFindFunction("sceAudio_Driver", "sceAudio", 0x647CEF33);
-            _sceAudioOutput2Release = (void *)sctrlHENFindFunction("sceAudio_Driver", "sceAudio", 0x43196845);
-            sctrlHENPatchSyscall((void*)_sceAudioOutput2Release, sceAudioOutput2ReleaseFixed);
-
-            // Boot Complete Action done
-            booted = 1;
-            goto flush;
-        }
-    }
-
 flush:
     sctrlFlushCache();
 
     // Forward to previous Handler
     if(previous) return previous(mod);
     return 0;
+}
+
+// Boot is complete
+void ARKVitaOnSystemBootedHandler()
+{
+    // Initialize Memory Stick Speedup Cache
+    if (se_config->msspeed)
+        sctrlMsCacheInit("ms", MSCACHE_BUFSIZE_MIN);
+
+    // Apply Directory IO PSP Emulation
+    patchFileSystemDirSyscall();
+
+    // Patch sceKernelExitGame Syscalls
+    REDIRECT_FUNCTION(sctrlHENFindFunction("sceLoadExec", "LoadExecForUser", 0x05572A5F), K_EXTRACT_IMPORT(sctrlArkExitLauncher));
+    REDIRECT_FUNCTION(sctrlHENFindFunction("sceLoadExec", "LoadExecForUser", 0x2AC9954B), K_EXTRACT_IMPORT(sctrlArkExitLauncher));
+
+    // Apply Directory IO PSP Emulation
+    patchFileSystemDirSyscall();
+
+    // patch bug in ePSP volatile mem
+    _sceKernelVolatileMemTryLock = (void *)sctrlHENFindFunction("sceSystemMemoryManager", "sceSuspendForUser", 0xA14F40B2);
+    sctrlHENPatchSyscall((void*)_sceKernelVolatileMemTryLock, sceKernelVolatileMemTryLockPatched);
+
+    // fix sound bug in ePSP (make sceAudioOutput2Release behave like real PSP)
+    _sceAudioOutput2GetRestSample = (void *)sctrlHENFindFunction("sceAudio_Driver", "sceAudio", 0x647CEF33);
+    _sceAudioOutput2Release = (void *)sctrlHENFindFunction("sceAudio_Driver", "sceAudio", 0x43196845);
+    sctrlHENPatchSyscall((void*)_sceAudioOutput2Release, sceAudioOutput2ReleaseFixed);
+
+    // Boot Complete Action done
+    sctrlFlushCache();
+
+    // Forward to previous Handler
+    if (sysboot_prev) sysboot_prev();
 }
 
 int (*prev_start)(int modid, SceSize argsize, void * argp, int * modstatus, SceKernelSMOption * opt) = NULL;
@@ -251,6 +247,9 @@ void initVitaSysPatch(){
 
     // Register custom start module
     prev_start = sctrlSetStartModuleExtra(StartModuleHandler);
+
+    // Register system booted handler
+    sysboot_prev = sctrlHENSetSystemBootedHandler(ARKVitaOnSystemBootedHandler);
 
     // Implement extra memory unlock
     HIJACK_FUNCTION(K_EXTRACT_IMPORT(sctrlHENApplyMemory), memoryHandlerVita, _sctrlHENApplyMemory);

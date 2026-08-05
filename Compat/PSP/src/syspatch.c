@@ -25,6 +25,8 @@ extern SEConfigARK* se_config;
 
 // Previous Module Start Handler
 STMOD_HANDLER previous = NULL;
+// Previous SystemBooted Handler
+SYSBOOT_HANDLER sysboot_prev = NULL;
 
 extern void usb_charge(u32 milis);
 extern void patchPops4Tool();
@@ -216,9 +218,7 @@ void processSettings(){
     disableLEDs();
 }
 
-int PSPOnModuleStart(SceModule * mod){
-    // System fully booted Status
-    static int booted = 0;
+int ARKPSPOnModuleStart(SceModule * mod){
 
     if (strcmp(mod->modname, "CWCHEATPRX") == 0) {
         if (sceKernelInitKeyConfig() == PSP_INIT_KEYCONFIG_POPS) {
@@ -309,39 +309,12 @@ int PSPOnModuleStart(SceModule * mod){
         goto flush;
     }
 
-    if (strcmp(mod->modname, "Legacy_Software_Loader") == 0 )
+    if (strcmp(mod->modname, "Legacy_Software_Loader") == 0)
     {
-        // Missing from SDK
-        #define PSP_INIT_APITYPE_EF2 0x152
-        if( sceKernelInitApitype() == PSP_INIT_APITYPE_EF2 )
+        if (sceKernelInitApitype() == PSP_INIT_APITYPE_EF2)
         {
         	_sw( 0x10000005, mod->text_addr + 0x0000014C );
         	goto flush;
-        }
-    }
-
-    if (booted == 0)
-    {
-        // Boot is complete
-        if (sctrlHENIsSystemBooted())
-        {
-
-            // handle mscache
-            if (se_config->msspeed){
-                char* drv =
-                    (psp_model == PSP_GO && sctrlKernelBootFrom()==0x50)?
-                    "eflash0a0f1p" : "msstor0p";
-                sctrlMsCacheInit(drv, MSCACHE_BUFSIZE_MIN);
-            }
-
-            // fix pops on toolkits
-            if (sctrlHENIsToolKit() && sceKernelInitKeyConfig() == PSP_INIT_KEYCONFIG_POPS){
-                patchPops4Tool();
-            }
-
-            // Boot Complete Action done
-            booted = 1;
-            goto flush;
         }
     }
 
@@ -351,6 +324,28 @@ flush:
     // Forward to previous Handler
     if (previous) return previous(mod);
     return 0;
+}
+
+void ARKPSPOnSystemBootedHandler()
+{
+    // handle mscache
+    if (se_config->msspeed){
+        char* drv =
+            (psp_model == PSP_GO && sctrlKernelBootFrom()==0x50)?
+            "eflash0a0f1p" : "msstor0p";
+        sctrlMsCacheInit(drv, MSCACHE_BUFSIZE_MIN);
+    }
+
+    // fix pops on toolkits
+    if (sctrlHENIsToolKit() && sceKernelInitKeyConfig() == PSP_INIT_KEYCONFIG_POPS){
+        patchPops4Tool();
+    }
+
+    // Boot Complete Action done
+    sctrlFlushCache();
+
+    // Forward to previous Handler
+    if (sysboot_prev) return sysboot_prev();
 }
 
 int (*prev_start)(int modid, SceSize argsize, void * argp, int * modstatus, SceKernelSMOption * opt) = NULL;
@@ -390,10 +385,13 @@ PspSysEventHandler g_power_event = {
 
 void PSPSyspatchStart(){
     // Register Module Start Handler
-    previous = sctrlHENSetStartModuleHandler(PSPOnModuleStart);
+    previous = sctrlHENSetStartModuleHandler(ARKPSPOnModuleStart);
 
     // Register custom start module
     prev_start = sctrlSetStartModuleExtra(StartModuleHandler);
+
+    // Register system booted handler
+    sysboot_prev = sctrlHENSetSystemBootedHandler(ARKPSPOnSystemBootedHandler);
 
     // Register Power Event Handler
     sceKernelRegisterSysEventHandler(&g_power_event);

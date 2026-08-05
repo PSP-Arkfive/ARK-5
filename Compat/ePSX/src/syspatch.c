@@ -22,6 +22,8 @@ extern SEConfigARK* se_config;
 
 // Previous Module Start Handler
 STMOD_HANDLER previous = NULL;
+// Previous SystemBooted Handler
+SYSBOOT_HANDLER sysboot_prev = NULL;
 
 static int draw_thread = -1;
 static volatile int do_draw = 0;
@@ -201,8 +203,6 @@ int sctrlKernelLoadExecVSHWithApitypeFixed(int apitype, const char * file, struc
 
 int ARKVitaPopsOnModuleStart(SceModule * mod){
 
-    static int booted = 0;
-
     #if 0
     #include <colordebugger.h>
     #include <tinyfont.h>
@@ -278,38 +278,6 @@ int ARKVitaPopsOnModuleStart(SceModule * mod){
         goto flush;
     }
 
-    // Boot Complete Action not done yet
-    if(booted == 0)
-    {
-        // Boot is complete
-        if(sctrlHENIsSystemBooted())
-        {
-
-            // Initialize Memory Stick Speedup Cache
-            if (se_config->msspeed)
-                sctrlMsCacheInit("ms", MSCACHE_BUFSIZE_MIN);
-
-            if (sceKernelInitKeyConfig() == PSP_INIT_KEYCONFIG_POPS){
-                // Set fake framebuffer so that plugins like cwcheat can be displayed
-                DisplaySetFrameBuf((void *)fake_vram, PSP_SCREEN_LINE, PSP_DISPLAY_PIXEL_FORMAT_8888, PSP_DISPLAY_SETBUF_NEXTFRAME);
-                memset((void *)fake_vram, 0, SCE_PSPEMU_FRAMEBUFFER_SIZE);
-                // enable vitapops
-                sceIoOpen("ms0:/__popsresume__", 0, 0);
-            }
-
-            // fix launcher exit
-            u32 exitFunc = sctrlHENFindFunction("SystemControl", "ArkCtrl", 0x8476E2F1);
-            HIJACK_FUNCTION(exitFunc, popsLauncher, arkLauncher);
-
-            // notify ps1cfw_enabler that boot is complete
-            sceIoOpen("ms0:/__popsbooted__", 0, 0);
-
-            // Boot Complete Action done
-            booted = 1;
-            goto flush;
-        }
-    }
-
 flush:
     sctrlFlushCache();
 
@@ -318,10 +286,43 @@ flush:
     return 0;
 }
 
+// Boot is complete
+void ARKVitaPopsOnSystemBootedHandler()
+{
+
+    // Initialize Memory Stick Speedup Cache
+    if (se_config->msspeed)
+        sctrlMsCacheInit("ms", MSCACHE_BUFSIZE_MIN);
+
+    if (sceKernelInitKeyConfig() == PSP_INIT_KEYCONFIG_POPS){
+        // Set fake framebuffer so that plugins like cwcheat can be displayed
+        DisplaySetFrameBuf((void *)fake_vram, PSP_SCREEN_LINE, PSP_DISPLAY_PIXEL_FORMAT_8888, PSP_DISPLAY_SETBUF_NEXTFRAME);
+        memset((void *)fake_vram, 0, SCE_PSPEMU_FRAMEBUFFER_SIZE);
+        // enable vitapops
+        sceIoOpen("ms0:/__popsresume__", 0, 0);
+    }
+
+    // fix launcher exit
+    u32 exitFunc = sctrlHENFindFunction("SystemControl", "ArkCtrl", 0x8476E2F1);
+    HIJACK_FUNCTION(exitFunc, popsLauncher, arkLauncher);
+
+    // notify ps1cfw_enabler that boot is complete
+    sceIoOpen("ms0:/__popsbooted__", 0, 0);
+
+    // Boot Complete Action done
+    sctrlFlushCache();
+
+    // Forward to previous Handler
+    if (sysboot_prev) return sysboot_prev();
+}
+
 void initVitaPopsSysPatch(){
 
     // Register Module Start Handler
     previous = sctrlHENSetStartModuleHandler(ARKVitaPopsOnModuleStart);
+
+    // Register system booted handler
+    sysboot_prev = sctrlHENSetSystemBootedHandler(ARKVitaPopsOnSystemBootedHandler);
 
     // patch to fix go-style apitypes
     HIJACK_FUNCTION(K_EXTRACT_IMPORT(sctrlKernelLoadExecVSHWithApitype), sctrlKernelLoadExecVSHWithApitypeFixed, _sctrlKernelLoadExecVSHWithApitype);

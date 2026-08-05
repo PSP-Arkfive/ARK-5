@@ -39,6 +39,8 @@ extern SEConfigARK* se_config;
 
 // Previous Module Start Handler
 STMOD_HANDLER previous = NULL;
+// Previous SystemBooted Handler
+SYSBOOT_HANDLER sysboot_prev = NULL;
 
 
 // kermit_peripheral's sub_000007CC clone, called by loadexec + 0x0000299C with a0=8 (was a0=7 for fw <210)
@@ -158,9 +160,6 @@ void exit_game_patched(){
 
 int AdrenalineOnModuleStart(SceModule * mod){
 
-    // System fully booted Status
-    static int booted = 0;
-
     // Patch Kermit Peripheral Module to load flash0
     if(strcmp(mod->modname, "sceKermitPeripheral_Driver") == 0)
     {
@@ -193,21 +192,6 @@ int AdrenalineOnModuleStart(SceModule * mod){
         }
         goto flush;
     }
-       
-    // Boot Complete Action not done yet
-    if(booted == 0)
-    {
-        // Boot is complete
-        if(sctrlHENIsSystemBooted())
-        {
-            // Initialize Memory Stick Speedup Cache
-            if (se_config->msspeed)
-        		sctrlMsCacheInit("ms", MSCACHE_BUFSIZE_MIN);
-
-            // Boot Complete Action done
-            booted = 1;
-        }
-    }
 
 flush:
     sctrlFlushCache();
@@ -217,7 +201,23 @@ flush:
     return 0;
 }
 
+// Boot is complete
+void AdrenalineOnSystemBootedHandler()
+{
+    // Initialize Memory Stick Speedup Cache
+    if (se_config->msspeed)
+        sctrlMsCacheInit("ms", MSCACHE_BUFSIZE_MIN);
+
+    // Boot Complete Action done
+    sctrlFlushCache();
+
+    // Forward to previous Handler
+    if (sysboot_prev) return sysboot_prev();
+}
+
 void initAdrenalineSysPatch(){
     // Register Module Start Handler
     previous = sctrlHENSetStartModuleHandler(AdrenalineOnModuleStart);
+    // Register system booted handler
+    sysboot_prev = sctrlHENSetSystemBootedHandler(AdrenalineOnSystemBootedHandler);
 }
