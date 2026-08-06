@@ -223,6 +223,13 @@ char* convert_battery_opts[] = {
     "Pandora",
 };
 
+char* mscache_options[] = {
+    "Off",
+    "4 KiB",
+    "8 KiB",
+    "16 KiB"
+};
+
 char* classic_plugins_opts[] = {
     "No Cleanup",
     "With Cleanup",
@@ -299,7 +306,7 @@ struct {
     ITEM_OPT(boolean_settings), // WPA2 ( Thanks again @Moment )
     ITEM_OPT(boolean_settings), // Autoboot Launcher
     ITEM_OPT(boolean_settings2), // Extra RAM
-    ITEM_OPT(boolean_settings), // MS Speedup
+    ITEM_OPT(mscache_options), // MS Speedup
     ITEM_OPT(infernocache_settings), // Inferno Cache
     ITEM_OPT(boolean_settings2), // Disable Go Pause
     ITEM_OPT(boolean_settings), // Old Plugins on ef0

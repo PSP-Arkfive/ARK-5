@@ -291,8 +291,17 @@ void ARKVitaPopsOnSystemBootedHandler()
 {
 
     // Initialize Memory Stick Speedup Cache
-    if (se_config->msspeed)
-        sctrlMsCacheInit("ms", MSCACHE_BUFSIZE_MIN);
+    switch (se_config->msspeed){
+        case 1:
+            sctrlMsCacheInit("ms", MSCACHE_BUFSIZE_MIN);
+            break;
+        case 2:
+            sctrlMsCacheInit("ms", MSCACHE_BUFSIZE_MED);
+            break;
+        case 3:
+            sctrlMsCacheInit("ms", MSCACHE_BUFSIZE_MAX);
+            break;
+    }
 
     if (sceKernelInitKeyConfig() == PSP_INIT_KEYCONFIG_POPS){
         // Set fake framebuffer so that plugins like cwcheat can be displayed

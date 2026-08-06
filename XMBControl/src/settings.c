@@ -91,8 +91,16 @@ static int processConfigLine(char* runlevel, char* path, char* enabled){
         config.highmem = opt;
         return 1;
     }
-    else if (strcasecmp(path, "mscache") == 0){
-        config.mscache = opt;
+    else if (strcasecmp(path, "mscache") == 0 || strcasecmp(path, "mscache:4k") == 0){
+        config.mscache = (opt)?1:0;
+        return 1;
+    }
+    else if (strcasecmp(path, "mscache:8k") == 0){
+        config.mscache = (opt)?2:0;
+        return 1;
+    }
+    else if (strcasecmp(path, "mscache:16k") == 0){
+        config.mscache = (opt)?3:0;
         return 1;
     }
     else if (strncasecmp(path, "infernocache", 12) == 0){
@@ -222,7 +230,6 @@ void loadSettings(){
     FIX_BOOLEAN(config.usbcharge);
     FIX_BOOLEAN(config.launcher);
     FIX_BOOLEAN(config.highmem);
-    FIX_BOOLEAN(config.mscache);
     FIX_BOOLEAN(config.disablepause);
     FIX_BOOLEAN(config.oldplugin);
     FIX_BOOLEAN(config.hibblock);
@@ -301,7 +308,12 @@ void saveSettings(){
     processSetting(fd, line, "wpa2", config.wpa2);
     processSetting(fd, line, "launcher", config.launcher);
     processSetting(fd, line, "highmem", config.highmem);
-    processSetting(fd, line, "mscache", config.mscache);
+    switch (config.mscache){
+        case 0: processSetting(fd, line, "mscache", 0); break;
+        case 1: processSetting(fd, line, "mscache:4k", 1); break;
+        case 2: processSetting(fd, line, "mscache:8k", 1); break;
+        case 3: processSetting(fd, line, "mscache:16k", 1); break;
+    }
     switch (config.infernocache){
         case 0: processSetting(fd, line, "infernocache", 0); break;
         case 1: processSetting(fd, line, "infernocache:lru", 1); break;

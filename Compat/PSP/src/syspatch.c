@@ -333,7 +333,17 @@ void ARKPSPOnSystemBootedHandler()
         char* drv =
             (psp_model == PSP_GO && sctrlKernelBootFrom()==0x50)?
             "eflash0a0f1p" : "msstor0p";
-        sctrlMsCacheInit(drv, MSCACHE_BUFSIZE_MIN);
+        switch (se_config->msspeed){
+            case 1:
+                sctrlMsCacheInit(drv, MSCACHE_BUFSIZE_MIN);
+                break;
+            case 2:
+                sctrlMsCacheInit(drv, MSCACHE_BUFSIZE_MED);
+                break;
+            case 3:
+                sctrlMsCacheInit(drv, MSCACHE_BUFSIZE_MAX);
+                break;
+        }
     }
 
     // fix pops on toolkits

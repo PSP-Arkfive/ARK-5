@@ -87,8 +87,14 @@ static void settingsHandler(const char* path, u8 enabled){
         }
         se_config.force_high_memory = enabled;
     }
-    else if (strcasecmp(path, "mscache") == 0){
-        se_config.msspeed = enabled; // enable ms cache for speedup
+    else if (strcasecmp(path, "mscache") == 0 || strcasecmp(path, "mscache:4k") == 0){
+        se_config.msspeed = (enabled)?1:0; // enable ms cache for speedup
+    }
+    else if (strcasecmp(path, "mscache:8k") == 0){
+        se_config.msspeed = (enabled)?2:0; // enable ms cache for speedup
+    }
+    else if (strcasecmp(path, "mscache:16k") == 0){
+        se_config.msspeed = (enabled)?3:0; // enable ms cache for speedup
     }
     else if (strcasecmp(path, "disablepause") == 0){ // disable pause game feature on psp go
         se_config.disable_pause = enabled;
