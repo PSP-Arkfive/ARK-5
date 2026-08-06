@@ -5,8 +5,7 @@ TARGET = popcorn
 OBJS = main.o \
 	src/icon.o \
 	src/syspatch.o \
-	src/libcrypt.o \
-	src/pgd.o
+	src/libcrypt.o 
 
 
 all: $(TARGET).prx
@@ -26,6 +25,6 @@ USE_KERNEL_LIBS=1
 
 LIBDIR = 
 LDFLAGS = -nostartfiles
-LIBS = -lpspsystemctrl_kernel -lpspsemaphore_660
+LIBS = -lpspsystemctrl_kernel -lpspsemaphore_660 -lpspnodrm
 
 include $(PSPSDK)/lib/build.mak

@@ -26,8 +26,8 @@ typedef struct {
 int sceUtilsBufferCopyWithRange(u8 *outbuf, int outlen, u8 *inbuf, int inlen, int cmd);
 
 int kirk7(u8 *buf, int size, int type);
-int get_version_key(u8 *version_key, char *path);
-int get_edat_key(u8 *vkey, u8 *pgd_buf);
-int bbmac_getkey(SceMacKey *mkey, u8 *bbmac, u8 *vkey);
+int sctrlNoDrmGetVersionKey(unsigned char * key, char *path);
+int sctrlNoDrmGetEdatKey(u8 *vkey, u8 *pgd_buf);
+int sctrlNoDrmBBMacGetKey(SceMacKey *mkey, u8 *bbmac, u8 *vkey);
 
 #endif /* _PGD_H */

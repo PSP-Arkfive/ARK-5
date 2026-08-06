@@ -22,9 +22,10 @@
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
+#include <pspnodrm.h>
 
 #include "nodrm_patch.h"
-#include "pgd.h"
+
 
 #define PSP_O_NPDRM 0x40000000
 
@@ -566,7 +567,7 @@ int setup_edat_version_key_hook(u8 *vkey, u8 *edat, int size)
         sceIoRead(ret, pgdbuf, 0x90);
         sceIoClose(ret);
 
-        ret = get_edat_key(vkey, pgdbuf);
+        ret = sctrlNoDrmGetEdatKey(vkey, pgdbuf);
     }
 
     return ret;

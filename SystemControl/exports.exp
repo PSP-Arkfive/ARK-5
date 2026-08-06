@@ -274,6 +274,12 @@ PSP_EXPORT_FUNC(__umoddi3)
 PSP_EXPORT_FUNC(__udivmoddi4)
 PSP_EXPORT_END
 
+PSP_EXPORT_START(NoDrm, 0, 0x0001)
+PSP_EXPORT_FUNC(sctrlNoDrmBBMacGetKey)
+PSP_EXPORT_FUNC(sctrlNoDrmGetEdatKey)
+PSP_EXPORT_FUNC(sctrlNoDrmGetVersionKey)
+PSP_EXPORT_END
+
 PSP_EXPORT_START(SystemCtrlPrivate, 0, 0x0001)
 PSP_EXPORT_FUNC(msstorCacheDisable)
 PSP_EXPORT_FUNC(sctrlHENSetPluginHandler)

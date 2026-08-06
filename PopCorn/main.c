@@ -25,8 +25,6 @@
 #include <cfwmacros.h>
 #include <systemctrl.h>
 
-#include "pgd.h"
-
 PSP_MODULE_INFO("PROPopcornManager", 0x1007, 1, 2);
 
 extern STMOD_HANDLER g_previous;
