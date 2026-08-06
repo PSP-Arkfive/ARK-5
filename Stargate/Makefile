@@ -11,7 +11,6 @@ C_OBJS = main.o \
 	src/pspcipher.o \
 	src/gamefix.o \
 	src/hide.o \
-	src/pgd.o \
 	src/chn_iso.o \
 
 OBJS = $(C_OBJS)
@@ -34,6 +33,6 @@ USE_KERNEL_LIBS=1
 
 LIBDIR =
 LDFLAGS = -nostartfiles
-LIBS = -lpspsystemctrl_kernel -lpspsysc_user -lpspsemaphore_660
+LIBS = -lpspsystemctrl_kernel -lpspsysc_user -lpspsemaphore_660 -lpspnodrm
 
 include $(PSPSDK)/lib/build.mak

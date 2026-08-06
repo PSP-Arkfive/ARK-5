@@ -25,8 +25,7 @@
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <pspamctrl.h>
-
-#include "pgd.h"
+#include <pspnodrm.h>
 
 extern unsigned char g_icon_png[6108];
 
@@ -537,7 +536,8 @@ static struct FunctionHook g_amctrlHooks[] = {
 };
 
 // Use an alternate method to get the version key
-static int myGetVersionKey(unsigned char * key)
+//static int myGetVersionKey(unsigned char * key) 
+static int myGetVersionKey(unsigned char * key, char *filename)
 {
     //char ebootpath[256];
     u8 pgdbuf[0x90];
@@ -546,7 +546,6 @@ static int myGetVersionKey(unsigned char * key)
     int drm_type;
     int mac_type;
 	SceMacKey mkey;
-	char* filename = sceKernelInitFileName();
 
 	SceUID fd = sceIoOpen(filename, PSP_O_RDONLY, 0);
 	sceIoRead(fd, pgdbuf, 0x28);
@@ -584,7 +583,8 @@ static int myGetVersionKey(unsigned char * key)
 
 	        sceDrmBBMacInit((SceMacKey *)&mkey, mac_type);
 	        sceDrmBBMacUpdate((SceMacKey *)&mkey, pgdbuf, 0x70);
-            bbmac_getkey(&mkey, pgdbuf + 0x70, key);
+            // bbmac_getkey(&mkey, pgdbuf + 0x70, key);
+            sctrlNoDrmBBMacGetKey(&mkey, pgdbuf + 0x70, key);
             ret = 0;
         }
 	}
@@ -597,11 +597,12 @@ static int (*sceNpDrmGetVersionKey)(unsigned char * key, unsigned char * act, un
 static int _sceNpDrmGetVersionKey(unsigned char * key, unsigned char * act, unsigned char * rif, unsigned int flags)
 {
     int result;
+    char* filename = sceKernelInitFileName();
 
     result = (*sceNpDrmGetVersionKey)(key, act, rif, flags);
 
     if (result)
-        result = myGetVersionKey(key);
+        result = myGetVersionKey(key, filename);
 
     if (g_isCustomPBP)
         result = 0;
