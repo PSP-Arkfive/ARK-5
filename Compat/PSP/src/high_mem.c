@@ -162,7 +162,7 @@ SceUID (*origAllocPartitionMemory)(int partition, char* name, int place, int siz
 SceUID extraAllocPartitionMemory(int partition, char* name, int place, int size, void* addr){
     // adjust memory partition
     if (partition == 2 && addr == NULL && // redirect p2 allocations
-        !se_config->force_high_memory && // don't redirect if extra ram is forced onto p2
+        se_config->high_memory_use == HIGHMEM_AUTO_USE && // don't redirect if extra ram is forced onto p2
         (psp_model != PSP_GO || se_config->disable_pause) && // disable on PSP Go with pause feature
         sctrlIsLoadingPlugins() && // only when loading plugins
         sceKernelInitApitype() < 0x200  // not in VSH

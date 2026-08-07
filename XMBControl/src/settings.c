@@ -88,7 +88,15 @@ static int processConfigLine(char* runlevel, char* path, char* enabled){
         return 1;
     }
     else if (strcasecmp(path, "highmem") == 0){
-        config.highmem = opt;
+        config.highmem = (opt)? HIGHMEM_DEFAULT_USE : HIGHMEM_FORCE_OFF;
+        return 1;
+    }
+    else if (strcasecmp(path, "highmem:auto") == 0){
+        config.highmem = HIGHMEM_AUTO_USE;
+        return 1;
+    }
+    else if (strcasecmp(path, "highmem:forced") == 0){
+        config.highmem = HIGHMEM_FORCE_MAX;
         return 1;
     }
     else if (strcasecmp(path, "mscache") == 0 || strcasecmp(path, "mscache:4k") == 0){
@@ -229,7 +237,6 @@ void loadSettings(){
     config.usbreadonly = se_config.usbdevice_rdonly;
     FIX_BOOLEAN(config.usbcharge);
     FIX_BOOLEAN(config.launcher);
-    FIX_BOOLEAN(config.highmem);
     FIX_BOOLEAN(config.disablepause);
     FIX_BOOLEAN(config.oldplugin);
     FIX_BOOLEAN(config.hibblock);
@@ -307,7 +314,12 @@ void saveSettings(){
 
     processSetting(fd, line, "wpa2", config.wpa2);
     processSetting(fd, line, "launcher", config.launcher);
-    processSetting(fd, line, "highmem", config.highmem);
+    switch (config.highmem){
+        case HIGHMEM_FORCE_OFF:    processSetting(fd, line, "highmem", 0); break;
+        case HIGHMEM_DEFAULT_USE:  processSetting(fd, line, "highmem", 1); break;
+        case HIGHMEM_AUTO_USE:     processSetting(fd, line, "highmem:auto", 1); break;
+        case HIGHMEM_FORCE_MAX:    processSetting(fd, line, "highmem:forced", 1); break;
+    }
     switch (config.mscache){
         case 0: processSetting(fd, line, "mscache", 0); break;
         case 1: processSetting(fd, line, "mscache:4k", 1); break;

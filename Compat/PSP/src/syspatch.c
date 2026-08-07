@@ -260,7 +260,7 @@ int ARKPSPOnModuleStart(SceModule * mod){
         if (psp_model>PSP_1000) { // 8M cache on other models
             se_config->iso_cache_size_kb = 64;
             se_config->iso_cache_num = 128;
-            se_config->iso_cache_partition = (se_config->force_high_memory)? 2 : 9;
+            se_config->iso_cache_partition = (se_config->high_memory_use >= HIGHMEM_FORCE_MAX)? 2 : 9;
         }
         // Disable Pause feature on PSP Go
         if (se_config->disable_pause){

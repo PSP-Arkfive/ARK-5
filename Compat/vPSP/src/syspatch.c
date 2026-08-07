@@ -182,7 +182,7 @@ int AdrenalineOnModuleStart(SceModule * mod){
         // configure inferno cache
         se_config->iso_cache_size_kb = 32;
         se_config->iso_cache_num = 32;
-        se_config->iso_cache_partition = (se_config->force_high_memory)? 2:11;
+        se_config->iso_cache_partition = (se_config->high_memory_use >= HIGHMEM_FORCE_MAX)? 2:11;
         goto flush;
     }
 

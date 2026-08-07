@@ -52,7 +52,7 @@ int memoryHandlerVita(u32 p2){
     // the first 16MB are stable and good enough for most use cases
     // but homebrew that require extra ram will be allowed to use (some of) the upper 16MB
     if (p2 > 52){
-        p2 = (se_config->force_high_memory == 2)? 52 : 40;
+        p2 = (se_config->high_memory_use == HIGHMEM_FORCE_MAX)? 52 : 40;
     }
 
     // call orig function to determine if can unlock
@@ -75,7 +75,7 @@ SceUID extraAllocPartitionMemory(int partition, char* name, int place, int size,
     if (addr == NULL &&
         partition == 2 &&
         highmem_enabled &&
-        !se_config->force_high_memory &&
+        se_config->high_memory_use == HIGHMEM_AUTO_USE &&
         sctrlIsLoadingPlugins()
     ){
         partition = 11;

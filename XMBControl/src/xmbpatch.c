@@ -181,6 +181,13 @@ char* clock_settings[] = {
     "443"
 };
 
+char* highmem_settings[] = {
+    "Off",
+    "Default",
+    "Auto",
+    "Forced"
+};
+
 char* skiplogos_settings[] = {
     "Disabled",
     "Enabled",
@@ -305,7 +312,7 @@ struct {
     ITEM_OPT(clock_settings), // Clock VSH
     ITEM_OPT(boolean_settings), // WPA2 ( Thanks again @Moment )
     ITEM_OPT(boolean_settings), // Autoboot Launcher
-    ITEM_OPT(boolean_settings2), // Extra RAM
+    ITEM_OPT(highmem_settings), // Extra RAM
     ITEM_OPT(mscache_options), // MS Speedup
     ITEM_OPT(infernocache_settings), // Inferno Cache
     ITEM_OPT(boolean_settings2), // Disable Go Pause

@@ -80,12 +80,18 @@ static void settingsHandler(const char* path, u8 enabled){
     else if (strcasecmp(path, "usbcharge") == 0){ // enable usb charging
         se_config.usbcharge = enabled;
     }
-    else if (strcasecmp(path, "highmem") == 0){ // enable high memory
+    else if (strncasecmp(path, "highmem", 7) == 0){ // enable high memory
         if (sceKernelFindModuleByName("sceUmdCache_driver") != NULL){
             // don't allow high memory in UMD when cache is enabled
+            se_config.high_memory_use = HIGHMEM_FORCE_OFF;
             return;
         }
-        se_config.force_high_memory = enabled;
+        se_config.high_memory_use = enabled;
+        char* c = strchr(path, ':');
+        if (enabled && c){
+            if (strcasecmp(c+1, "auto") == 0) se_config.high_memory_use = HIGHMEM_AUTO_USE;
+            else if (strcasecmp(c+1, "forced") == 0) se_config.high_memory_use = HIGHMEM_FORCE_MAX;
+        }
     }
     else if (strcasecmp(path, "mscache") == 0 || strcasecmp(path, "mscache:4k") == 0){
         se_config.msspeed = (enabled)?1:0; // enable ms cache for speedup
@@ -206,11 +212,14 @@ void loadSettings(){
         u32 paramsize=4;
         int use_highmem = 0;
         if (sctrlGetInitPARAM("MEMSIZE", NULL, &paramsize, &use_highmem) >= 0 && use_highmem){
-            se_config.force_high_memory = 2;
+            switch (use_highmem){
+                case 1: se_config.high_memory_use = HIGHMEM_FORCE_MAX; break;
+                case 2: se_config.high_memory_use = HIGHMEM_FORCE_16; break;
+            }
         }
     }
 
-    if (se_config.force_high_memory){
+    if (se_config.high_memory_use >= HIGHMEM_FORCE_MAX){
         se_config.disable_pause = 1; // unless we figure out how to fix this
     }
 
