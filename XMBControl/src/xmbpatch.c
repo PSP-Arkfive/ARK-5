@@ -527,7 +527,7 @@ void reset_ark_settings(){
         "always, cpuclock:333, on\n"
         "always, wpa2, on\n"
         "always, launcher, off\n"
-        "always, highmem, off\n"
+        "always, highmem:auto, on\n"
         "always, mscache, on\n"
         "always, infernocache, on\n"
         "always, disablepause, off\n"
