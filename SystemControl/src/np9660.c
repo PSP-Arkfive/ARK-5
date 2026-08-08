@@ -63,7 +63,7 @@ int setup_eboot_version_key_hook(u8 *vkey, u8 *cid, u32 type, u8 *act)
 	int ret = setup_eboot_version_key(vkey, cid, type, act);
 
 	if (ret < 0) //generate key from mac if official method fails.
-		ret = sctrlNoDrmGetVersionKey(vkey, ebootpath);
+		ret = nodrmGetVersionKey(vkey, ebootpath);
 
 	if (ret >= 0) {
 		memcpy(g_eboot_key, vkey, 16); //backup eboot vkey for later calls.

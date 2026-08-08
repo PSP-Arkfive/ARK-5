@@ -25,6 +25,6 @@ USE_KERNEL_LIBS=1
 
 LIBDIR = 
 LDFLAGS = -nostartfiles
-LIBS = -lpspsystemctrl_kernel -lpspsemaphore_660 -lpspnodrm
+LIBS = -lpspsystemctrl_kernel -lpspsemaphore_660 -lpspnodrm_helper
 
 include $(PSPSDK)/lib/build.mak

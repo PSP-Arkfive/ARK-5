@@ -22,7 +22,7 @@
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
-#include <pspnodrm.h>
+#include <pspnodrm_helper.h>
 
 #include "nodrm_patch.h"
 
@@ -567,7 +567,7 @@ int setup_edat_version_key_hook(u8 *vkey, u8 *edat, int size)
         sceIoRead(ret, pgdbuf, 0x90);
         sceIoClose(ret);
 
-        ret = sctrlNoDrmGetEdatKey(vkey, pgdbuf);
+        ret = nodrmGetEdatKey(vkey, pgdbuf);
     }
 
     return ret;

@@ -25,7 +25,7 @@
 #include <cfwmacros.h>
 #include <systemctrl.h>
 #include <pspamctrl.h>
-#include <pspnodrm.h>
+#include <pspnodrm_helper.h>
 
 extern unsigned char g_icon_png[6108];
 
@@ -584,7 +584,7 @@ static int myGetVersionKey(unsigned char * key, char *filename)
 	        sceDrmBBMacInit((SceMacKey *)&mkey, mac_type);
 	        sceDrmBBMacUpdate((SceMacKey *)&mkey, pgdbuf, 0x70);
             // bbmac_getkey(&mkey, pgdbuf + 0x70, key);
-            sctrlNoDrmBBMacGetKey(&mkey, pgdbuf + 0x70, key);
+            nodrmBBMacGetKey(&mkey, pgdbuf + 0x70, key);
             ret = 0;
         }
 	}
