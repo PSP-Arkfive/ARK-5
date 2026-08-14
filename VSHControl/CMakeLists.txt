@@ -3,18 +3,18 @@ add_prx_module(vshcontrol exports.exp)
 target_sources(vshcontrol PRIVATE 
    main.c
    imports.S
-   src/vshpatch.c
-   src/xmbiso.c
-   src/isoreader.c
-   src/virtual_pbp.c
-   src/virtual_mp4.c
+   src/custom_update.c
    src/dirent_track.c
    src/disctype.c
-   src/vshmenu.c
-   src/usbdevice.c
-   src/custom_update.c
    src/hibernation.c
+   src/isoreader.c
    src/registry.c
+   src/usbdevice.c
+   src/virtual_mp4.c
+   src/virtual_pbp.c
+   src/vshmenu.c
+   src/vshpatch.c
+   src/xmbiso.c
 )
 
 target_compile_options(vshcontrol PRIVATE ${COMPILE_OPS})

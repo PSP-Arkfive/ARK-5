@@ -3,15 +3,16 @@ add_prx_module(xmbcontrol exports.exp)
 target_sources(xmbcontrol PRIVATE 
    main.c
    stub.S
-   src/xmbpatch.c
-   src/list.c
-   src/settings.c
-   src/config.c
-   src/plugins.c
    src/battery.c
-   src/vshmenu.c
+   src/configparser.c
+   src/list.c
+   src/plugins.c
+   src/settings.c
    src/utils.c
    src/vshcube.c
+   src/vshgu.c
+   src/vshmenu.c
+   src/xmbpatch.c
 )
 
 target_compile_options(xmbcontrol PRIVATE ${COMPILE_OPS} -O2 -fshort-wchar -mno-check-zero-division)

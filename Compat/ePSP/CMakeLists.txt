@@ -1,15 +1,15 @@
 add_compat_prx(vitacompat vita
    SRC_FILES
       main.c
-      src/vlf.c
-      src/syspatch.c
-      src/vitamem.c
-      src/vitaflash.c 
-      src/popspatch.c
-      src/filesystem.c
-      src/fatef.c
-      src/flashfs.c
       imports.S
+      src/fatef.c
+      src/filesystem.c
+      src/flashfs.c
+      src/popspatch.c
+      src/syspatch.c
+      src/vitaflash.c
+      src/vitamem.c
+      src/vlf.c
       payload.h
    BTCNF_FILES
       psvbtcnf.bin

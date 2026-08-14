@@ -1,15 +1,15 @@
 add_compat_prx(pspcompat psp
    SRC_FILES
       main.c
-      src/overclock.c
-      src/syspatch.c
-      src/wpa2.c
       src/cwpatch.c
       src/high_mem.c
       src/libertas.c
-      src/usb_charge.c
-      src/region_free.c
+      src/overclock.c
       src/pops4tool.c
+      src/region_free.c
+      src/syspatch.c
+      src/usb_charge.c
+      src/wpa2.c
       imports.S
       payload.h
    BTCNF_FILES

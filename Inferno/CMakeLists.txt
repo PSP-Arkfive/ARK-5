@@ -3,9 +3,9 @@ add_prx_module(inferno exports.exp)
 target_sources(inferno PRIVATE 
    main.c
    src/iodrv_funcs.c
-   src/umd.c
-   src/isoread.c
    src/isocache.c
+   src/isoread.c
+   src/umd.c
    imports.S
 )
 
