@@ -208,14 +208,16 @@ void loadSettings(){
     if (processConfigFile(NULL, path, settingsEnabler, settingsDisabler) < 0) // try external settings
         processConfigFile(NULL, ARK_SETTINGS_FLASH, settingsEnabler, settingsDisabler); // retry flash1 settings
 
-    int apitype = sceKernelInitApitype();
-    if (apitype == 0x141 || apitype == 0x152){
-        u32 paramsize=4;
-        int use_highmem = 0;
-        if (sctrlGetInitPARAM("MEMSIZE", NULL, &paramsize, &use_highmem) >= 0 && use_highmem){
-            switch (use_highmem){
-                case 1: se_config.high_memory_use = HIGHMEM_FORCE_MAX; break;
-                case 2: se_config.high_memory_use = HIGHMEM_FORCE_16; break;
+    if (se_config.high_memory_use != HIGHMEM_FORCE_OFF){
+        int apitype = sceKernelInitApitype();
+        if (apitype == 0x141 || apitype == 0x152){
+            u32 paramsize=4;
+            int use_highmem = 0;
+            if (sctrlGetInitPARAM("MEMSIZE", NULL, &paramsize, &use_highmem) >= 0 && use_highmem){
+                switch (use_highmem){
+                    case 1: se_config.high_memory_use = HIGHMEM_FORCE_MAX; break;
+                    case 2: se_config.high_memory_use = HIGHMEM_FORCE_16; break;
+                }
             }
         }
     }
