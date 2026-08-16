@@ -185,7 +185,8 @@ char* highmem_settings[] = {
     "Off",
     "Default",
     "Auto",
-    "Forced"
+    "+16MiB",
+    "MAX"
 };
 
 char* skiplogos_settings[] = {

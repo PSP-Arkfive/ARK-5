@@ -15,8 +15,6 @@
 
 extern SEConfigARK* se_config;
 
-int highmem_enabled = 1;
-
 int unlockVitaMemory(u32 user_size_mib){
 
     int apitype = sceKernelInitApitype(); // prevent in pops and vsh
@@ -47,13 +45,10 @@ int unlockVitaMemory(u32 user_size_mib){
 int (*_sctrlHENApplyMemory)(u32) = NULL;
 int memoryHandlerVita(u32 p2){
     // sanity checks
-    if (p2<=24 || !highmem_enabled) return -1;
+    if (p2<=24) return -1;
 
-    // the first 16MB are stable and good enough for most use cases
-    // but homebrew that require extra ram will be allowed to use (some of) the upper 16MB
-    if (p2 > 52){
-        p2 = (se_config->high_memory_use == HIGHMEM_FORCE_MAX)? 52 : 40;
-    }
+    // adjust max mem
+    if (p2 > 52) p2 = 52;
 
     // call orig function to determine if can unlock
     int res = _sctrlHENApplyMemory(p2);
@@ -74,7 +69,6 @@ SceUID extraAllocPartitionMemory(int partition, char* name, int place, int size,
     // adjust partition
     if (addr == NULL &&
         partition == 2 &&
-        highmem_enabled &&
         se_config->high_memory_use == HIGHMEM_AUTO_USE &&
         sctrlIsLoadingPlugins()
     ){

@@ -90,7 +90,8 @@ static void settingsHandler(const char* path, u8 enabled){
         char* c = strchr(path, ':');
         if (enabled && c){
             if (strcasecmp(c+1, "auto") == 0) se_config.high_memory_use = HIGHMEM_AUTO_USE;
-            else if (strcasecmp(c+1, "forced") == 0) se_config.high_memory_use = HIGHMEM_FORCE_MAX;
+            else if (strcasecmp(c+1, "force16") == 0) se_config.high_memory_use = HIGHMEM_FORCE_16;
+            else if (strcasecmp(c+1, "forcemax") == 0) se_config.high_memory_use = HIGHMEM_FORCE_MAX;
         }
     }
     else if (strcasecmp(path, "mscache") == 0 || strcasecmp(path, "mscache:4k") == 0){
@@ -219,7 +220,7 @@ void loadSettings(){
         }
     }
 
-    if (se_config.high_memory_use >= HIGHMEM_FORCE_MAX){
+    if (se_config.high_memory_use >= HIGHMEM_FORCE_16){
         se_config.disable_pause = 1; // unless we figure out how to fix this
     }
 

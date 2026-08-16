@@ -141,12 +141,11 @@ int ARKVitaOnModuleStart(SceModule * mod){
         // disable highmem if not available
         if (sceIoOpen("ms0:/__highmem__", PSP_O_RDONLY, 0777) < 0){
             se_config->high_memory_use = HIGHMEM_FORCE_OFF;
-            highmem_enabled = 0;
         }
         // Configure Inferno Cache
         se_config->iso_cache_size_kb = 32;
         se_config->iso_cache_num = 32;
-        se_config->iso_cache_partition = (se_config->high_memory_use >= HIGHMEM_FORCE_MAX)? 2:11;
+        se_config->iso_cache_partition = 11;
         goto flush;
     }
 

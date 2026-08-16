@@ -95,7 +95,11 @@ static int processConfigLine(char* runlevel, char* path, char* enabled){
         config.highmem = HIGHMEM_AUTO_USE;
         return 1;
     }
-    else if (strcasecmp(path, "highmem:forced") == 0){
+    else if (strcasecmp(path, "highmem:force16") == 0){
+        config.highmem = HIGHMEM_FORCE_16;
+        return 1;
+    }
+    else if (strcasecmp(path, "highmem:forcemax") == 0){
         config.highmem = HIGHMEM_FORCE_MAX;
         return 1;
     }
@@ -318,7 +322,8 @@ void saveSettings(){
         case HIGHMEM_FORCE_OFF:    processSetting(fd, line, "highmem", 0); break;
         case HIGHMEM_DEFAULT_USE:  processSetting(fd, line, "highmem", 1); break;
         case HIGHMEM_AUTO_USE:     processSetting(fd, line, "highmem:auto", 1); break;
-        case HIGHMEM_FORCE_MAX:    processSetting(fd, line, "highmem:forced", 1); break;
+        case HIGHMEM_FORCE_16:    processSetting(fd, line, "highmem:force16", 1); break;
+        case HIGHMEM_FORCE_MAX:    processSetting(fd, line, "highmem:forcemax", 1); break;
     }
     switch (config.mscache){
         case 0: processSetting(fd, line, "mscache", 0); break;

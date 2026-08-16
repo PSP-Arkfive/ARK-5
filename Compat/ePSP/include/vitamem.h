@@ -1,8 +1,6 @@
 #ifndef VITAMEM_H
 #define VITAMEM_H
 
-extern int highmem_enabled;
-
 extern void unprotectVitaMemory();
 
 extern int (*_sctrlHENApplyMemory)(u32);

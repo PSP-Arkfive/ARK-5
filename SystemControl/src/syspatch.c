@@ -147,8 +147,8 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
     if (strcmp(mod->modname, "sceImpose_Driver") == 0){
         // Handle extra ram setting
         switch (se_config.high_memory_use){
-            case HIGHMEM_FORCE_MAX: sctrlHENApplyMemory(MAX_HIGH_MEMSIZE);
-            case HIGHMEM_FORCE_16: sctrlHENApplyMemory(40);
+            case HIGHMEM_FORCE_16: sctrlHENApplyMemory(40); break;
+            case HIGHMEM_FORCE_MAX: sctrlHENApplyMemory(MAX_HIGH_MEMSIZE); break;
         }
     }
 
@@ -234,7 +234,7 @@ static int ARKSyspatchOnModuleStart(SceModule * mod)
             // handle inferno cache settings
             if (se_config.iso_cache_type){
                 extern int p2_size;
-                if (p2_size>24 || se_config.high_memory_use >= HIGHMEM_FORCE_MAX){
+                if (p2_size>24 || se_config.high_memory_use >= HIGHMEM_FORCE_16){
                     se_config.iso_cache_partition = 2;
                 }
                 // set cache policy first
