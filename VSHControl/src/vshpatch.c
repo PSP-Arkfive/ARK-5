@@ -32,6 +32,7 @@
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <systemctrl_ark.h>
+#include <pspnodrm_helper.h>
 
 #include "main.h"
 #include "xmbiso.h"
@@ -60,8 +61,11 @@ static void patch_sceCtrlReadBufferPositive(void);
 static void patch_Gameboot(SceModule *mod); 
 static void patch_hibblock(SceModule *mod); 
 static void patch_msvideo_main_plugin_module(SceModule* mod);
+static void patch_scePspNpDrm_Driver(void);
 extern void patch_sceUSB_Driver(void);
 
+// remember the most recently opened npdrm file (theme/document.dat)
+char g_npdrm_file[256];
 
 static int vshpatch_module_chain(SceModule *mod)
 {
@@ -79,6 +83,7 @@ static int vshpatch_module_chain(SceModule *mod)
     if(0 == strcmp(mod->modname, "vsh_module")) {
         patch_vsh_module(mod);
         patch_sceCtrlReadBufferPositive();
+        patch_scePspNpDrm_Driver();
         goto exit;
     }
 
@@ -270,6 +275,27 @@ static void patch_sysconf_plugin_module(SceModule *mod)
     _sw(0x34420000 | ((u32)(p) & 0xFFFF), a + 4); // or $v0, $v0, 
 
     sctrlHookImportByNID((SceModule*)mod, "IoFileMgrForUser", 0x06A70004, myIoMkdir);
+
+	//patch sysconf act/rif check, call official function first, then patch to return 0 if it fails.
+    for (addr=text_addr; addr<top_addr; addr+=4) {
+	//for (addr = mod->text_addr; addr < (mod->text_addr + mod->text_size); addr += 4) {
+		if (_lw(addr) == 0x0062200B) { //movn       $a0, $v1, $v0
+			//_sw(MAKE_CALL(0x08802000), addr + 4);
+            MAKE_CALL(addr + 4, 0x08802000);
+			_sw(0x27BDFFF0, 0x08802000); //addiu      $sp, $sp, -16
+			_sw(0xAFBF0000, 0x08802004); //sw         $ra, 0($sp)
+			//_sw(MAKE_CALL(mod->text_addr + 0x0000A1D0), 0x08802008); //jal        sub_0000A1D0 (sysconf)
+            MAKE_CALL(0x08802008, mod->text_addr + 0x0000A1D0);
+			_sw(0, 0x0880200C); //nop
+			_sw(0x0002100B, 0x08802010); //movn       $v0, $zr, $v0
+			_sw(0x8FBF0000, 0x08802014); //lw         $ra, 0($sp)
+			_sw(0x03E00008, 0x08802018); //jr         $ra
+			_sw(0x27BD0010, 0x0880201C); //addiu      $sp, $sp, 16
+			sctrlFlushCache();
+			break;
+		}
+	}
+
 }
 
 int fakeParamInexistance(void)
@@ -516,6 +542,65 @@ static void hook_iso_io(void)
             sctrlHENPatchSyscall(fp, hook_list[i].func);
         }
     }
+}
+
+// remember the most recently opened npdrm file
+int (* do_open)(const char *path, int flags, SceMode mode, int async, int retAddr, int oldK1);
+int do_open_hook(const char *path, int flags, SceMode mode, int async, int retAddr, int oldK1)
+{
+	if (flags & 0x40000000)
+		strcpy(g_npdrm_file, path);
+
+	return do_open(path, flags, mode, async, retAddr, oldK1);
+}
+
+// recover key from npdrm file if the act/rif method fails 
+int (* setup_edat_version_key)(u8 *vkey, u8 *edat, int size);
+int setup_edat_version_key_hook(u8 *vkey, u8 *edat, int size)
+{
+    int ret = setup_edat_version_key(vkey, edat, size);
+    u8 pgdbuf[0x90];
+
+    if (ret < 0) { //generate key from mac if official method fails.
+        ret = sceIoOpen(g_npdrm_file, 1, 0);
+        sceIoRead(ret, pgdbuf, 16);
+        sceIoLseek(ret, *(u32*)(pgdbuf + 0xC) & 0xFFFF, 0);
+        sceIoRead(ret, pgdbuf, 0x90);
+        sceIoClose(ret);
+
+        ret = nodrmGetEdatKey(vkey, pgdbuf);
+    }
+
+    return ret;
+}
+
+static void patch_scePspNpDrm_Driver(){
+    u32 addr;
+
+    SceModule* mod = (SceModule*)sceKernelFindModuleByName("scePspNpDrm_Driver");
+    if(mod){
+        for (addr = mod->text_addr; addr < (mod->text_addr + mod->text_size ); addr += 4) {
+            if (_lw(addr) == 0x2CC60080) { //sltiu      $a2, $a2, 128
+                HIJACK_FUNCTION(addr - 8, setup_edat_version_key_hook, setup_edat_version_key);
+            
+                break;
+            }
+        }
+    }
+
+    addr = K_EXTRACT_IMPORT(sceIoOpen) + 4;
+
+	while (1) {
+		if ((_lw(addr) & 0xFC000000) == 0x0C000000) {
+			do_open = (void *)(((_lw(addr) & 0x03FFFFFF) << 2) | 0x80000000);
+			MAKE_CALL(addr, do_open_hook);
+			break;
+		}
+
+		addr += 4;
+	}
+
+	sctrlFlushCache();
 }
 
 int vshpatch_init(void)

@@ -36,6 +36,6 @@ USE_KERNEL_LIBS=1
 
 LIBDIR = 
 LDFLAGS =  -nostartfiles
-LIBS = -lcisoread -larkctrl -lpspsystemctrl_kernel -lpspusb -lpspusbdevice_driver -lpspreg
+LIBS = -lcisoread -larkctrl -lpspsystemctrl_kernel -lpspusb -lpspusbdevice_driver -lpspreg -lpspnodrm_helper
 
 include $(PSPSDK)/lib/build.mak
