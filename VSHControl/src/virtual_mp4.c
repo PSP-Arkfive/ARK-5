@@ -61,7 +61,10 @@ static void getIconStatFromISO(const char* isopath){
     res = isoGetFileInfo(video_icon_path, &size, &lba);
     if (res<0) res = isoGetFileInfo(music_icon_path, &size, &lba); // retry with UMD_AUDIO
     isoClose();
-    if (res<0) return;
+    if (res<0){
+        icon_size = sizeof(smallpng); ; // smallpng
+        return;
+    }
     
     icon_size = size;
 }
@@ -76,8 +79,41 @@ static void readIconFromISO(const char* isopath){
 
     res = isoGetFileInfo(video_icon_path, &size, &lba);
     if (res<0) res = isoGetFileInfo(music_icon_path, &size, &lba); // retry with UMD_AUDIO
-    if (res<0) {
+    if (res<0) { // fall back to a dummy png
         isoClose();
+
+        if (icon_data){
+        oe_free(icon_data);
+        } 
+
+        // use our dummy png
+        size = sizeof(smallpng); 
+        u8* data = user_malloc(size);
+        memcpy(data, smallpng, sizeof(smallpng));
+
+        icon_data = data;
+        icon_size = size;
+
+        // patch smallvid
+        size +=24;
+        smallvid[0x9CC] = 0; // icon count
+        smallvid[0x9DE] = icon_data[0x13]; // icon width
+        smallvid[0x9E0] = icon_data[0x17]; // icon size
+        smallvid[0xB1A] = (unsigned char)size; // size of png + size of tag (24)
+        smallvid[0xB19] = (unsigned char)(size>>8);
+        smallvid[0xA2E] = (unsigned char)icon_size; // size of png
+        smallvid[0xA2D] = (unsigned char)(icon_size>>8);
+        smallvid[0xB1A] = (unsigned char)size; // size of png + size of tag (24)
+        smallvid[0x6E2] = 0; // nullify titles so it uses filename instead
+        smallvid[0x71C] = 0;
+        smallvid[0x770] = 0;
+        smallvid[0x7AC] = 0;
+        smallvid[0x7EE] = 0;
+        smallvid[0x832] = 0;
+        smallvid[0x86A] = 0;
+        smallvid[0x8AB] = 0;
+        smallvid[0x8AC] = 0;
+        smallvid[0x8AD] = 0;
         return;
     }
 
@@ -100,6 +136,7 @@ static void readIconFromISO(const char* isopath){
 
     // patch smallvid
     size += 24;
+    smallvid[0x9CC] = 1; // icon count
     smallvid[0x9DE] = icon_data[0x13]; // icon width
     smallvid[0x9E0] = icon_data[0x17]; // icon size
     smallvid[0xB1A] = (unsigned char)size; // size of png + size of tag (24)
