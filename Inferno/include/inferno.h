@@ -32,6 +32,8 @@ do { \
     } \
 } while ( 0 )
 
+#define MAX_ISO_PATH_SIZE 255
+
 struct IoReadArg {
     u32 offset; // 0
     u8 *address; // 4

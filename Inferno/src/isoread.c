@@ -17,12 +17,14 @@
 
 #include <stdio.h>
 #include <string.h>
+
 #include <pspkernel.h>
 #include <pspreg.h>
 #include <pspsysmem_kernel.h>
 #include <psprtc.h>
 #include <psputilsforkernel.h>
 #include <pspthreadman_kernel.h>
+#include <pspumd.h>
 
 #include <ciso.h>
 #include <cfwmacros.h>
@@ -100,7 +102,7 @@ static int read_raw_data(void* arg, void* addr, u32 size, u32 offset)
     int ret, i;
     SceOff ofs;
     i = 0;
-    
+
     do {
         i++;
         ofs = sceIoLseek(g_iso_fd, offset, PSP_SEEK_SET);
@@ -223,4 +225,94 @@ int iso_read_with_stack(u32 offset, void *ptr, u32 data_len)
 void infernoSetUmdDelay(int seek, int speed){
     umd_seek = seek;
     umd_speed = speed;
+}
+
+int isoGetTitleId(char title_id[10]) {
+	// game ID is always at offset 0x8373 within the ISO
+	// lba=16, offset=883
+	u32 pos = 16 * ISO_SECTOR_SIZE + 883;
+	struct IoReadArg read_arg = {
+		.address = (u8*)title_id,
+		.size = 10,
+		.offset = pos,
+	};
+	int res = iso_read(&read_arg);
+	if (res != 10) {
+		return 0;
+	}
+
+	// remove the dash in the middle: ULUS-01234 -> ULUS01234
+	title_id[4] = title_id[5];
+	title_id[5] = title_id[6];
+	title_id[6] = title_id[7];
+	title_id[7] = title_id[8];
+	title_id[8] = title_id[9];
+	title_id[9] = 0;
+	return 1;
+}
+
+int isoSetUmdFile(const char* path) {
+	if (path != NULL && path[0] != 0) {
+		memset(g_iso_fn, 0, sizeof(g_iso_fn));
+		strncpy(g_iso_fn, path, sizeof(g_iso_fn)-1);
+		return 0;
+	}
+
+	return 0x80010016;
+}
+
+int isoGetUmdFile(char *path_buf, size_t path_size) {
+	if (path_buf == NULL) {
+		return 0x80010016;
+	}
+
+	int len = strlen(g_iso_fn);
+	if (path_size < len) {
+		return 0x80010016;
+	}
+
+	strncpy(path_buf, g_iso_fn, path_size);
+	return 0;
+}
+
+int isoSwapUmdFile(const char *new_file_path, char *previous, SceSize previous_size) {
+	char old_path[MAX_ISO_PATH_SIZE] = {0};
+	memcpy(old_path, g_iso_fn, MAX_ISO_PATH_SIZE);
+	sceUmdSetDriveStatus(PSP_UMD_NOT_PRESENT | PSP_UMD_CHANGED);
+	sceKernelDelayThread(100000);
+
+	isoSetUmdFile(new_file_path);
+
+	int res = iso_open();
+	sceKernelDelayThread(20000);
+
+	if (res < 0) {
+		// reset and reopen previous filepath
+		isoSetUmdFile(old_path);
+		iso_open();
+		sceIoLseek32(g_iso_fd, 0, PSP_SEEK_SET);
+		sceKernelDelayThread(20000);
+		sceUmdSetDriveStatus(PSP_UMD_PRESENT | PSP_UMD_INITED | PSP_UMD_READY);
+
+		return res;
+	}
+
+	sceIoLseek32(g_iso_fd, 0, PSP_SEEK_SET);
+	sceUmdSetDriveStatus(PSP_UMD_PRESENT | PSP_UMD_INITED | PSP_UMD_CHANGED);
+
+	sceKernelDelayThread(20000);
+    sceUmdSetDriveStatus(PSP_UMD_PRESENT | PSP_UMD_INITED | PSP_UMD_READY | PSP_UMD_CHANGED);
+
+	// Copy if possible
+	if (previous != NULL && previous_size >= MAX_ISO_PATH_SIZE) {
+		memcpy(previous, old_path, MAX_ISO_PATH_SIZE);
+	}
+
+	return 0;
+}
+
+int isoReopenUmdFile(void) {
+	int res = iso_open();
+	sceKernelDelayThread(20000);
+	return res;
 }
