@@ -84,8 +84,8 @@ int module_start(SceSize args, void* argp)
     vshpatch_init();
     load_server_file();
     
-    // always reset to NORMAL mode in VSH
-    // to avoid ISO mode is used in homebrews in next reboot
+    // Always reset to NORMAL mode in VSH
+    // To avoid ISO mode That's used in homebrews in the next reboot
     char* umdfile = sctrlSEGetUmdFile();
     has_umd_iso = (umdfile[0] != 0 && sctrlSEGetBootConfFileIndex() == MODE_VSHUMD);
     if (has_umd_iso) strcpy(mounted_iso, umdfile);
@@ -93,7 +93,7 @@ int module_start(SceSize args, void* argp)
     sctrlSESetBootConfFileIndex(MODE_UMD);
 
     if (has_umd_iso){
-        // disable launcher mode if using VSH ISO
+        // Disable launcher mode if using VSH ISO
         ark_config->launcher[0] = 0;
     }
 
