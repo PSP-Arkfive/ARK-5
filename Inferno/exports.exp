@@ -139,7 +139,7 @@ PSP_EXPORT_START(isoCtrl_driver, 0x0011, 0x0001)
 # isoCtrl_driver_D4FAB33F
 PSP_EXPORT_FUNC(isoGetTitleId)
 # isoCtrl_driver_FAEC97D6
-PSP_EXPORT_FUNC_NID(infernoSetUmdDelay, 0xFAEC97D6)
+PSP_EXPORT_FUNC_NID(isoSetUmdDelay, 0xFAEC97D6)
 # isoCtrl_driver_3F83B110
 PSP_EXPORT_FUNC_NID(iso_read_with_stack, 0x3F83B110)
 # isoCtrl_driver_2830271E
