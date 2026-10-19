@@ -121,13 +121,13 @@ int inferno_mount(SceSize args, void *arg)
             goto out;
         }
     }
-	
+
     for(i=0; i<NELEMS(djmax_umd_ids); ++i) {
         if(0 == memcmp(g_read_arg.address + 0x00000373, djmax_umd_ids[i], 10)) {
             g_game_fix_type = 3;
             goto out;
         }
-    }	
+    }
 
     if(g_game_fix_type) {
         goto out;
@@ -314,6 +314,12 @@ static int IoRead(PspIoDrvFileArg *arg, char *data, int len)
         read_len = g_total_sectors - offset;
     }
 
+	ret = sceKernelWaitSema(g_umd9660_sema_id, 1, 0);
+    if(ret < 0) {
+        ret = -1;
+        goto exit;
+    }
+
 	// per-fd seek delay
 	if (umd_seek) {
 	  u32 read_byte_pos = offset * ISO_SECTOR_SIZE;
@@ -326,8 +332,8 @@ static int IoRead(PspIoDrvFileArg *arg, char *data, int len)
 	if (umd_speed) {
 	  sceKernelDelayThread(read_len * ISO_SECTOR_SIZE * umd_speed);
 	}
-	
-    retv = iso_read_with_stack(offset * ISO_SECTOR_SIZE, data, read_len * ISO_SECTOR_SIZE);
+
+    retv = _isoReadUmdFileInner(offset * ISO_SECTOR_SIZE, data, read_len * ISO_SECTOR_SIZE);
 
     if(retv <= 0) {
         ret = retv;
@@ -335,12 +341,6 @@ static int IoRead(PspIoDrvFileArg *arg, char *data, int len)
     }
 
     retv = retv / ISO_SECTOR_SIZE;
-    ret = sceKernelWaitSema(g_umd9660_sema_id, 1, 0);
-
-    if(ret < 0) {
-        ret = -1;
-        goto exit;
-    }
 
     g_open_slot[idx].offset += retv;
 	g_open_slot[idx].last_read_byte_pos = (offset + retv) * ISO_SECTOR_SIZE;
@@ -371,7 +371,7 @@ static SceOff IoLseek(PspIoDrvFileArg *arg, SceOff ofs, int whence)
     }
 
     idx = (int)arg->arg;
-    
+
     if(whence == PSP_SEEK_SET) {
         g_open_slot[idx].offset = ofs;
     } else if (whence == PSP_SEEK_CUR) {
@@ -427,7 +427,7 @@ static int IoIoctl(PspIoDrvFileArg *arg, unsigned int cmd, void *indata, int inl
             ret = 0x80010016;
             goto exit;
         }
-        
+
         /* Read fd current offset */
         ret = sceKernelWaitSema(g_umd9660_sema_id, 1, NULL);
 
@@ -489,7 +489,7 @@ static int IoIoctl(PspIoDrvFileArg *arg, unsigned int cmd, void *indata, int inl
 }
 
 // 0x00000488
-static int umd_devctl_read(void *outdata, int outlen, struct LbaParams *param)
+static int umd_devctl_read(PspIoDrvFileArg *arg, void *outdata, int outlen, struct LbaParams *param)
 {
     u32 lba_top, byte_size_total, byte_size_start;
     u32 offset;
@@ -514,7 +514,53 @@ static int umd_devctl_read(void *outdata, int outlen, struct LbaParams *param)
         offset = lba_top * ISO_SECTOR_SIZE - byte_size_start + ISO_SECTOR_SIZE;
     }
 
-    ret = iso_read_with_stack(offset, outdata, byte_size_total);
+    ret = sceKernelWaitSema(g_umd9660_sema_id, 1, 0);
+    if (ret < 0) {
+        return -1;
+    }
+
+    int idx = arg != NULL ? (int)arg->arg : -1;
+    u32 last_read_byte_pos = global_head_pos;
+
+    if (idx >= 0 && idx < MAX_FILES_NR) {
+        last_read_byte_pos = g_open_slot[idx].last_read_byte_pos;
+    }
+
+    if (umd_seek) {
+		u32 diff;
+		if (last_read_byte_pos > offset) {
+			diff = last_read_byte_pos - offset;
+		} else {
+			diff = offset - last_read_byte_pos;
+		}
+        sceKernelDelayThread(
+            (diff * umd_seek) / 1024
+        );
+    }
+
+    if (umd_speed) {
+        sceKernelDelayThread(byte_size_total * umd_speed);
+    }
+
+    ret = _isoReadUmdFileInner(offset, outdata, byte_size_total);
+
+    if (ret > 0 && (umd_speed || umd_seek)) {
+        u32 new_position = offset + ret;
+
+        global_head_pos = new_position;
+
+        /*
+         * Do not change the descriptor's logical offset.
+         * Only update its simulated physical read position.
+         */
+        if (idx >= 0 && idx < MAX_FILES_NR) {
+            g_open_slot[idx].last_read_byte_pos = new_position;
+        }
+    }
+
+    if (sceKernelSignalSema(g_umd9660_sema_id, 1) < 0) {
+        return -1;
+    }
 
     return ret;
 }
@@ -531,7 +577,7 @@ static int IoDevctl(PspIoDrvFileArg *arg, const char *devname, unsigned int cmd,
         ret = 0;
         goto exit;
     } else if(cmd == 0x01F20001) {
-        // get UMD disc type 
+        // get UMD disc type
         _sw(-1, (u32)(outdata));
         _sw(g_disc_type, (u32)(outdata+4));
 
@@ -549,7 +595,7 @@ static int IoDevctl(PspIoDrvFileArg *arg, const char *devname, unsigned int cmd,
     } else if(cmd == 0x01F100A4) {
         u32 lba;
         u32 sector;
-        
+
         /* missing cmd in march33, prepare UMD data into cache */
         if(indata == NULL || inlen < 16) {
             ret = 0x80010016;
@@ -651,7 +697,7 @@ static int IoDevctl(PspIoDrvFileArg *arg, const char *devname, unsigned int cmd,
             goto exit;
         }
 
-        ret = umd_devctl_read(outdata, outlen, indata);
+        ret = umd_devctl_read(arg, outdata, outlen, indata);
         goto exit;
     } else if(cmd == 0x01E38012) {
         int outlen2 = outlen;

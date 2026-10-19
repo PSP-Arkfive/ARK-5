@@ -76,4 +76,6 @@ extern int infernoCacheInit(int cache_size, int cache_num, int partition);
 extern int infernoCacheAdd(u32 pos, int len);
 extern void infernoCacheSetPolicy(int policy);
 
+int _isoReadUmdFileInner(u32 offset, void *ptr, u32 data_len);
+
 #endif

@@ -78,12 +78,25 @@ void applyFixesByModule(SceModule* mod){
     // disable anti-CFW code
     else if (strcasecmp(mod->modname, "DJMAX") == 0) {
         SEConfigARK* se_config = (SEConfigARK*)sctrlSEGetConfigInternal();
-        
+
         // Patch CFW dirs
         hide_cfw_folder(mod);
 
 		//Read speed fixes under cmd 0x01F30003
     }
+
+	else if (strcmp(mod->modname, "Megpoid") == 0) {
+		SEConfigARK* se_config = (SEConfigARK*)sctrlSEGetConfigInternal();
+
+        if (se_config->umdseek == 0 && se_config->umdspeed == 0){
+            void (*SetUmdDelay)(int, int) = (void*)sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0xB6522E93);
+            if (SetUmdDelay) {
+				SetUmdDelay(1, 1);
+			}
+            se_config->umdseek = 1;
+            se_config->umdspeed = 1;
+        }
+	}
 
     sctrlFlushCache();
 }

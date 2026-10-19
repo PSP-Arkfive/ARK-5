@@ -197,6 +197,21 @@ int iso_read(struct IoReadArg *args)
 
 // 0x000003E0
 int (*iso_reader)(struct IoReadArg *args) = &iso_read;
+
+int _isoReadUmdFileInner(u32 offset, void *ptr, u32 data_len) {
+	g_read_arg.offset = offset;
+	g_read_arg.address = ptr;
+	g_read_arg.size = data_len;
+
+	int ret =  sceKernelExtendKernelStack(
+        0x2000,
+        (void*)iso_reader,
+        &g_read_arg
+    );
+
+	return ret;
+}
+
 int iso_read_with_stack(u32 offset, void *ptr, u32 data_len)
 {
     int ret, retv;
@@ -207,11 +222,7 @@ int iso_read_with_stack(u32 offset, void *ptr, u32 data_len)
         return -1;
     }
 
-    g_read_arg.offset = offset;
-    g_read_arg.address = ptr;
-    g_read_arg.size = data_len;
-
-    retv = sceKernelExtendKernelStack(0x2000, (void*)iso_reader, &g_read_arg);
+    retv = _isoReadUmdFileInner(offset, ptr, data_len);
 
     ret = sceKernelSignalSema(g_umd9660_sema_id, 1);
 
@@ -223,6 +234,11 @@ int iso_read_with_stack(u32 offset, void *ptr, u32 data_len)
 }
 
 void infernoSetUmdDelay(int seek, int speed){
+    umd_seek = seek;
+    umd_speed = speed;
+}
+
+void isoSetUmdDelay(int seek, int speed, int _strategy) {
     umd_seek = seek;
     umd_speed = speed;
 }
