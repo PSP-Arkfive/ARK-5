@@ -1,6 +1,6 @@
 add_prx_module(vshcontrol exports.exp)
 
-target_sources(vshcontrol PRIVATE 
+target_sources(vshcontrol PRIVATE
    main.c
    imports.S
    src/custom_update.c
@@ -32,4 +32,5 @@ target_link_libraries(vshcontrol PRIVATE
    pspsdk
    pspmodinfo
    pspkernel
+   pspnodrm_helper
 )

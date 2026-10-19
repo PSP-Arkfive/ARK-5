@@ -3,6 +3,12 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - 'Dockerfile'
+      - '**/README.md'
 permissions:
   contents: write
 jobs:
@@ -16,7 +22,7 @@ jobs:
           apk add clang build-base automake autoconf zlib-dev python3 zip curl unzip sudo
 
       - name: Cloning and Building lastest pspsdk
-        run: | 
+        run: |
           git clone https://github.com/pspdev/pspsdk
 
       - name: Bootstrap sdk and build
@@ -28,24 +34,26 @@ jobs:
           make install
 
       - name: Checkout
-        uses: actions/checkout@v4 
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Update psp-cfw-sdk
         run: curl -OJL "https://github.com/pspdev/psp-cfw-sdk/releases/download/latest/psp-cfw-sdk.zip"
-      
+
       - name: Extract psp-cfw-sdk
         run: sudo unzip -o psp-cfw-sdk.zip -d /
 
       - name: Build
-        run:  make clean && make 
+        run: |
+          psp-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build -j
 
       - name: Compress
         run: |
           cd dist
           zip -r ../ARK-5.zip .
-      
+
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
@@ -54,6 +62,7 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v8
@@ -69,6 +78,3 @@ jobs:
           files: ARK-5.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-    
