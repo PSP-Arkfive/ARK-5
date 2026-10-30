@@ -8,6 +8,7 @@
 
 #include <cfwmacros.h>
 #include <systemctrl.h>
+#include <systemctrl_se.h>
 
 #include "overclock.h"
 
@@ -30,6 +31,8 @@ static unsigned int pll_mul_msb       = PLL_MUL_MSB;
 static unsigned int pll_ratio_index   = PLL_RATIO_INDEX;
 static unsigned int freq_step         = FREQUENCY_STEP;
 
+extern int psp_model;
+extern SEConfigARK* se_config;
 
 int currFreq = DEFAULT_FREQUENCY, targetFreq = DEFAULT_FREQUENCY;
 
@@ -223,8 +226,8 @@ static void adjustInitialFrequencies() {
 }
 
 static void adjustValues(){
-  extern int psp_model;
-  if (psp_model == PSP_4000 || psp_model > PSP_GO){
+  if (se_config->overclock_table == 1) return; // already set by default
+  if (psp_model == PSP_4000 || psp_model > PSP_GO || se_config->overclock_table == 2){ // auto or table 2
     pll_den           = PLL_DEN_OTHER;
     pll_base_freq     = PLL_BASE_FREQ_OTHER;
     pll_mul_msb       = PLL_MUL_MSB_OTHER;
@@ -315,6 +318,7 @@ void cancelOverclock() {
 void overclockHandler(int cpu, int bus){    
     if (cpu > DEFAULT_FREQUENCY && cpu <= MAX_ALLOWED_FREQUENCY && cpu > currFreq) {
         targetFreq = cpu;
+        adjustValues();
         doOverclock();
     }
     else {
@@ -333,6 +337,5 @@ void initOverclock() {
   // override clock set/get functions
   HIJACK_FUNCTION(K_EXTRACT_IMPORT(sctrlHENSetSpeed), overclockHandler, origSetClockFrequency);
   HIJACK_FUNCTION(K_EXTRACT_IMPORT(sctrlHENGetSpeed), getOverclockSpeed, origGetClockFrequency);
-  adjustValues();
   sctrlFlushCache();
 }

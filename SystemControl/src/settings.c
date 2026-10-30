@@ -74,6 +74,12 @@ static void settingsHandler(const char* path, u8 enabled){
         }
         else se_config.custom_bus_clock = 0;
     }
+    else if (strncasecmp(path, "overclockvalues:", 16) == 0){
+        char* c = strchr(path, ':');
+        if (strcasecmp(c+1, "auto") == 0) se_config.overclock_table = 0;
+        else if (strcasecmp(c+1, "table1") == 0) se_config.overclock_table = 1;
+        else if (strcasecmp(c+1, "table2") == 0) se_config.overclock_table = 2;
+    }
     else if (strcasecmp(path, "wpa2") == 0){ // wpa2 support
         se_config.wpa2 = enabled;
     }

@@ -115,6 +115,13 @@ static int processConfigLine(char* runlevel, char* path, char* enabled){
         config.mscache = (opt)?3:0;
         return 1;
     }
+    else if (strncasecmp(path, "overclockvalues:", 16) == 0){
+        char* c = strchr(path, ':');
+        if (strcasecmp(c+1, "auto") == 0) config.overclock_table = 0;
+        else if (strcasecmp(c+1, "table1") == 0) config.overclock_table = 1;
+        else if (strcasecmp(c+1, "table2") == 0) config.overclock_table = 2;
+        return 1;
+    }
     else if (strncasecmp(path, "infernocache", 12) == 0){
         char* c = strchr(path, ':');
         FIX_BOOLEAN(opt);
@@ -314,6 +321,12 @@ void saveSettings(){
         saveClockSetting(fd, "game", config.clock_game);
         // Save CPU Clock in-vsh
         saveClockSetting(fd, "vsh", config.clock_vsh);
+    }
+
+    switch (config.overclock_table){
+        case 0: processSetting(fd, line, "overclockvalues:auto", 1); break;
+        case 1: processSetting(fd, line, "overclockvalues:table1", 1); break;
+        case 2: processSetting(fd, line, "overclockvalues:table2", 1); break;
     }
 
     processSetting(fd, line, "wpa2", config.wpa2);

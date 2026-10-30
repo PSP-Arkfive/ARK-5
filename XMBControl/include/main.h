@@ -55,6 +55,7 @@ typedef struct
     u8 usbcharge;
     u8 clock_game;
     u8 clock_vsh;
+    u8 overclock_table;
     u8 wpa2;
     u8 launcher;
     u8 highmem;

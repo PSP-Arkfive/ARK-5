@@ -80,6 +80,7 @@ enum{
     USB_CHARGE,
     CPU_CLOCK_GAME,
     CPU_CLOCK_VSH,
+    OVERCLOCK_VALUES,
     WPA2_SUPPORT,
     AUTOBOOT_LAUNCHER,
     USE_EXTRA_MEM,
@@ -181,6 +182,12 @@ char* clock_settings[] = {
     "443"
 };
 
+char* overclockvalues_settings[] = {
+    "Auto",
+    "Table 1",
+    "Table 2"
+};
+
 char* highmem_settings[] = {
     "Off",
     "Default",
@@ -270,6 +277,7 @@ XmbControlItem xmbitems[] =
     { USB_CHARGE          +PLUGINS_CONTEXT+2, 0, "USB Charge" },
     { CPU_CLOCK_GAME      +PLUGINS_CONTEXT+2, 0, "CPU Clock in Game" },
     { CPU_CLOCK_VSH       +PLUGINS_CONTEXT+2, 0, "CPU Clock in XMB" },
+    { OVERCLOCK_VALUES    +PLUGINS_CONTEXT+2, 0, "Overclock Values" },
     { WPA2_SUPPORT        +PLUGINS_CONTEXT+2, 0, "WPA2 Support" },
     { AUTOBOOT_LAUNCHER   +PLUGINS_CONTEXT+2, 0, "Autoboot Launcher" },
     { USE_EXTRA_MEM       +PLUGINS_CONTEXT+2, 0, "Use Extra Memory" },
@@ -311,6 +319,7 @@ struct {
     ITEM_OPT(boolean_settings), // USB Charge
     ITEM_OPT(clock_settings), // Clock Game
     ITEM_OPT(clock_settings), // Clock VSH
+    ITEM_OPT(overclockvalues_settings), // Overclock Values
     ITEM_OPT(boolean_settings), // WPA2 ( Thanks again @Moment )
     ITEM_OPT(boolean_settings), // Autoboot Launcher
     ITEM_OPT(highmem_settings), // Extra RAM
@@ -1316,7 +1325,8 @@ int vshGetRegistryValuePatched(u32 *option, char *name, void *arg2, int size, in
                 config.usbreadonly,
                 config.usbcharge,        
                 config.clock_game,        
-                config.clock_vsh, 
+                config.clock_vsh,
+                config.overclock_table,
                 config.wpa2,           
                 config.launcher,        
                 config.highmem,        	
@@ -1400,6 +1410,7 @@ int vshSetRegistryValuePatched(u32 *option, char *name, int size, int *value)
                 &config.usbcharge,
                 &config.clock_game,
                 &config.clock_vsh,
+                &config.overclock_table,
                 &config.wpa2,
                 &config.launcher,
                 &config.highmem,
