@@ -39,11 +39,11 @@
 #define sysconf_console_action_arg 2
 
 enum {
-    sysconf_tnconfig_action_arg = 0x1000,
+    sysconf_config_action_arg = 0x1000,
     sysconf_plugins_action_arg = 0x1002,
     sysconf_custom_launcher_arg = 0x1003,
     sysconf_custom_app_arg = 0x1004,
-    sysconf_150_reboot_arg = 0x1005,
+    sysconf_tm_action_arg = 0x1005,
 };
 
 typedef struct

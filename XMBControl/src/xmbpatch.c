@@ -43,9 +43,6 @@
 #include "plugins.h"
 #include "battery.h"
 
-// TODO: send to pspsdk
-//#define PSP_INIT_APITYPE_EF2 0x152
-//extern int scePowerRequestColdReset(int unk);
 
 ARKConfig ark_config;
 RebootexConfigARK rebootex_config;
@@ -267,6 +264,10 @@ char* plugins_install_options[] = {
     NULL, // Last Played Game
 };
 
+char* tm_options[] = {
+    "Cancel",
+    "Boot"
+};
 
 XmbControlItem xmbitems[] =
 {
@@ -346,6 +347,16 @@ struct {
     ITEM_OPT(boolean_settings4), // Reset Settings
 };
 
+struct {
+    char* name;
+    char* path;
+} tm_paths[] = {
+    {"1.50 ARK", "DCARK/150/reboot150.prx"},
+};
+
+u8 tm_installs[NELEMS(tm_paths)] = {0};
+u8 n_tm_installs = 0;
+
 typedef struct {
     char* orig;
     char* translated;
@@ -382,7 +393,7 @@ int unload = 0;
 u32 backup[4];
 int context_mode = 0;
 
-char user_buffer[LINE_BUFFER_SIZE];
+wchar_t user_buffer[LINE_BUFFER_SIZE/2];
 
 int startup = 1;
 
@@ -421,6 +432,18 @@ void ClearCaches()
 {
     sceKernelDcacheWritebackAll();
     kuKernelIcacheInvalidateAll();
+}
+
+void scanTimeMachineInstallations(){
+    SceIoStat stat;
+    char path[256];
+    n_tm_installs = 0;
+    for (int i=0; i<NELEMS(tm_paths); i++){
+        snprintf(path, sizeof(path), "ms0:/TM/%s", tm_paths[i].path);
+        if (sceIoGetstat(path, &stat) >= 0){
+            tm_installs[n_tm_installs++] = i+1;
+        }
+    }
 }
 
 char* getLastGameForPlugin(){
@@ -463,9 +486,11 @@ void exec_custom_launcher() {
     }
 }
 
-void exec_150_reboot(void) {
+void exec_tm_reboot(int i) {
+    char tmpath[256];
+    snprintf(tmpath, sizeof(tmpath), "ms0:/TM/%s", tm_paths[i].path);
     int k1 = pspSdkSetK1(0);
-    SceUID mod = sceKernelLoadModule(ARK_DC_PATH "/150/reboot150.prx", 0, NULL);
+    SceUID mod = sceKernelLoadModule(tmpath, 0, NULL);
     if(mod < 0) {
         pspSdkSetK1(k1);
         return;
@@ -724,7 +749,7 @@ void findAllTranslatableStrings(){
     language_strings[n_translated++].orig = "xmbmsgtop_sysconf_plugins";
     language_strings[n_translated++].orig = "xmbmsgtop_custom_launcher";
     language_strings[n_translated++].orig = "xmbmsgtop_custom_app";
-    language_strings[n_translated++].orig = "xmbmsgtop_150_reboot";
+    language_strings[n_translated++].orig = "xmbmsgtop_time_machine";
     
     for (int i=0; i<NELEMS(xmbitems); i++){
         language_strings[n_translated++].orig = xmbitems[i].item;
@@ -886,7 +911,7 @@ void* addCustomVshItem(int id, char* text, int action_arg, SceVshItem* orig){
     item->action_arg = action_arg;
     item->play_sound = 1;
     item->context = NULL;
-    strcpy(item->text, text);
+    strncpy(item->text, text, sizeof(item->text)-1);
 
     return item;
 }
@@ -898,6 +923,7 @@ int AddVshItemPatched(void *a0, int topitem, SceVshItem *item)
     if (strcmp(item->text, "msgtop_sysconf_console")==0){
         sysconf_action = item->action;
         LoadTextLanguage(-1);
+        scanTimeMachineInstallations();
     }
 
     if ( !items_added && // prevent adding more than once
@@ -926,7 +952,7 @@ int AddVshItemPatched(void *a0, int topitem, SceVshItem *item)
         }
 
         // Add CFW Settings
-        new_item = addCustomVshItem(81, "xmbmsgtop_sysconf_configuration", sysconf_tnconfig_action_arg, (cur_icon)?item:(SceVshItem*)signup_item);
+        new_item = addCustomVshItem(81, "xmbmsgtop_sysconf_configuration", sysconf_config_action_arg, (cur_icon)?item:(SceVshItem*)signup_item);
         AddVshItem(a0, topitem, new_item);
 
         // Add Plugins Manager
@@ -958,14 +984,11 @@ int AddVshItemPatched(void *a0, int topitem, SceVshItem *item)
             AddVshItem(a0, topitem, new_item4);
         }
 
-        // Add 1.50 Kernel Addon (if found)
-        SceIoStat _150_file;
-        int _1k_file = sceIoGetstat("ms0:/TM/DCARK/150/reboot150.prx", &_150_file);
-        if((psp_model == PSP_1000) && _1k_file >= 0 && !IS_VITA_ADR((&ark_config))) {
-            new_item5 = addCustomVshItem(84, "xmbmsgtop_150_reboot", sysconf_150_reboot_arg, item);
+        // Add Time Machine (if installs found)
+        if (n_tm_installs > 0){
+            new_item5 = addCustomVshItem(85, "xmbmsgtop_time_machine", sysconf_tm_action_arg, item);
             AddVshItem(a0, topitem, new_item5);
         }
-
     }
     
     return AddVshItem(a0, topitem, item);
@@ -991,7 +1014,7 @@ int ExecuteActionPatched(int action, int action_arg)
 
     if(action == sysconf_console_action)
     {
-        if(action_arg == sysconf_tnconfig_action_arg)
+        if(action_arg == sysconf_config_action_arg)
         {
             is_cfw_config = 1;
             action = sysconf_console_action;
@@ -1009,8 +1032,10 @@ int ExecuteActionPatched(int action, int action_arg)
         else if (action_arg == sysconf_custom_app_arg){
             exec_custom_app(custom_app_path);
         }
-        else if (action_arg == sysconf_150_reboot_arg){
-        	exec_150_reboot();
+        else if (action_arg == sysconf_tm_action_arg){
+        	is_cfw_config = 3;
+            action = sysconf_console_action;
+            action_arg = sysconf_console_action_arg;
         }
         else is_cfw_config = 0;
     }
@@ -1173,6 +1198,17 @@ void OnInitMenuPspConfigPatched()
             }
         }
     }
+    else if (is_cfw_config == 3){
+        if (((u32*)sysconf_option)[2] == 0){
+            for (int i=0; i<NELEMS(tm_installs); i++){
+                int tm_id = tm_installs[i];
+                if (tm_id != 0){
+                    AddSysconfContextItem(tm_paths[tm_id-1].name, tm_paths[tm_id-1].path, tm_paths[tm_id-1].name);
+                }
+                else break;
+            }
+        }
+    }
     else
     {
         OnInitMenuPspConfig();
@@ -1205,6 +1241,9 @@ SceSysconfItem *GetSysconfItemPatched(void *a0, void *a1)
             context_mode = PLUGINS_CONTEXT;
         }
     }
+    else if (is_cfw_config == 3){
+        context_mode = 1;
+    }
     return item;
 }
 
@@ -1233,8 +1272,8 @@ wchar_t *scePafGetTextPatched(void *a0, char *name)
                     translated = "Custom App";
                     star = STAR;
                 }
-                else if(strcmp(name, "xmbmsgtop_150_reboot") == 0){
-                    translated = "Reboot to 1.50 ARK";
+                else if(strcmp(name, "xmbmsgtop_time_machine") == 0){
+                    translated = "Time Machine";
                     star = STAR;
                 }
                 else if (isTranslatableString(name))
@@ -1293,6 +1332,10 @@ wchar_t *scePafGetTextPatched(void *a0, char *name)
                     return (wchar_t *)user_buffer;
                 }
             }
+        }
+        else if (is_cfw_config == 3){
+            utf8_to_unicode((wchar_t *)user_buffer, name);
+        	return (wchar_t *)user_buffer;
         }
         else if (strcmp(name, "msg_system_update") == 0 && se_config.custom_update)
         {
@@ -1387,6 +1430,9 @@ int vshGetRegistryValuePatched(u32 *option, char *name, void *arg2, int size, in
         		*value = plugin->active;
         		return 0;
         	}
+        }
+        else if (is_cfw_config == 3) {
+            return 0;
         }
     }
 
@@ -1533,6 +1579,17 @@ int vshSetRegistryValuePatched(u32 *option, char *name, int size, int *value)
         		return 0;
         	}
         }
+        else if (is_cfw_config == 3){
+            if (*value){
+                for (int i=0; i<NELEMS(tm_paths); i++){
+                    if (strcmp(name, tm_paths[i].name) == 0){
+                        exec_tm_reboot(i);
+                        return 0;
+                    }
+                }
+            }
+            return 0;
+        }
         if (strcmp(name, "/CONFIG/SYSTEM/XMB/language") == 0)
         {
             LoadTextLanguage(*value);
@@ -1609,6 +1666,13 @@ int PAF_Resource_GetPageNodeByID_Patched(void *resource, char *name, SceRcoEntry
             if(strcmp(name, "page_psp_config_umd_autoboot") == 0)
             {
                 HijackContext(*child, item_opts[context_mode].c, item_opts[context_mode].n);
+            }
+        }
+        else if (is_cfw_config == 3)
+        {
+            if(strcmp(name, "page_psp_config_umd_autoboot") == 0)
+            {
+                HijackContext(*child, tm_options, NELEMS(tm_options));
             }
         }
     }
