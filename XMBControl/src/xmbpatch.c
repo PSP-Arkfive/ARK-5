@@ -352,6 +352,15 @@ struct {
     char* path;
 } tm_paths[] = {
     {"1.50 ARK", "DCARK/150/reboot150.prx"},
+    {"5.00 M33-7", "500M33/reboot.prx"},
+    {"5.50 M33-7", "550M33/reboot.prx"},
+    {"6.20 PRO-D", "620PRO/reboot.prx"},
+    {"6.20 LME-3", "620LME/reboot.prx"},
+    {"6.39 PRO-D", "639PRO/reboot.prx"},
+    {"6.39 LME-3", "639LME/reboot.prx"},
+    {"6.61 PRO-D", "661PRO/reboot.prx"},
+    {"6.61 LME-3", "661LME/reboot.prx"},
+    {"6.61 Epinephrine", "V661EPI/reboot.prx"},
 };
 
 u8 tm_installs[NELEMS(tm_paths)] = {0};
