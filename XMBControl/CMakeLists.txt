@@ -21,12 +21,14 @@ target_link_libraries(xmbcontrol PRIVATE
    -nostartfiles
    pspgum
    pspgu
+   pspmath
+   pspvram
+   pspcpaf
    arkctrl
    pspsystemctrl_user
    pspkubridge
    pspvshctrl
    pspreg
-   pspsysc_user
    psppower
    pspdebug
    pspdisplay

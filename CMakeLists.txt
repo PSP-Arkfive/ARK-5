@@ -69,16 +69,16 @@ add_custom_target(dist ALL
    COMMAND mkdir -p ${FLASH0_DIR}
 
    #Create compressed prx modules
-   COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_systemctrl.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:systemctrl>" SystemControl 0x3007
-   COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_vshctrl.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:vshcontrol>" VshControl 0x3007
-	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_xmbctrl.prx ${BUILDTOOLS}/gz/UserModule.hdr "$<TARGET_FILE:xmbcontrol>" XmbControl 0x0000
-	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_inferno.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:inferno>" PRO_Inferno_Driver 0x3007
-	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_popcorn.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:popcorn>" PROPopcornManager 0x3007
-	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_stargate.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:stargate>" Stargate 0x3007
-	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_pspcompat.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:pspcompat>" PSPCompat 0x3007
-	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_vitacompat.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:vitacompat>" VitaCompat 0x3007
-	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_vitapops.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:vitapops>" VitaPopsCompat 0x3007
-	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_vitaplus.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:vitaplus>" VitaPlusCompat 0x3007
+   COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_systemctrl.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:systemctrl>.prx" SystemControl 0x3007
+   COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_vshctrl.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:vshcontrol>.prx" VshControl 0x3007
+	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_xmbctrl.prx ${BUILDTOOLS}/gz/UserModule.hdr "$<TARGET_FILE:xmbcontrol>.prx" XmbControl 0x0000
+	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_inferno.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:inferno>.prx" PRO_Inferno_Driver 0x3007
+	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_popcorn.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:popcorn>.prx" PROPopcornManager 0x3007
+	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_stargate.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:stargate>.prx" Stargate 0x3007
+	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_pspcompat.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:pspcompat>.prx" PSPCompat 0x3007
+	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_vitacompat.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:vitacompat>.prx" VitaCompat 0x3007
+	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_vitapops.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:vitapops>.prx" VitaPopsCompat 0x3007
+	COMMAND python3 $<TARGET_PROPERTY:tool_pspgz,EXEC> ${FLASH0_DIR}/ark_vitaplus.prx ${BUILDTOOLS}/gz/SystemControl.hdr "$<TARGET_FILE:vitaplus>.prx" VitaPlusCompat 0x3007
 
    #Copy PSP Compat btcnf files
    #COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:pspcompat>/pstbtcnf_dt.bin ${FLASH0_DIR}/
