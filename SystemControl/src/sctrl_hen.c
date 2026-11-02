@@ -173,13 +173,13 @@ SYSBOOT_HANDLER sctrlHENSetSystemBootedHandler(SYSBOOT_HANDLER new_handler)
 u32 sctrlHENFindFunction(const char * modname, const char *library, u32 nid){
     // Find Target Module
     SceModule * mod = (SceModule *)sceKernelFindModuleByName(modname);
-    
+
     // Module not found
     if (mod == NULL)
     {
         // Attempt to find it by Address
         mod = (SceModule *)sceKernelFindModuleByAddress((unsigned int)modname);
-        
+
         // Module not found
         if (mod == NULL) return 0;
     }
@@ -202,7 +202,7 @@ u32 sctrlHENFindFunctionInMod(SceModule * mod, const char * library, u32 nid)
         // Resolve NID
         nid = getNidReplacement(resolver, nid);
     }
-    
+
 
     // Fetch Export Table Start Address
     void * entTab = mod->ent_top;
@@ -221,7 +221,7 @@ u32 sctrlHENFindFunctionInMod(SceModule * mod, const char * library, u32 nid)
 
             // NID + Address Table
             u32 * vars = entry->entrytable;
-            
+
             // Exports available
             if(total > 0)
             {
@@ -340,20 +340,20 @@ void sctrlHENHijackFunction(SctrlFunctionPatchData* patch_data, void* func_addr,
 }
 
 u32 sctrlHENMakeSyscallStub(void *function) {
-    
-	u32 stub = (u32)user_malloc(2*sizeof(u32));
-	s32 syscall_num = sceKernelQuerySystemCall(function);
 
-	if (stub == 0) {
-		return 0;
-	}
+    u32 stub = (u32)user_malloc(2*sizeof(u32));
+    s32 syscall_num = sceKernelQuerySystemCall(function);
 
-	if (syscall_num < 0) {
-		return 0;
-	}
+    if (stub == 0) {
+        return 0;
+    }
 
-	MAKE_SYSCALL_FUNCTION(stub, syscall_num);
-	return stub;
+    if (syscall_num < 0) {
+        return 0;
+    }
+
+    MAKE_SYSCALL_FUNCTION(stub, syscall_num);
+    return stub;
 }
 
 void sctrlHENLoadModuleOnReboot(char *module_before, void *buf, int size, int flags)
@@ -470,7 +470,7 @@ int sctrlHENIsToolKit()
 }
 
 int sctrlHENIsSystemBooted() {
-	int res = sceKernelGetSystemStatus();
+    int res = sceKernelGetSystemStatus();
 
-	return (res == 0x20000);
+    return (res == 0x20000);
 }

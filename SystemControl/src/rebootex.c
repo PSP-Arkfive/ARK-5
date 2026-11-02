@@ -58,11 +58,11 @@ void backupRebootBuffer(void)
     if (IS_ARK_CONFIG(backup_conf) && backup_conf->reboot_buffer_size){
         memcpy(&rebootex_config, backup_conf, sizeof(RebootexConfigARK));
     }
-    
+
     // Copy ARK runtime Config
     if (IS_ARK_CONFIG(ARK_CONFIG))
         memcpy(&ark_config, (void*)ARK_CONFIG, sizeof(ARKConfig));
-    
+
     // Flush Cache
     sctrlFlushCache();
 }
@@ -90,10 +90,9 @@ void restoreRebootBuffer(void)
     else{
         rebootex_config.boot_from_fw_version = sceKernelDevkitVersion();
         memcpy((void *)REBOOTEX_CONFIG, &rebootex_config, sizeof(RebootexConfigARK));
+        // Restore ARK Configuration
+        memcpy((void*)ARK_CONFIG, &ark_config, sizeof(ARKConfig));
     }
-    
-    // Restore ARK Configuration
-    memcpy((void*)ARK_CONFIG, &ark_config, sizeof(ARKConfig));
 }
 
 // Reboot Buffer Loader
