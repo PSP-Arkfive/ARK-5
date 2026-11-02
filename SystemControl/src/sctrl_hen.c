@@ -169,13 +169,13 @@ SYSBOOT_HANDLER sctrlHENSetSystemBootedHandler(SYSBOOT_HANDLER new_handler)
 u32 sctrlHENFindFunction(const char * modname, const char *library, u32 nid){
     // Find Target Module
     SceModule * mod = (SceModule *)sceKernelFindModuleByName(modname);
-    
+
     // Module not found
     if (mod == NULL)
     {
         // Attempt to find it by Address
         mod = (SceModule *)sceKernelFindModuleByAddress((unsigned int)modname);
-        
+
         // Module not found
         if (mod == NULL) return 0;
     }
@@ -198,7 +198,7 @@ u32 sctrlHENFindFunctionInMod(SceModule * mod, const char * library, u32 nid)
         // Resolve NID
         nid = getNidReplacement(resolver, nid);
     }
-    
+
 
     // Fetch Export Table Start Address
     void * entTab = mod->ent_top;
@@ -217,7 +217,7 @@ u32 sctrlHENFindFunctionInMod(SceModule * mod, const char * library, u32 nid)
 
             // NID + Address Table
             u32 * vars = entry->entrytable;
-            
+
             // Exports available
             if(total > 0)
             {
@@ -336,20 +336,20 @@ void sctrlHENHijackFunction(SctrlFunctionPatchData* patch_data, void* func_addr,
 }
 
 u32 sctrlHENMakeSyscallStub(void *function) {
-    
-	u32 stub = (u32)user_malloc(2*sizeof(u32));
-	s32 syscall_num = sceKernelQuerySystemCall(function);
 
-	if (stub == 0) {
-		return 0;
-	}
+    u32 stub = (u32)user_malloc(2*sizeof(u32));
+    s32 syscall_num = sceKernelQuerySystemCall(function);
 
-	if (syscall_num < 0) {
-		return 0;
-	}
+    if (stub == 0) {
+        return 0;
+    }
 
-	MAKE_SYSCALL_FUNCTION(stub, syscall_num);
-	return stub;
+    if (syscall_num < 0) {
+        return 0;
+    }
+
+    MAKE_SYSCALL_FUNCTION(stub, syscall_num);
+    return stub;
 }
 
 void sctrlHENLoadModuleOnReboot(char *module_before, void *buf, int size, int flags)
@@ -361,10 +361,23 @@ void sctrlHENLoadModuleOnReboot(char *module_before, void *buf, int size, int fl
 }
 
 extern void* custom_rebootex;
-void sctrlHENSetRebootexOverride(const u8 *rebootex)
+extern void* custom_rebootex_size;
+void sctrlHENSetRebootexOverride(const u8 *rebootex, u32 size)
 {
-    if (rebootex != NULL) // override rebootex
+    // override rebootex
+    if (rebootex != NULL) {
         custom_rebootex = (void*)rebootex;
+        custom_rebootex_size = size;
+    }
+}
+
+extern void* custom_rebootex_config;
+extern u32 custom_rebootex_config_size;
+void sctrlHENSetRebootexConfigOverride(const u8 *rebootex_config, u32 size_rebootex_config) {
+	if (rebootex_config != NULL) {
+		custom_rebootex_config = rebootex_config;
+		custom_rebootex_config_size = size_rebootex_config;
+	}
 }
 
 extern int (* LoadRebootOverrideHandler)(void * arg1, unsigned int arg2, void * arg3, unsigned int arg4);
@@ -457,7 +470,7 @@ int sctrlHENIsToolKit()
 }
 
 int sctrlHENIsSystemBooted() {
-	int res = sceKernelGetSystemStatus();
+    int res = sceKernelGetSystemStatus();
 
-	return (res == 0x20000);
+    return (res == 0x20000);
 }

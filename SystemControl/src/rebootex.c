@@ -42,6 +42,9 @@ RebootexConfigARK rebootex_config = {
 
 // custom rebootex
 void* custom_rebootex = NULL;
+u32 custom_rebootex_size = 0;
+void* custom_rebootex_config = NULL;
+u32 custom_rebootex_config_size = 0;
 
 // LoadReboot handler
 int (* LoadRebootOverrideHandler)(void * arg1, unsigned int arg2, void * arg3, unsigned int arg4) = NULL;
@@ -55,11 +58,11 @@ void backupRebootBuffer(void)
     if (IS_ARK_CONFIG(backup_conf) && backup_conf->reboot_buffer_size){
         memcpy(&rebootex_config, backup_conf, sizeof(RebootexConfigARK));
     }
-    
+
     // Copy ARK runtime Config
     if (IS_ARK_CONFIG(ARK_CONFIG))
         memcpy(&ark_config, (void*)ARK_CONFIG, sizeof(ARKConfig));
-    
+
     // Flush Cache
     sctrlFlushCache();
 }
@@ -81,12 +84,20 @@ void restoreRebootBuffer(void)
         memcpy((void *)REBOOTEX_TEXT, rebootex, REBOOTEX_MAX_SIZE);
 
     rebootex_config.boot_from_fw_version = sceKernelDevkitVersion();
-        
-    // Restore Reboot Buffer Configuration
-    memcpy((void *)REBOOTEX_CONFIG, &rebootex_config, sizeof(RebootexConfigARK));
 
-    // Restore ARK Configuration
-    memcpy((void*)ARK_CONFIG, &ark_config, sizeof(ARKConfig));
+	if (custom_rebootex == NULL) {
+		// Restore Reboot Buffer Configuration
+		memcpy((void *)REBOOTEX_CONFIG, &rebootex_config, sizeof(RebootexConfigARK));
+		// Restore ARK Configuration
+		memcpy((void*)ARK_CONFIG, &ark_config, sizeof(ARKConfig));
+	} else {
+		memset((void *)REBOOTEX_CONFIG, 0, REBOOTEX_MAX_SIZE);
+		if (custom_rebootex_config != NULL) {
+			memcpy((void *)REBOOTEX_CONFIG, &custom_rebootex_config, custom_rebootex_config_size);
+		}
+		memset((void *)ARK_CONFIG, 0, sizeof(ARKConfig));
+	}
+
 }
 
 // Reboot Buffer Loader
