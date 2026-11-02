@@ -77,6 +77,13 @@ static int InitKernelStartModule(int modid, SceSize argsize, void * argp, int * 
     int result = -1;
     u32* vshmain_args = NULL;
 
+    if (strcmp(mod->modname, "nploader") == 0
+        || strcmp(mod->modname, "npdrm_free") == 0
+        || strcmp(mod->modname, "npdrm_free_loader") == 0)
+    {
+        return -1; // prevent loading of these modules, they are not needed and can cause issues
+    }
+
     // VSH replacement
     if (strcmp(modname, "vsh_module") == 0){
         // system in recovery or launcher mode
