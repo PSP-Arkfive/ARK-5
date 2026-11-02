@@ -752,9 +752,9 @@ static PspIoDrvFuncs g_drv_funcs = {
 
 // 0x00002444
 PspIoDrv g_iodrv = {
-    .name = "umd",
-    .dev_type = 4, // block device
-    .unk2 = 0x800,
-    .name2 = "UMD9660",
-    .funcs = &g_drv_funcs,
+    "umd",
+    4, // block device
+    0x800,
+    "UMD9660",
+    &g_drv_funcs,
 };
