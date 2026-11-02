@@ -20,9 +20,10 @@ List iplugins;
 
 extern ARKConfig ark_config;
 
-static char* sample_plugin_path = "ULUS01234, ms0:/SEPLUGINS/example.prx";
-
 int cur_place = 0;
+
+const char* example_runlevel = "ULUS01234";
+const char* example_path = "ms0:/SEPLUGINS/example.prx";
 
 char* plugins_paths[] = {
     "ms0:/SEPLUGINS/",
@@ -142,16 +143,7 @@ void loadPlugins(){
 
     if (plugins.count == 0){
         // Add example plugin
-        Plugin* plugin = (Plugin*)malloc(sizeof(Plugin));
-        plugin->name = (char*)malloc(20);
-        plugin->surname = (char*)malloc(20);
-        plugin->path = (char*)malloc(strlen(sample_plugin_path)+1);
-        plugin->active = 1;
-        plugin->place = 0;
-        strcpy(plugin->name, "plugin_0");
-        strcpy(plugin->surname, "plugins0");
-        strcpy(plugin->path, sample_plugin_path);
-        add_list(&plugins, plugin);
+        processPlugin(example_runlevel, example_path, "1");
     }
 }
 
@@ -161,7 +153,7 @@ void savePlugins(){
 
     if (plugins.count == 1){
         Plugin* plugin = (Plugin*)(plugins.table[0]);
-        if (strcmp(plugin->path, sample_plugin_path) == 0){
+        if (strcmp(plugin->path, example_path) == 0){
             return;
         }
     }
