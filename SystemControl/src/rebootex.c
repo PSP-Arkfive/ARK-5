@@ -70,7 +70,6 @@ void backupRebootBuffer(void)
 // Restore Reboot Buffer
 void restoreRebootBuffer(void)
 {
-
     u8* rebootex = custom_rebootex; // try custom rebootex from sctrlHENSetRebootexOverride
     if (rebootex == NULL) return; // can't inject custom rebootex, make sure compat layer has defined one using sctrlHENSetRebootexOverride
 
