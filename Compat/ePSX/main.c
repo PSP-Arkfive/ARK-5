@@ -63,7 +63,7 @@ int module_start(SceSize args, void * argp)
     #endif
 
     // set rebootex for VitaPOPS
-    sctrlHENSetRebootexOverride(rebootbuffer_vitapops);
+    sctrlHENSetRebootexOverride(rebootbuffer_vitapops, size_rebootbuffer_vitapops);
 
     initVitaPopsSysPatch();
     

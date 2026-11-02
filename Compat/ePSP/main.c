@@ -82,7 +82,7 @@ int module_start(SceSize args, void * argp)
     }
 
     // set rebootex for Vita
-    sctrlHENSetRebootexOverride(rebootbuffer_vita);
+    sctrlHENSetRebootexOverride(rebootbuffer_vita, size_rebootbuffer_vita);
     
     // Vita patches
     initVitaSysPatch();

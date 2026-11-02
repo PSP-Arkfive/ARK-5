@@ -55,7 +55,7 @@ int module_start(SceSize args, void * argp)
     }
 
     // set rebootex for PSP
-    sctrlHENSetRebootexOverride(rebootbuffer_psp);
+    sctrlHENSetRebootexOverride(rebootbuffer_psp, size_rebootbuffer_psp);
 
     PSPSyspatchStart();
 

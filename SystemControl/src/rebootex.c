@@ -42,6 +42,9 @@ RebootexConfigARK rebootex_config = {
 
 // custom rebootex
 void* custom_rebootex = NULL;
+u32 custom_rebootex_size = REBOOTEX_MAX_SIZE;
+void* custom_rebootex_config = NULL;
+u32 custom_rebootex_config_size = 0;
 
 // LoadReboot handler
 int (* LoadRebootOverrideHandler)(void * arg1, unsigned int arg2, void * arg3, unsigned int arg4) = NULL;
@@ -80,11 +83,15 @@ void restoreRebootBuffer(void)
     else // plain payload
         memcpy((void *)REBOOTEX_TEXT, rebootex, REBOOTEX_MAX_SIZE);
 
-    rebootex_config.boot_from_fw_version = sceKernelDevkitVersion();
-        
     // Restore Reboot Buffer Configuration
-    memcpy((void *)REBOOTEX_CONFIG, &rebootex_config, sizeof(RebootexConfigARK));
-
+    if (custom_rebootex_config && custom_rebootex_config_size){
+        memcpy((void *)REBOOTEX_CONFIG, custom_rebootex_config, custom_rebootex_config_size);
+    }
+    else{
+        rebootex_config.boot_from_fw_version = sceKernelDevkitVersion();
+        memcpy((void *)REBOOTEX_CONFIG, &rebootex_config, sizeof(RebootexConfigARK));
+    }
+    
     // Restore ARK Configuration
     memcpy((void*)ARK_CONFIG, &ark_config, sizeof(ARKConfig));
 }

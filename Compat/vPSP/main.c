@@ -61,7 +61,7 @@ int module_start(SceSize args, void * argp)
     }
 
     // set rebootex for Vita
-    sctrlHENSetRebootexOverride(rebootbuffer_pentazemin);
+    sctrlHENSetRebootexOverride(rebootbuffer_pentazemin, size_rebootbuffer_pentazemin);
 
     // Vita patches
     initAdrenalineSysPatch();

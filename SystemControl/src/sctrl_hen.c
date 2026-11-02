@@ -26,6 +26,10 @@
 #include "systemctrl_private.h"
 
 extern SEConfig se_config;
+extern void* custom_rebootex;
+extern u32 custom_rebootex_size;
+extern void* custom_rebootex_config;
+extern u32 custom_rebootex_config_size;
 
 int p2_size = 24;
 
@@ -360,11 +364,20 @@ void sctrlHENLoadModuleOnReboot(char *module_before, void *buf, int size, int fl
     rebootex_config.rtm_mod.flags = flags;
 }
 
-extern void* custom_rebootex;
-void sctrlHENSetRebootexOverride(const u8 *rebootex)
+void sctrlHENSetRebootexOverride(void *rebootex, u32 size)
 {
     if (rebootex != NULL) // override rebootex
-        custom_rebootex = (void*)rebootex;
+        custom_rebootex = rebootex;
+    if (size != 0) // override rebootex size
+        custom_rebootex_size = size;
+}
+
+void sctrlHENSetRebootexConfigOverride(void *rebootex_config, u32 rebootex_config_size)
+{
+    if (rebootex_config != NULL) // override rebootex config
+        custom_rebootex_config = rebootex_config;
+    if (rebootex_config_size != 0) // override rebootex config size
+        custom_rebootex_config_size = rebootex_config_size;
 }
 
 extern int (* LoadRebootOverrideHandler)(void * arg1, unsigned int arg2, void * arg3, unsigned int arg4);
