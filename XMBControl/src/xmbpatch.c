@@ -601,18 +601,14 @@ void reset_ark_settings(){
     strcat(arkMenuPath, MENU_SETTINGS);
     strcat(arkSettingsPath, ARK_SETTINGS);
     
-    int fd = sceIoOpen(arkMenuPath, PSP_O_RDONLY, 0);
-    if(fd) {
-        sceIoClose(fd);
-        sceIoRemove(arkMenuPath);
-        sceIoRemove(arkSettingsPath);
-        sceKernelDelayThread(8000);
-        int settings_file = sceIoOpen(arkSettingsPath, PSP_O_CREAT | PSP_O_WRONLY, 0777);
+    int settings_file = sceIoOpen(arkSettingsPath, PSP_O_CREAT | PSP_O_WRONLY, 0777);
+    if (settings_file < 0) settings_file = sceIoOpen(ARK_SETTINGS_FLASH, PSP_O_WRONLY, 0777);
+    if (settings_file >= 0){
         sceIoWrite(settings_file, settings, sizeof(settings)-1);
-        sceKernelDelayThread(8000);
         sceIoClose(settings_file);
-
     }
+
+    sceIoRemove(arkMenuPath);
 }
 
 int has_classic_plugins(){
