@@ -15,7 +15,7 @@ target_sources(xmbcontrol PRIVATE
    src/xmbpatch.c
 )
 
-target_compile_options(xmbcontrol PRIVATE ${COMPILE_OPS} -O2 -fshort-wchar -mno-check-zero-division)
+target_compile_options(xmbcontrol PRIVATE ${COMPILE_OPS} -Oz -fshort-wchar -mno-check-zero-division)
 target_include_directories(xmbcontrol PRIVATE include)
 target_link_libraries(xmbcontrol PRIVATE
    -nostartfiles
