@@ -362,7 +362,7 @@ void sctrlHENLoadModuleOnReboot(char *module_before, void *buf, int size, int fl
 
 extern void* custom_rebootex;
 extern void* custom_rebootex_size;
-void sctrlHENSetRebootexOverride(const u8 *rebootex, u32 size)
+void sctrlHENSetRebootexOverride(const void *rebootex, u32 size)
 {
     // override rebootex
     if (rebootex != NULL) {
@@ -373,7 +373,7 @@ void sctrlHENSetRebootexOverride(const u8 *rebootex, u32 size)
 
 extern void* custom_rebootex_config;
 extern u32 custom_rebootex_config_size;
-void sctrlHENSetRebootexConfigOverride(const u8 *rebootex_config, u32 size_rebootex_config) {
+void sctrlHENSetRebootexConfigOverride(const void *rebootex_config, u32 size_rebootex_config) {
 	if (rebootex_config != NULL) {
 		custom_rebootex_config = rebootex_config;
 		custom_rebootex_config_size = size_rebootex_config;
