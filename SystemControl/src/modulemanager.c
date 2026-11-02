@@ -419,5 +419,4 @@ SceModule* patchModuleManager()
     sctrlFlushCache();
 
     return mod;
-    
 }

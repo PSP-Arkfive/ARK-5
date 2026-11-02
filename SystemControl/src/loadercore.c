@@ -38,15 +38,15 @@
 
 
 // Real Executable Check Function Pointer
-int (* ProbeExec1)(u8 *buffer, int *check) = NULL;
-int (* ProbeExec2)(u8 *buffer, int *check) = NULL;
+int (* ProbeExec1)(u8 *buffer, SceLoadCoreExecFileInfo *check) = NULL;
+int (* ProbeExec2)(u8 *buffer, SceLoadCoreExecFileInfo *check) = NULL;
 
 // Sony PRX Decrypter Function Pointer
 int (* SonyPRXDecrypt)(void *, unsigned int, unsigned int *) = NULL;
 int (* origCheckExecFile)(unsigned char * addr, void * arg2) = NULL;
 
 // Executable Check #1
-int _ProbeExec1(u8 *buffer, int *check)
+int _ProbeExec1(u8 *buffer, SceLoadCoreExecFileInfo *check)
 {
     // Check Executable (we patched our files with shifted attributes so this works)
     int result = ProbeExec1(buffer, check);
@@ -58,7 +58,7 @@ int _ProbeExec1(u8 *buffer, int *check)
     if(magic == 0x464C457F)
     {
         // Recover Attributes (which we shifted before)
-        unsigned short realattr = *(unsigned short *)(buffer + check[19]);
+        unsigned short realattr = *(unsigned short *)(buffer + check->module_info_offset);
         
         // Mask Attributes
         unsigned short attr = realattr & 0x1E00;
@@ -67,18 +67,18 @@ int _ProbeExec1(u8 *buffer, int *check)
         if(attr != 0)
         {
             // Fetch OFW-detected Attributes
-            unsigned short attr2 = *(u16*)((void*)(check)+0x58);
+            unsigned short attr2 = check->mod_info_attribute;
             
             // OFW Attributes don't match
             if((attr2 & 0x1E00) != attr)
             {
                 // Now they do. :)
-                *(u16*)((void*)(check)+0x58) = realattr;
+                check->mod_info_attribute = realattr;
             }
         }
         
         // Flip Switch
-        if(check[18] == 0) check[18] = 1;
+        if(check->is_decrypted == 0) check->is_decrypted = 1;
     }
     
     // Return Result
@@ -86,7 +86,7 @@ int _ProbeExec1(u8 *buffer, int *check)
 }
 
 // Executable Check #2
-int _ProbeExec2(u8 *buffer, int *check)
+int _ProbeExec2(u8 *buffer, SceLoadCoreExecFileInfo *check)
 {
     // Check Executable
     int result = ProbeExec2(buffer, check);
@@ -98,10 +98,10 @@ int _ProbeExec2(u8 *buffer, int *check)
     if(magic == 0x464C457F && IsStaticElf(buffer))
     {
         // Fake UMD Apitype (as its the only one that allows Static ELFs... and even that, only as LoadExec Target)
-        check[2] = 0x120;
+        check->api_type = 0x120;
         
         // Invalid Module Info Section
-        if(check[19] == 0)
+        if(check->module_info_offset == 0)
         {
             // Search String Table
             char * strtab = GetStrTab(buffer);
@@ -125,8 +125,9 @@ int _ProbeExec2(u8 *buffer, int *check)
                     if(strcmp(strtab + section->sh_name, ".rodata.sceModuleInfo") == 0)
                     {
                         // Fix Section Pointer
-                        check[19] = section->sh_offset;
-                        check[22] = 0;
+                        check->module_info_offset = section->sh_offset;
+                        check->mod_info_attribute = 0;
+                        check->exec_attribute = 0;
                         
                         // Stop Search
                         break;
