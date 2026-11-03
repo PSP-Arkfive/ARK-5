@@ -19,6 +19,7 @@
 #include <strings.h>
 #include <pspsdk.h>
 #include <pspkernel.h>
+#include <pspiofilemgr.h>
 #include <pspsysmem_kernel.h>
 #include <pspthreadman_kernel.h>
 #include <psputility_sysparam.h>
@@ -65,7 +66,10 @@ void applyFixesByModule(SceModule* mod){
 		//Read speed fixes under cmd 0x01F30003
     }
 
-	else if (strcmp(mod->modname, "Megpoid") == 0) {
+    // fix games with read speed issues
+	else if (strcmp(mod->modname, "BAMG") == 0 || // Bust-a-Move
+            strcmp(mod->modname, "Megpoid") == 0) // Megpoid the Music
+    {
         if (se_config->umdseek == 0 && se_config->umdspeed == 0){
             void (*SetUmdDelay)(int, int) = (void*)sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0xB6522E93);
             if (SetUmdDelay) {
@@ -78,7 +82,21 @@ void applyFixesByModule(SceModule* mod){
 
     // fix Pangya
     else if (strcmp(mod->modname, "projectg_psp") == 0){
-        // TODO: port from Adrenaline
+        if (strcasecmp("ULUS10438", gameid) == 0) { // USA
+            u32* patch_addr = (u32*)(mod->text_addr + 0x35fd88);
+			patch_addr[0] = 0;
+			patch_addr[2] = 0;
+			patch_addr[4] = 0;
+		} else if (strcasecmp("ULJM05440", gameid) == 0) { // JAPAN
+            u32* patch_addr = (u32*)(mod->text_addr + 0x366498);
+            patch_addr[0] = 0;
+            patch_addr[2] = 0;
+            patch_addr[4] = 0;
+		} else if (strcasecmp("ULKS46164", gameid) == 0) { // KOREA
+            u32* patch_addr = (u32*)(mod->text_addr + 0x363c50);
+            patch_addr[0] = 0;
+            patch_addr[2] = 0;
+		}
     }
 
     // Patch Smakdown vs RAW 2010 & 2011 anti-CFW check (CPU speed)
@@ -111,8 +129,6 @@ void applyFixesByGameId(){
     // Patch games that have issues with high read speeds
     else if (strcasecmp("ULES00590", gameid) == 0   // Aces of War (EU)
             || strcasecmp("ULJM05075", gameid) == 0 // Aces of War (JP)
-            || strcasecmp("ULES00233", gameid) == 0 // Bust-a-Move Ghost (EU)
-            || strcasecmp("ULUS10438", gameid) == 0 // Pangya (US)
     ){
         if (se_config->umdseek == 0 && se_config->umdspeed == 0){
             void (*SetUmdDelay)(int, int) = (void*)sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0xB6522E93);
