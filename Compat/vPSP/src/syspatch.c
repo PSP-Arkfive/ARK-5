@@ -157,6 +157,27 @@ void exit_game_patched(){
         sctrlKernelExitVSH(NULL);
 }
 
+// This patch forces user plugins to allocate on extra ram
+SceUID (*origAllocPartitionMemory)(int partition, char* name, int place, int size, void* addr) = NULL;
+SceUID extraAllocPartitionMemory(int partition, char* name, int place, int size, void* addr){
+    // adjust partition
+    if (addr == NULL &&
+        partition == 2 &&
+        se_config->high_memory_use == HIGHMEM_AUTO_USE &&
+        sctrlIsLoadingPlugins()
+    ){
+        partition = 11;
+    }
+    
+    SceUID res = origAllocPartitionMemory(partition, name, place, size, addr);
+
+    // if memory has been allocated into p11, disable growing of p2
+    if (partition == 11 && res >= 0){
+        MAKE_DUMMY_FUNCTION(K_EXTRACT_IMPORT(sctrlHENApplyMemory), 0xFFFF); // make it return -1
+    }
+
+    return res;
+}
 
 int AdrenalineOnModuleStart(SceModule * mod){
 
@@ -227,6 +248,10 @@ void AdrenalineOnSystemBootedHandler()
 void initAdrenalineSysPatch(){
     // Register Module Start Handler
     previous = sctrlHENSetStartModuleHandler(AdrenalineOnModuleStart);
+
     // Register system booted handler
     sysboot_prev = sctrlHENSetSystemBootedHandler(AdrenalineOnSystemBootedHandler);
+
+    // Patch to load user plugins in highmem
+    HIJACK_FUNCTION(K_EXTRACT_IMPORT(sceKernelAllocPartitionMemory), extraAllocPartitionMemory, origAllocPartitionMemory);
 }

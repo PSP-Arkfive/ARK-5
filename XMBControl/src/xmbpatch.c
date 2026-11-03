@@ -1099,7 +1099,8 @@ int skipSetting(int i){
         i == WPA2_SUPPORT ||
         i == UMD_REGION ||
         i == GO_PAUSE_DELETE ||
-        i == VITA_MUTE
+        i == VITA_MUTE ||
+        i == OVERCLOCK_VALUES
     );
     else if (psp_model == PSP_1000) return (
         i == USB_CHARGE ||
