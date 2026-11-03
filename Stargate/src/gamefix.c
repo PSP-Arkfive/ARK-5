@@ -122,8 +122,11 @@ void applyFixesByGameId(){
         game_previous = sctrlHENSetStartModuleHandler(wweModuleOnStart);
     }
 
-    // Patch Aces of War anti-CFW check (UMD speed)
-    else if (strcasecmp("ULES00590", gameid) == 0 || strcasecmp("ULJM05075", gameid) == 0){
+    // Patch games that have issues with high read speeds
+    else if (strcasecmp("ULES00590", gameid) == 0   // Aces of War EU
+            || strcasecmp("ULJM05075", gameid) == 0 // Aces of War JP
+            || strcasecmp("ULES00233", gameid) == 0 // Bust-a-Move Ghost EU
+    ){
         SEConfigARK* se_config = (SEConfigARK*)sctrlSEGetConfigInternal();
         if (se_config->umdseek == 0 && se_config->umdspeed == 0){
             void (*SetUmdDelay)(int, int) = (void*)sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0xB6522E93);
