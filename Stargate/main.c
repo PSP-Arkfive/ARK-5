@@ -37,6 +37,9 @@ PSP_MAIN_THREAD_ATTR(0);
 // Previous Module Start Handler
 STMOD_HANDLER previous;
 
+SEConfigARK* se_config;
+RebootexConfigARK* reboot_config;
+
 // Module Start Handler
 int stargateSyspatchModuleOnStart(SceModule * mod)
 {
@@ -130,6 +133,9 @@ int module_start(SceSize args, void * argp)
 
     if (apitype == 0x141 || apitype == 0x152)
         return 0; // don't do anything in homebrew
+
+    se_config = (SEConfigARK*)sctrlSEGetConfigInternal();
+    reboot_config = (RebootexConfigARK*)sctrlHENGetRebootexConfig(NULL);
 
     patch_sceMesgLed();
 

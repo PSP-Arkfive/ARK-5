@@ -4,6 +4,12 @@
 #include <pspsdk.h>
 #include <pspkernel.h>
 
+#include <systemctrl_se.h>
+#include <rebootexconfig.h>
+
+extern SEConfigARK* se_config;
+extern RebootexConfigARK* reboot_config;
+
 extern void patch_ioDevCtl();
 extern void patch_IsoDrivers();
 extern void patch_sceMesgLed();

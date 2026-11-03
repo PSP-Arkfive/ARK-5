@@ -106,6 +106,8 @@ void findGameId(){
         memcpy(gameinfo+0x44, rebootex_config.game_id, 9);
     }
 
+    rebootex_config.game_id[9] = 0;
+
 }
 
 // Fixed Game Info Getter Function

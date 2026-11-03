@@ -29,11 +29,8 @@
 #include <systemctrl_se.h>
 #include <systemctrl_ark.h>
 
+#include "main.h"
 
-extern SEConfig* se_config;
-void hide_cfw_folder(SceModule * mod);
-
-static STMOD_HANDLER game_previous;
 
 static int (*utilityGetParam)(int, int*) = NULL;
 static int getParamFixed_ULJM05221(int param, int* value){
@@ -44,24 +41,10 @@ static int getParamFixed_ULJM05221(int param, int* value){
     return res;
 }
 
-static int wweModuleOnStart(SceModule * mod)
-{
-    // Boot Complete Action not done yet
-    if (strcmp(mod->modname, "mainPSP") == 0)
-    {
-        sctrlHookImportByNID(mod, "scePower", 0x34F9C463, (void*)222); // scePowerGetPllClockFrequencyInt
-        sctrlHookImportByNID(mod, "scePower", 0x843FBF43, (void*)0);   // scePowerSetCpuClockFrequency
-        sctrlHookImportByNID(mod, "scePower", 0xFDB5BFE9, (void*)222); // scePowerGetCpuClockFrequencyInt
-        sctrlHookImportByNID(mod, "scePower", 0xBD681969, (void*)111); // scePowerGetBusClockFrequencyInt
-    }
-
-    // Call Previous Module Start Handler
-    if(game_previous) return game_previous(mod);
-    return 0;
-}
-
-
 void applyFixesByModule(SceModule* mod){
+
+    // Obtain game ID for other patches
+    char* gameid = reboot_config->game_id;
 
     // fix black screen in Tekken 6
     if (strcmp(mod->modname, "tekken") == 0) {
@@ -77,17 +60,12 @@ void applyFixesByModule(SceModule* mod){
 
     // disable anti-CFW code
     else if (strcasecmp(mod->modname, "DJMAX") == 0) {
-        SEConfigARK* se_config = (SEConfigARK*)sctrlSEGetConfigInternal();
-
         // Patch CFW dirs
         hide_cfw_folder(mod);
-
 		//Read speed fixes under cmd 0x01F30003
     }
 
 	else if (strcmp(mod->modname, "Megpoid") == 0) {
-		SEConfigARK* se_config = (SEConfigARK*)sctrlSEGetConfigInternal();
-
         if (se_config->umdseek == 0 && se_config->umdspeed == 0){
             void (*SetUmdDelay)(int, int) = (void*)sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0xB6522E93);
             if (SetUmdDelay) {
@@ -98,14 +76,31 @@ void applyFixesByModule(SceModule* mod){
         }
 	}
 
+    // fix Pangya
+    else if (strcmp(mod->modname, "projectg_psp") == 0){
+        // TODO: port from Adrenaline
+    }
+
+    // Patch Smakdown vs RAW 2010 & 2011 anti-CFW check (CPU speed)
+    else if (strcmp(mod->modname, "mainPSP") == 0 &&
+            (strcasecmp("ULES01472", gameid) == 0 ||
+            strcasecmp("ULUS10543", gameid) == 0 ||
+            strcasecmp("ULES01339", gameid) == 0 ||
+            strcasecmp("ULUS10452", gameid) == 0 ))
+    {
+        sctrlHookImportByNID(mod, "scePower", 0x34F9C463, (void*)222); // scePowerGetPllClockFrequencyInt
+        sctrlHookImportByNID(mod, "scePower", 0x843FBF43, (void*)0);   // scePowerSetCpuClockFrequency
+        sctrlHookImportByNID(mod, "scePower", 0xFDB5BFE9, (void*)222); // scePowerGetCpuClockFrequencyInt
+        sctrlHookImportByNID(mod, "scePower", 0xBD681969, (void*)111); // scePowerGetBusClockFrequencyInt
+    }
+
     sctrlFlushCache();
 }
 
 void applyFixesByGameId(){
+    
     // Obtain game ID for other patches
-    RebootexConfigARK* reboot_config = (RebootexConfigARK*)sctrlHENGetRebootexConfig(NULL);
-    char gameid[10]; memset(gameid, 0, sizeof(gameid));
-    strncpy(gameid, reboot_config->game_id, 9);
+    char* gameid = reboot_config->game_id;
 
     // Fix TwinBee Portable when not using English or Japanese language
     if (strcasecmp("ULJM05221", gameid) == 0){
@@ -113,26 +108,30 @@ void applyFixesByGameId(){
         sctrlHENPatchSyscall(utilityGetParam, getParamFixed_ULJM05221);
     }
 
-    // Patch Smakdown vs RAW 2010 & 2011 anti-CFW check (CPU speed)
-    else if (
-            strcasecmp("ULES01472", gameid) == 0 ||
-            strcasecmp("ULUS10543", gameid) == 0 ||
-            strcasecmp("ULES01339", gameid) == 0 ||
-            strcasecmp("ULUS10452", gameid) == 0 ){
-        game_previous = sctrlHENSetStartModuleHandler(wweModuleOnStart);
-    }
-
     // Patch games that have issues with high read speeds
-    else if (strcasecmp("ULES00590", gameid) == 0   // Aces of War EU
-            || strcasecmp("ULJM05075", gameid) == 0 // Aces of War JP
-            || strcasecmp("ULES00233", gameid) == 0 // Bust-a-Move Ghost EU
+    else if (strcasecmp("ULES00590", gameid) == 0   // Aces of War (EU)
+            || strcasecmp("ULJM05075", gameid) == 0 // Aces of War (JP)
+            || strcasecmp("ULES00233", gameid) == 0 // Bust-a-Move Ghost (EU)
+            || strcasecmp("ULUS10438", gameid) == 0 // Pangya (US)
     ){
-        SEConfigARK* se_config = (SEConfigARK*)sctrlSEGetConfigInternal();
         if (se_config->umdseek == 0 && se_config->umdspeed == 0){
             void (*SetUmdDelay)(int, int) = (void*)sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0xB6522E93);
             if (SetUmdDelay) SetUmdDelay(1, 1);
             se_config->umdseek = 1;
             se_config->umdspeed = 1;
         }
+    }
+
+    // patch games that have issues with inferno cache
+    else if (strcasecmp("ULUS10201", gameid) == 0   // Luxor - The Wrath of Set (US)
+            || strcasecmp("ULUS10328", gameid) == 0 // Flat-Out Head On (US)
+            || strcasecmp("ULES00968", gameid) == 0 // Flat-Out Head On (EU)
+    ){
+        // enable cache
+        int (*CacheInit)(u32, u32, u32) = (void*)sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0x8CDE7F95);
+        if (CacheInit){
+            CacheInit(0, 0, 0);
+        }
+        se_config->iso_cache_type = 0;
     }
 }
