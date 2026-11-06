@@ -4,6 +4,9 @@ Next Generation Custom Firmware for PSP and Vita's ePSP.
 ## Download and Installation
 - Go here: https://github.com/PSP-Arkfive/FasterARK/
 
+## Usage
+Check out the Wiki: https://github.com/PSP-Arkfive/ARK-5/wiki
+
 ## Building
 - Requires the very `latest pspsdk` development build found here: https://github.com/pspdev/pspdev/releases/tag/latest
 - Requires the latest `psp-cfw-sdk` package: https://github.com/pspdev/psp-cfw-sdk/
