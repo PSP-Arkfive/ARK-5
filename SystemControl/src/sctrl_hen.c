@@ -386,24 +386,24 @@ void sctrlHENSetLoadRebootOverrideHandler(int (* func)(void * arg1, unsigned int
     LoadRebootOverrideHandler = func;
 }
 
-extern int (*ExtendDecryption)();
-void* sctrlHENRegisterKDecryptHandler(int (* func)())
+extern KDEC_HANDLER ExtendDecryption;
+KDEC_HANDLER sctrlHENRegisterKDecryptHandler(KDEC_HANDLER func)
 {
-    int (* r)() = ExtendDecryption;
+    KDEC_HANDLER r = ExtendDecryption;
     ExtendDecryption = func;
     return r;
 }
 
-extern int (*MesgLedDecryptEX)();
-void* sctrlHENRegisterMDecryptHandler(int (* func)())
+extern MDEC_HANDLER MesgLedDecryptEX;
+MDEC_HANDLER sctrlHENRegisterMDecryptHandler(MDEC_HANDLER func)
 {
-    int (* r)() = (void *)MesgLedDecryptEX;
-    MesgLedDecryptEX = (void *)func;
-    return (void *)r;
+    MDEC_HANDLER r = MesgLedDecryptEX;
+    MesgLedDecryptEX = func;
+    return r;
 }
 
-extern void (*lle_handler)(void*);
-void sctrlHENRegisterLLEHandler(void* handler)
+extern LLE_HANDLER lle_handler;
+void sctrlHENRegisterLLEHandler(LLE_HANDLER handler)
 {
     lle_handler = handler;
 }
