@@ -27,16 +27,13 @@
 #include "elf.h"
 
 // custom user crypto functions
-int (*ExtendDecryption)() = NULL;
-int (*MesgLedDecryptEX)() = NULL;
+KDEC_HANDLER ExtendDecryption = NULL;
+MDEC_HANDLER MesgLedDecryptEX = NULL;
 
 // Memlmd Decrypt Function
 int (*memlmd_unsigner)(u8 *prx, u32 size, u32 use_polling) = NULL;
-int (* memlmdDecrypt)(unsigned char * prx, unsigned int size, unsigned int * newsize, unsigned int use_polling) = NULL;
-int (* mesgledDecrypt)(unsigned int * tag, unsigned char * key,
-    unsigned int code, unsigned char * prx, unsigned int size,
-    unsigned int * newsize, unsigned int use_polling, unsigned char * blacklist,
-    unsigned int blacklistsize, unsigned int type, unsigned char * xor_key1, unsigned char * xor_key2) = NULL;
+KDEC_HANDLER memlmdDecrypt = NULL;
+MDEC_HANDLER mesgledDecrypt = NULL;
 static int (*sceMemlmdInitializeScrambleKey)(u32 unk, void *hash_addr) = NULL;
 
 // sub_334
@@ -100,7 +97,7 @@ int isTagCompressed(unsigned int tag)
             return 1;
         }
     }
-    
+
     // Encrypted PRX
     return 0;
 }
@@ -122,7 +119,7 @@ int isPrxCompressed(unsigned char * prx, unsigned int size)
 }
 
 // Memlmd Decrypt Function Hook
-int _memlmdDecrypt(unsigned char * prx, unsigned int size, unsigned int * newsize, unsigned int use_polling)
+int _memlmdDecrypt(u8 *prx, u32 size, u32 *newsize, u8 use_polling)
 {
     if(ExtendDecryption)
     {
@@ -136,21 +133,21 @@ int _memlmdDecrypt(unsigned char * prx, unsigned int size, unsigned int * newsiz
     {
         // Read GZIP Payload Size
         unsigned int compsize = *(unsigned int*)(prx + 0xB0);
-        
+
         // GZIP Compressed PRX
         if(isPrxCompressed(prx, size))
         {
             // Remove PRX Header
             memcpy(prx, prx + 0x150, compsize);
-            
+
             // Write GZIP Payload Size
             *newsize = compsize;
-            
+
             // Return Decrypt Success
             return 0;
         }
     }
-    
+
     // Passthrough
     int ret = memlmdDecrypt(prx, size, newsize, use_polling);
 
@@ -167,40 +164,41 @@ int _memlmdDecrypt(unsigned char * prx, unsigned int size, unsigned int * newsiz
     }
 
     return (*memlmdDecrypt)(prx, size, newsize, use_polling);
-    
+
 }
 
 // Mesgled Decrypt Function Hook
-int _mesgledDecrypt(unsigned int * tag, unsigned char * key, unsigned int code, unsigned char * prx, unsigned int size, unsigned int * newsize, unsigned int use_polling, unsigned char * blacklist, unsigned int blacklistsize, unsigned int type, unsigned char * xor_key1, unsigned char * xor_key2)
+int _mesgledDecrypt(u32 *tag, u8 *key, u32 code, u8 *prx, u32 size, u32 *newsize, u8 use_polling, u8 *blacklist, u32 blacklistsize, u32 type, u8 *xor_key1, u8 *xor_key2)
 {
     // Valid Parameters
     if(prx != NULL && newsize != NULL)
     {
-    
+
         if( MesgLedDecryptEX )
         {
-            int ret = MesgLedDecryptEX(prx, size, newsize, use_polling);
+            int ret = MesgLedDecryptEX(tag, key, code, prx, size, newsize, use_polling, blacklist, blacklistsize, type,
+                xor_key1, xor_key2);
             if( ret >= 0 )
                 return ret;
         }
-    
+
         // Read GZIP Payload Size from PRX Header
         unsigned int compsize = *(unsigned int *)(prx + 0xB0);
-        
+
         // GZIP Compressed PRX
         if(isPrxCompressed(prx, size))
         {
             // Remove PRX Header
             memcpy(prx, prx + 0x150, compsize);
-            
+
             // Write GZIP Payload Size
             *newsize = compsize;
-            
+
             // Return Decrypt Success
             return 0;
         }
     }
-    
+
     // Passthrough
     return mesgledDecrypt(tag, key, code, prx, size, newsize, use_polling, blacklist, blacklistsize, type, xor_key1, xor_key2);
 }
@@ -210,12 +208,12 @@ SceModule* patchMemlmd(void)
 {
     // Find Module
     SceModule* mod = (SceModule*)sceKernelFindModuleByName("sceMemlmd");
-    
+
     // Fetch Text Address
     unsigned int text_addr = mod->text_addr;
 
     u32 topaddr = mod->text_addr + mod->text_size;
-    
+
     int patches = 5;
     for (u32 addr = text_addr; addr<topaddr && patches; addr+=4){
         u32 data = _lw(addr);
@@ -234,7 +232,7 @@ SceModule* patchMemlmd(void)
         else if (data == 0x3222003F){
             u32 a = addr;
             do {a-=4;} while (_lw(a)!=0x27BDFFF0);
-            memlmd_unsigner = (void*)a; // inner function which unsigns a PRX module 
+            memlmd_unsigner = (void*)a; // inner function which unsigns a PRX module
         }
         else if (data == 0x27BDFF80){
             memlmdDecrypt = (void*)(addr-8); // Backup Decrypt Function Pointer
@@ -245,7 +243,7 @@ SceModule* patchMemlmd(void)
     }
     // Flush Cache
     sctrlFlushCache();
-    
+
     return mod;
 }
 

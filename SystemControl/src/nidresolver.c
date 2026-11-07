@@ -36,7 +36,7 @@ NidResolverLib * nidTable = NULL;
 unsigned int nidTableSize = 0;
 
 // LLE Handler
-void (*lle_handler)(void*) = NULL;
+LLE_HANDLER lle_handler = NULL;
 
 // Get NID Resolver Library
 NidResolverLib * getNidResolverLib(const char * libName)
@@ -197,11 +197,12 @@ int fillLibraryStubs(void * lib, unsigned int nid, void * stub, unsigned int nid
     int result = 0;
 
     u32 stubtable = _lw((unsigned int)stub + 24);
+	SceLibraryStubTable *lib_stub_table = (void *)((u32 *)stub)[0x24 / 4];
 
     // NidResolverEx
     if (lle_handler)
     {
-        lle_handler((void*)stubtable);
+        lle_handler((void*)lib_stub_table);
     }
 
     // Calculate Stub Destination Address

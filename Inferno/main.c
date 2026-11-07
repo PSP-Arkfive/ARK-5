@@ -33,8 +33,6 @@
 
 PSP_MODULE_INFO("PRO_Inferno_Driver", 0x1000, 2, 1);
 
-
-extern int sceKernelSetQTGP3(void *unk0);
 extern char *GetUmdFile();
 
 // 00002790
