@@ -402,8 +402,8 @@ void* sctrlHENRegisterMDecryptHandler(int (* func)())
     return (void *)r;
 }
 
-extern void (*lle_handler)(void*);
-void sctrlHENRegisterLLEHandler(void* handler)
+extern LLE_HANDLER lle_handler;
+void sctrlHENRegisterLLEHandler(LLE_HANDLER handler)
 {
     lle_handler = handler;
 }
