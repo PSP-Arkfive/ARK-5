@@ -119,7 +119,7 @@ int isPrxCompressed(unsigned char * prx, unsigned int size)
 }
 
 // Memlmd Decrypt Function Hook
-int _memlmdDecrypt(u8 *prx, u32 size, u32 *newsize, int use_polling)
+int _memlmdDecrypt(u8 *prx, u32 size, u32 *newsize, u8 use_polling)
 {
     if(ExtendDecryption)
     {
@@ -168,7 +168,7 @@ int _memlmdDecrypt(u8 *prx, u32 size, u32 *newsize, int use_polling)
 }
 
 // Mesgled Decrypt Function Hook
-int _mesgledDecrypt(u32 *tag, u8 *key, u32 code, u8 *prx, u32 size, u32 *newsize, u32 use_polling, u8 *blacklist, u32 blacklistsize, u32 type, u8 *xor_key1, u8 *xor_key2)
+int _mesgledDecrypt(u32 *tag, u8 *key, u32 code, u8 *prx, u32 size, u32 *newsize, u8 use_polling, u8 *blacklist, u32 blacklistsize, u32 type, u8 *xor_key1, u8 *xor_key2)
 {
     // Valid Parameters
     if(prx != NULL && newsize != NULL)
