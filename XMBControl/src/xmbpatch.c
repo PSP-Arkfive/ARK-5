@@ -360,6 +360,7 @@ struct {
     {"6.39 LME-3", "639LME/reboot.prx"},
     {"6.61 PRO-D", "661PRO/reboot.prx"},
     {"6.61 LME-3", "661LME/reboot.prx"},
+    {"6.61 DC-ARK", "DCARK/reboot.prx"},
     {"6.61 Epinephrine", "V661EPI/reboot.prx"},
 };
 
