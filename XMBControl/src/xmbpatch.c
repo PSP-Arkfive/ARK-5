@@ -52,10 +52,12 @@ STMOD_HANDLER previous = NULL;
 CFWConfig config;
 
 int psp_model;
-SEConfigARK se_config;
 int codecs_active = 0;
 int battery_type = -1;
 int has_hibernation = 0;
+
+SEConfigARK se_config;
+//SEConfigADR se_config2;
 
 
 char* custom_app_path = "ms0:/PSP/APP/CUSTOM/EBOOT.PBP";
@@ -430,7 +432,6 @@ static unsigned char ps_store_item[] __attribute__((aligned(16))) = {
     0x56, 0x00, 0x00, 0x46, 0x5a, 0x00, 0x00, 0x47, 0x44, 0x00, 0x00, 0x6d, 0x73, 0x67, 0x5f, 0x70, 
     0x73, 0x5f, 0x73, 0x74, 0x6f, 0x72, 0x65,
 };
-
 static unsigned char information_board_item[] __attribute__((aligned(16))) = {
     0x2e, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x1e, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 
     0x08, 0xdf, 0x09, 0x0a, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x46, 
@@ -443,17 +444,22 @@ void ClearCaches()
     sceKernelDcacheWritebackAll();
     kuKernelIcacheInvalidateAll();
 }
-
 void scanTimeMachineInstallations(){
     SceIoStat stat;
     char path[256];
     n_tm_installs = 0;
     for (int i=0; i<NELEMS(tm_paths); i++){
-        snprintf(path, sizeof(path), "ms0:/TM/%s", tm_paths[i].path);
-        if (sceIoGetstat(path, &stat) >= 0){
-            tm_installs[n_tm_installs++] = i+1;
-        }
-    }
+        //if (IS_ADR_SECONFIG(&se_config2) && (i < NELEMS(tm_paths)))
+		//	continue;
+		if ((psp_model == PSP_GO && i == 0) || (psp_model >= PSP_1000 && strncmp(tm_paths[i].name, "6.61 Epinephrine", 16) == 0))
+			continue;
+		else {
+           snprintf(path, sizeof(path), "ms0:/TM/%s", tm_paths[i].path);
+           if (sceIoGetstat(path, &stat) >= 0){
+               tm_installs[n_tm_installs++] = i+1;
+           }
+		}
+    }   
 }
 
 char* getLastGameForPlugin(){
