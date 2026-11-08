@@ -45,6 +45,8 @@ PSP_EXPORT_FUNC(has_update_file)
 PSP_EXPORT_FUNC(iso_has_valid_boot)
 PSP_EXPORT_FUNC(vctrlGetRegistryValue)
 PSP_EXPORT_FUNC(vctrlSetRegistryValue)
+PSP_EXPORT_FUNC(vctrlVSHSetRecovery)
+PSP_EXPORT_FUNC(vctrlVSHSetSpeed)
 PSP_EXPORT_END
 
 PSP_END_EXPORTS

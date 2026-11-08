@@ -73,6 +73,14 @@ int get_device_name(char *device, int size, const char* path)
     return 0;
 }
 
+void vctrlVSHSetRecovery(){
+    ark_config->recovery = 1;
+}
+
+void vctrlVSHSetSpeed(int cpu, int bus ){
+    sctrlHENSetSpeed(cpu, bus);
+}
+
 int module_start(SceSize args, void* argp)
 {   
     psp_model = sceKernelGetModel();
