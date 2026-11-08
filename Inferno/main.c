@@ -24,6 +24,7 @@
 #include <pspumd.h>
 #include <psprtc.h>
 #include <pspinit.h>
+#include <pspsysmem_kernel.h>
 
 #include <cfwmacros.h>
 #include <systemctrl.h>
