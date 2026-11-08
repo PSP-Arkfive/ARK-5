@@ -449,9 +449,9 @@ void scanTimeMachineInstallations(){
     char path[256];
     n_tm_installs = 0;
     for (int i=0; i<NELEMS(tm_paths); i++){
-        //if (IS_ADR_SECONFIG(&se_config2) && (i < NELEMS(tm_paths)))
-		//	continue;
-		if ((psp_model == PSP_GO && i == 0) || (psp_model >= PSP_1000 && strncmp(tm_paths[i].name, "6.61 Epinephrine", 16) == 0))
+        if (IS_VITA(&ark_config) && (i < NELEMS(tm_paths)))
+			continue;
+		if ((IS_PSP(&ark_config) && i == 0) || (IS_PSP(&ark_config) && strncmp(tm_paths[i].name, "6.61 Epinephrine", 16) == 0))
 			continue;
 		else {
            snprintf(path, sizeof(path), "ms0:/TM/%s", tm_paths[i].path);
