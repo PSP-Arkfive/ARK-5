@@ -49,9 +49,11 @@ void patchSystemMemoryManager(void)
     // Force branching
     u32 nids[] = {0x7591C7DB, 0x342061E5, 0x315AD3A0, 0xEBD5C3E6, 0x057E7380,\
                     0x91DE343C, 0x7893F79A, 0x35669D4C, 0x1B4217BC, 0x358CA1BB };
-    int i;
-    for (i=0; i<sizeof(nids)/sizeof(u32); i++)
+
+    for (int i=0; i<sizeof(nids)/sizeof(u32); i++){
         _sh(0x1000, sctrlHENFindFirstBEQ(sctrlHENFindFunction("sceSystemMemoryManager", "SysMemUserForUser", nids[i])) + 2);
+    }
+    
     // Flush Cache
     sctrlFlushCache();
 }

@@ -63,9 +63,15 @@ int prevent_highmem(){
     return (apitype == 0x144 || apitype == 0x155 || apitype > 0x200);
 }
 
+int is_homebrews_runlevel(void)
+{
+	int apitype = sceKernelInitApitype();
+	return (apitype == 0x152 || apitype == 0x141);
+}
+
 int prepatch_partitions()
 {
-    if(prevent_highmem()){
+    if (prevent_highmem() || !is_homebrews_runlevel()){
         return -1;
     }
 

@@ -102,7 +102,7 @@ void findGameId(){
         memcpy((void*)defaultdata.id, rebootex_config.game_id, 9);
     }
 
-    if (SysMemForKernel_EF29061C && (gameinfo=SysMemForKernel_EF29061C())) {
+    if (SysMemForKernel_EF29061C && (gameinfo=SysMemForKernel_EF29061C()) != NULL) {
         memcpy(gameinfo+0x44, rebootex_config.game_id, 9);
     }
 
