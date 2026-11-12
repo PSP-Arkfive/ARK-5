@@ -45,7 +45,7 @@ static void modify_partition(MemPart *part)
     offset = part->offset;
     size = part->size;
 
-    if(meminfo == NULL) {
+    if (meminfo == NULL) {
         return;
     }
 
@@ -71,7 +71,7 @@ int is_homebrews_runlevel(void)
 
 int prepatch_partitions()
 {
-    if (prevent_highmem() || !is_homebrews_runlevel()){
+    if (psp_model == PSP_1000 || !is_homebrews_runlevel()){
         return -1;
     }
 
@@ -82,7 +82,7 @@ int prepatch_partitions()
 
     g_p8_size = p8.size = 1;
     
-    if(p11.meminfo != NULL) {
+    if (p11.meminfo != NULL) {
         p8.offset = 56-4-p8.size;
     } else {
         p8.offset = 56-p8.size;
@@ -100,7 +100,7 @@ int prepatch_partitions()
 int patch_partitions(u32 p2_size) 
 {
 
-    if(prevent_highmem()){
+    if (prevent_highmem()){
         return -1;
     }
 
@@ -113,7 +113,7 @@ int patch_partitions(u32 p2_size)
     p2.size = p2_size;
     p9.size = 0;
 
-    if(sctrlGetMemoryPartition(11) != NULL) {
+    if (sctrlGetMemoryPartition(11) != NULL) {
         max_user_part_size = 56 - 4 - g_p8_size;
     } else {
         max_user_part_size = 56 - g_p8_size;
@@ -125,7 +125,7 @@ int patch_partitions(u32 p2_size)
 
         reserved_len = p2.size + p9.size - max_user_part_size;
 
-        if(p9.size > reserved_len) {
+        if (p9.size > reserved_len) {
             p9.size -= reserved_len;
         } else {
             p2.size -= reserved_len - p9.size; 
