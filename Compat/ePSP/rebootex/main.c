@@ -12,6 +12,7 @@ int pspemuLfatOpenArkEPSP(BootFile* file)
     char* p = file->name;
     if (strcmp(p, "pspbtcnf.bin") == 0){
         p[2] = 'v'; // custom btcnf for PS Vita
+        RebootexConfigARK* reboot_conf = (RebootexConfigARK*)REBOOTEX_CONFIG;
         if (reboot_conf->iso_mode >= MODE_OE_LEGACY && reboot_conf->iso_mode <= MODE_ME){
             reboot_conf->iso_mode = MODE_INFERNO;
             p[5] = 'i'; // use inferno ISO mode (psvbtinf.bin)
