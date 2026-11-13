@@ -175,10 +175,10 @@ char* clock_settings[] = {
     "133",
     "222",
     "333",
-    "383",
-    "403",
-    "423",
-    "443"
+    "383(OC)",
+    "403(OC)",
+    "423(OC)",
+    "443(OC)"
 };
 
 char* overclockvalues_settings[] = {
@@ -284,7 +284,7 @@ XmbControlItem xmbitems[] =
     { WPA2_SUPPORT        +PLUGINS_CONTEXT+2, 0, "WPA2 Support" },
     { AUTOBOOT_LAUNCHER   +PLUGINS_CONTEXT+2, 0, "Autoboot Launcher" },
     { USE_EXTRA_MEM       +PLUGINS_CONTEXT+2, 0, "Use Extra Memory" },
-    { MEM_STICK_SPEEDUP   +PLUGINS_CONTEXT+2, 0, "Memory Stick Speedup" },
+    { MEM_STICK_SPEEDUP   +PLUGINS_CONTEXT+2, 0, "Memory Stick Cache" },
     { INFERNO_CACHE       +PLUGINS_CONTEXT+2, 0, "Inferno Cache" },
     { DISABLE_GO_PAUSE    +PLUGINS_CONTEXT+2, 0, "Disable PSP Go Pause" },
     { OLD_GO_PLUGINS      +PLUGINS_CONTEXT+2, 0, "Old Plugins on ef0" },
