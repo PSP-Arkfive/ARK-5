@@ -33,6 +33,19 @@
 #include "main.h"
 
 
+static struct {
+    char* gameid;
+    u8 mscache;
+    u8 isocache;
+} cache_blacklist[] = {
+    {"ULES01154", 1, 1},
+    {"ULUS10374", 1, 1},
+    {"ULJM05290", 1, 1},
+    {"ULUS10201", 0, 1},
+    {"ULUS10328", 0, 1},
+    {"ULES00968", 0, 1}
+};
+
 static int (*utilityGetParam)(int, int*) = NULL;
 static int getParamFixed_ULJM05221(int param, int* value){
     int res = utilityGetParam(param, value);
@@ -137,17 +150,25 @@ void applyFixesByGameId(){
             se_config->umdspeed = 1;
         }
     }
-
-    // patch games that have issues with inferno cache
-    else if (strcasecmp("ULUS10201", gameid) == 0   // Luxor - The Wrath of Set (US)
-            || strcasecmp("ULUS10328", gameid) == 0 // Flat-Out Head On (US)
-            || strcasecmp("ULES00968", gameid) == 0 // Flat-Out Head On (EU)
-    ){
-        // enable cache
-        int (*CacheInit)(u32, u32, u32) = (void*)sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0x8CDE7F95);
-        if (CacheInit){
-            CacheInit(0, 0, 0);
+    // patch games that have issues with cache
+    else {
+        for (int i = 0; i < NELEMS(cache_blacklist); i++){
+            if (strcasecmp(cache_blacklist[i].gameid, gameid) == 0){
+                if (cache_blacklist[i].mscache){
+                    // disable mscache
+                    se_config->msspeed = 0;
+                    sctrlMsCacheInit(NULL, 0);
+                }
+                if (cache_blacklist[i].isocache){
+                    // disable inferno cache
+                    int (*CacheInit)(u32, u32, u32) = (void*)sctrlHENFindFunction("PRO_Inferno_Driver", "inferno_driver", 0x8CDE7F95);
+                    if (CacheInit){
+                        CacheInit(0, 0, 0);
+                    }
+                    se_config->iso_cache_type = 0;
+                }
+                break;
+            }
         }
-        se_config->iso_cache_type = 0;
     }
 }
