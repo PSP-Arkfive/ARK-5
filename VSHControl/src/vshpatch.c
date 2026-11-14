@@ -412,7 +412,7 @@ int umdLoadExecUpdater(char * file, struct SceKernelLoadExecVSHParam * param)
 {
     //result
     int ret = 0;
-    sctrlSESetBootConfFileIndex(MODE_UPDATERUMD);
+    sctrlSESetBootConfFileIndex(BOOT_MODE_UPDATERUMD);
     sctrlSESetDiscType(PSP_UMD_TYPE_GAME);
     ret = sceKernelLoadExecVSHDiscUpdater(file, param);
     return ret;

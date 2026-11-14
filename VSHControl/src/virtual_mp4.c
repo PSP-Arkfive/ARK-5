@@ -43,7 +43,7 @@ static void launch_umdvideo_mount(const char *path) {
         return;
 
     sctrlSESetUmdFile(path);
-    sctrlSESetBootConfFileIndex(MODE_VSHUMD);
+    sctrlSESetBootConfFileIndex(BOOT_MODE_VSHUMD);
     sctrlSESetDiscType(type);
     sctrlKernelExitVSH(NULL);
 }
