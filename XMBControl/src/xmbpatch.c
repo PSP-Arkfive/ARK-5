@@ -352,18 +352,20 @@ struct {
 struct {
     char* name;
     char* path;
+    int max_model;
 } tm_paths[] = {
-    {"1.50 ARK", "DCARK/150/reboot150.prx"},
-    {"5.00 M33-7", "500M33/reboot.prx"},
-    {"5.50 M33-7", "550M33/reboot.prx"},
-    {"6.20 PRO-D", "620PRO/reboot.prx"},
-    {"6.20 LME-3", "620LME/reboot.prx"},
-    {"6.39 PRO-D", "639PRO/reboot.prx"},
-    {"6.39 LME-3", "639LME/reboot.prx"},
-    {"6.61 PRO-D", "661PRO/reboot.prx"},
-    {"6.61 LME-3", "661LME/reboot.prx"},
-    {"6.61 DC-ARK", "DCARK/reboot.prx"},
-    {"6.61 Epinephrine", "V661EPI/reboot.prx"},
+    {"1.50 ARK", "DCARK/150/reboot150.prx", PSP_1000},
+    {"5.00 M33-7", "500M33/reboot.prx", PSP_3000},
+    {"5.50 M33-7", "550M33/reboot.prx", PSP_3000},
+    {"6.20 PRO-D", "620PRO/reboot.prx", PSP_GO},
+    {"6.20 LME-3", "620LME/reboot.prx", PSP_GO},
+    {"6.39 PRO-D", "639PRO/reboot.prx", PSP_9000},
+    {"6.39 LME-3", "639LME/reboot.prx", PSP_9000},
+    {"6.61 PRO-D", "661PRO/reboot.prx", PSP_STREET},
+    {"6.61 LME-3", "661LME/reboot.prx", PSP_STREET},
+    {"6.61 DC-ARK", "DCARK/reboot.prx", PSP_STREET},
+    {"6.61 TN-V2", "V661TN/reboot.prx", PSP_VITA},
+    {"6.61 Epinephrine", "V661EPI/reboot.prx", PSP_VITA},
 };
 
 u8 tm_installs[NELEMS(tm_paths)] = {0};
@@ -449,9 +451,9 @@ void scanTimeMachineInstallations(){
     char path[256];
     n_tm_installs = 0;
     for (int i=0; i<NELEMS(tm_paths); i++){
-        if (IS_VITA(&ark_config) && (i < NELEMS(tm_paths)))
+        if (IS_VITA(&ark_config) && tm_paths[i].max_model != PSP_VITA)
 			continue;
-		if ((IS_PSP(&ark_config) && i == 0) || (IS_PSP(&ark_config) && strncmp(tm_paths[i].name, "6.61 Epinephrine", 16) == 0))
+		else if (tm_paths[i].max_model < psp_model)
 			continue;
 		else {
            snprintf(path, sizeof(path), "ms0:/TM/%s", tm_paths[i].path);
