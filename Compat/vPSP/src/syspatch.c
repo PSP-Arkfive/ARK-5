@@ -29,6 +29,7 @@
 
 #include <cfwmacros.h>
 #include <rebootexconfig.h>
+#include <bootloadex.h>
 #include <systemctrl.h>
 #include <systemctrl_se.h>
 #include <systemctrl_ark.h>
@@ -73,11 +74,11 @@ int flashLoadPatch(int cmd)
 
         int fd = sceIoOpen(archive, PSP_O_RDONLY, 0777);
         if (fd >= 0){
-            sceIoRead(fd, (void*)VITA_FLASH_ARK, MAX_FLASH0_SIZE);
+            sceIoRead(fd, (void*)VITA_FLASH_EXTRA, MAX_FLASH0_SIZE);
             sceIoClose(fd);
         }
         else {
-            memset((void*)VITA_FLASH_ARK, 0, 32);
+            memset((void*)VITA_FLASH_EXTRA, 0, 32);
         }
 
         sctrlFlushCache();

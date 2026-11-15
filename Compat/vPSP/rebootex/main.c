@@ -23,11 +23,11 @@ int pspemuLfatOpenArkVPSP(BootFile* file){
             case BOOT_MODE_VSHUMD: // inferno ISO mode
                 reboot_conf->iso_mode = MODE_INFERNO;
                 p[5] = 'j'; // use inferno ISO mode (psvbtjnf.bin)
-                ret = findArkFlashFile(file, p);
+                ret = vitaFlashOpenExtra(file, p);
                 break;
             default: // np9660 mode
                 p[5] = 'k'; // use np9660 ISO mode (psvbtknf.bin)
-                ret = findArkFlashFile(file, p);
+                ret = vitaFlashOpenExtra(file, p);
                 break;
         }
         if (ret == 0){
@@ -35,7 +35,7 @@ int pspemuLfatOpenArkVPSP(BootFile* file){
         }
     }
     else if (strncmp(p, "/kd/ark_", 8) == 0){ // ARK module
-        ret = findArkFlashFile(file, p);
+        ret = vitaFlashOpenExtra(file, p);
         if (ret == 0){
             relocateFlashFile(file);
         }
