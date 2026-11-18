@@ -31,13 +31,13 @@ int pspemuLfatOpenArkVPSP(BootFile* file){
                 break;
         }
         if (ret == 0){
-            relocateFlashFile(file);
+            vitaFlashRelocateFile(file);
         }
     }
     else if (strncmp(p, "/kd/ark_", 8) == 0){ // ARK module
         ret = vitaFlashOpenExtra(file, p);
         if (ret == 0){
-            relocateFlashFile(file);
+            vitaFlashRelocateFile(file);
         }
     }
 
