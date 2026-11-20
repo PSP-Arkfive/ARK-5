@@ -68,7 +68,7 @@ int nodrmBBMacGetKey(SceMacKey *mkey, u8 *bbmac, u8 *vkey)
 	return 0;
 }
 
-int nodrmGetVersionKey(unsigned char * version_key, char *path) //(u8 *version_key, char *path)
+int nodrmGetVersionKey(unsigned char * version_key, const char *path) //(u8 *version_key, char *path)
 {
 	SceMacKey mkey;
 	u8 header[256];
