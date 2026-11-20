@@ -453,7 +453,7 @@ void scanTimeMachineInstallations(){
     for (int i=0; i<NELEMS(tm_paths); i++){
         if (IS_VITA(&ark_config) && tm_paths[i].max_model != PSP_VITA)
 			continue;
-		else if (tm_paths[i].max_model < psp_model)
+		else if (tm_paths[i].max_model < psp_model || tm_paths[i].max_model == PSP_VITA)
 			continue;
 		else {
            snprintf(path, sizeof(path), "ms0:/TM/%s", tm_paths[i].path);
@@ -461,7 +461,7 @@ void scanTimeMachineInstallations(){
                tm_installs[n_tm_installs++] = i+1;
            }
 		}
-    }   
+    }
 }
 
 char* getLastGameForPlugin(){
@@ -1215,7 +1215,8 @@ void OnInitMenuPspConfigPatched()
     }
     else if (is_cfw_config == 3){
         if (((u32*)sysconf_option)[2] == 0){
-            for (int i=0; i<NELEMS(tm_installs); i++){
+            scanTimeMachineInstallations();
+            for (int i=0; i<n_tm_installs; i++){
                 int tm_id = tm_installs[i];
                 if (tm_id != 0){
                     AddSysconfContextItem(tm_paths[tm_id-1].name, tm_paths[tm_id-1].path, tm_paths[tm_id-1].name);
