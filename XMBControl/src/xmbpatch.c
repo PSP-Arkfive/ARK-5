@@ -453,7 +453,7 @@ void scanTimeMachineInstallations(){
     for (int i=0; i<NELEMS(tm_paths); i++){
         if (IS_VITA(&ark_config) && tm_paths[i].max_model != PSP_VITA)
 			continue;
-		else if (tm_paths[i].max_model < psp_model || tm_paths[i].max_model == PSP_VITA)
+		else if (IS_PSP(&ark_config) && (tm_paths[i].max_model < psp_model || tm_paths[i].max_model == PSP_VITA))
 			continue;
 		else {
            snprintf(path, sizeof(path), "ms0:/TM/%s", tm_paths[i].path);
@@ -1263,6 +1263,16 @@ SceSysconfItem *GetSysconfItemPatched(void *a0, void *a1)
     return item;
 }
 
+static int isTimeMachineText(const char *name)
+{
+    for (int i = 0; i < NELEMS(tm_paths); i++) {
+        if (strcmp(name, tm_paths[i].name) == 0 ||
+            strcmp(name, tm_paths[i].path) == 0)
+            return 1;
+    }
+    return 0;
+}
+
 wchar_t *scePafGetTextPatched(void *a0, char *name)
 {
     if(name)
@@ -1349,7 +1359,7 @@ wchar_t *scePafGetTextPatched(void *a0, char *name)
                 }
             }
         }
-        else if (is_cfw_config == 3){
+        else if (is_cfw_config == 3 && isTimeMachineText(name)){
             utf8_to_unicode((wchar_t *)user_buffer, name);
         	return (wchar_t *)user_buffer;
         }
