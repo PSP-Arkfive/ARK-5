@@ -341,6 +341,62 @@ static int myIoGetstat(const char *path, SceIoStat *stat)
     return ret;
 }
 
+// Number of 0x9300-byte blocks (16 sectors each) stored for a disc, counted from its
+// block index at PSISOIMG+0x4000. Some converters (popstation, PSX2PSP) write a fixed
+// placeholder TOC lead-out (27:19:22) and a zero disc size, so POPS believes the disc
+// is shorter than it is and reads past that point fail (e.g. FMV/XA streams).
+#define PSISO_INDEX_OFFSET 0x4000
+#define PSISO_DATA_OFFSET  0x100000
+#define PSISO_BLOCK_SIZE   0x9300
+#define PSISO_BLOCK_SECTORS 16
+static u32 psiso_blocks[5] = {0, 0, 0, 0, 0};
+
+static u32 getDiscBlocks(int fd, int disc, u32 psiso_offset, u32 restore_pos)
+{
+    u32 entries[0x200/4];
+    u32 count = 0;
+    u32 max = (PSISO_DATA_OFFSET - PSISO_INDEX_OFFSET) / 32;
+
+    if (psiso_blocks[disc]) return psiso_blocks[disc];
+
+    sceIoLseek32(fd, psiso_offset + PSISO_INDEX_OFFSET, PSP_SEEK_SET);
+    while (count < max)
+    {
+        if (sceIoRead(fd, entries, sizeof(entries)) != sizeof(entries)) break;
+        int i;
+        for (i = 0; i < NELEMS(entries); i += 8) // 32-byte entries: offset, length, 6 reserved
+        {
+            if (entries[i+1] == 0) goto done; // first unused entry ends the index
+            count++;
+        }
+    }
+done:
+    sceIoLseek32(fd, restore_pos, PSP_SEEK_SET);
+    psiso_blocks[disc] = count;
+    return count;
+}
+
+static inline u8 toBCD(u32 v)
+{
+    return (u8)(((v / 10) % 10) << 4 | (v % 10));
+}
+
+// Replace the placeholder TOC lead-out (A2 point) with the real end of the disc.
+// buf points at PSISOIMG+0x400, so the A2 entry's MSF lives at buf+0x41B..0x41D.
+static int fixPlaceholderLeadout(unsigned char *buf, u32 blocks)
+{
+    if (blocks == 0) return 0;
+    if (!(buf[0x41B] == 0x27 && buf[0x41C] == 0x19 && buf[0x41D] == 0x22 &&
+            buf[0x41E] == 0x41 && buf[0x41A] == buf[0x41F]))
+        return 0;
+
+    u32 frames = blocks * PSISO_BLOCK_SECTORS + 150; // plus the 2 second pregap
+    buf[0x41B] = toBCD(frames / (60 * 75));
+    buf[0x41C] = toBCD((frames / 75) % 60);
+    buf[0x41D] = toBCD(frames % 75);
+    return 1;
+}
+
 static int myIoRead(int fd, unsigned char *buf, int size)
 {
     int ret;
@@ -380,6 +436,15 @@ static int myIoRead(int fd, unsigned char *buf, int size)
         int offset = psiso_offsets[i];
         if (offset == 0) break;
 
+        // PSISOIMG header read: fill in a missing disc size (isosize + 0x100000 at +0x0C)
+        if (g_isCustomPBP && offset == pos && ret >= 0x10 &&
+                strncmp((char*)buf, "PSISOIMG", 8) == 0 && *(u32*)(buf+0x0C) == 0)
+        {
+            u32 blocks = getDiscBlocks(fd, i, offset, pos+ret);
+            if (blocks) *(u32*)(buf+0x0C) = blocks * PSISO_BLOCK_SIZE + PSISO_DATA_OFFSET;
+            break;
+        }
+
         // emulator reads a huge chunk of data starting at PSISOIMG+0x400
         // more information about PSISOIMG: https://www.psdevwiki.com/psp/PSISOIMG0000
         if (offset+0x400 == pos){ // read is within expected bounds
@@ -401,7 +466,13 @@ static int myIoRead(int fd, unsigned char *buf, int size)
                     mw ^= 0x72D0EE59; // needs to be xored with this constant
                     memcpy(buf+0xeb0, &mw, sizeof(mw));
                 }
-            
+
+                // replace a placeholder TOC lead-out with the disc's real length
+                if (g_isCustomPBP && ret >= 0x420)
+                {
+                    fixPlaceholderLeadout(buf, getDiscBlocks(fd, i, offset, pos+ret));
+                }
+
             }
             break;
         }
